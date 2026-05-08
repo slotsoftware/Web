@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="theme-color" content="#ffffff">
+    <title>SlotSoftware | Tecnología para Slot</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-white': 'var(--bg-brand)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 1s ease-out forwards',
+                        'fade-in-up': 'fadeInUp 1s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --bg-brand: #FFFFFF;
+        }
+
+        .animate-on-load { opacity: 0; }
+        
+        html { -webkit-text-size-adjust: 100%; }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .animate-on-load {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+        
+        .animate-fade-in, .animate-fade-in-up { will-change: opacity, transform; }
+        .text-balance { text-wrap: balance; }
+
+        html[lang="es"] .lang-en { display: none !important; }
+        html[lang="en"] .lang-es { display: none !important; }
+    </style>
+</head>
+<body class="bg-brand-white text-gray-900 font-sans antialiased flex flex-col min-h-[100dvh] selection:bg-gray-900 selection:text-white transition-colors duration-300">
+
+    <nav class="container mx-auto px-6 py-6 md:py-8 flex justify-between items-center animate-on-load animate-fade-in">
+        <a href="#" class="flex items-center transition-transform hover:scale-105">
+            <img src="logo1.png" alt="SlotSoftware Logo" class="h-32 md:h-40 w-auto" onerror="this.src='https://placehold.co/200x80?text=SlotSoftware+Logo'">
+        </a>
+        <div class="hidden md:flex gap-8 text-sm font-medium text-gray-500">
+            <a href="#productos" class="hover:text-black transition-colors">
+                <span class="lang-es">Productos</span><span class="lang-en">Products</span>
+            </a>
+            <a href="#servicios" class="hover:text-black transition-colors">
+                <span class="lang-es">Servicios</span><span class="lang-en">Services</span>
+            </a>
+            <a href="#filosofia" class="hover:text-black transition-colors">
+                <span class="lang-es">Filosofía</span><span class="lang-en">Philosophy</span>
+            </a>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleLanguage()" class="text-xs font-bold tracking-widest hover:text-black text-gray-400 transition-colors">
+                <span class="lang-es">EN</span><span class="lang-en">ES</span>
+            </button>
+            <a href="#contacto" class="text-sm font-medium border border-gray-200 px-5 py-2.5 rounded-full hover:border-black hover:bg-black hover:text-white transition-all">
+                <span class="lang-es">Contacto</span><span class="lang-en">Contact</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex flex-col justify-center items-center text-center relative overflow-hidden w-full">
+        <div class="container mx-auto px-6 py-12 sm:py-20 md:py-32 landscape:py-10 max-w-5xl flex flex-col items-center justify-center">
+            
+            <div class="animate-on-load animate-fade-in-up mb-8" style="animation-delay: 0.1s;">
+                <img id="main-logo" src="logo1.png" alt="SlotSoftware Main Logo" class="w-[1200px] max-w-[90vw] h-auto block hover:scale-105 transition-transform duration-700" onerror="this.src='https://placehold.co/600x200?text=SlotSoftware+Main+Logo'">
+            </div>
+
+            <div class="animate-on-load animate-fade-in-up flex flex-col items-center" style="animation-delay: 0.2s;">
+                <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.1] mb-6 sm:mb-8 text-balance">
+                    <span class="lang-es">Software de Slot.<br /><span class="text-gray-400">Simulación Pura.</span></span>
+                    <span class="lang-en">Slot Software.<br /><span class="text-gray-400">Pure Simulation.</span></span>
+                </h1>
+                <p class="text-lg sm:text-xl md:text-2xl text-gray-500 mb-8 sm:mb-12 max-w-2xl font-light leading-relaxed text-balance">
+                    <span class="lang-es">En SlotSoftware revolucionamos el slot. Construimos herramientas digitales potentes para cronometraje por cámara, diseño 3D y telemetría avanzada. Ni más, ni menos.</span>
+                    <span class="lang-en">At SlotSoftware we revolutionize slot racing. We build powerful digital tools for camera timing, 3D design, and advanced telemetry. Nothing more, nothing less.</span>
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
+                    <a href="#contacto" class="px-6 py-4 sm:px-8 bg-black text-white rounded-full font-medium text-center hover:bg-gray-800 active:scale-95 sm:hover:scale-105 transition-all duration-300">
+                        <span class="lang-es">Empezar un proyecto</span><span class="lang-en">Start a project</span>
+                    </a>
+                    <a href="#productos" class="px-6 py-4 sm:px-8 bg-gray-50 text-black rounded-full font-medium text-center hover:bg-gray-100 active:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2 border border-gray-200">
+                        <span class="lang-es">Ver productos</span><span class="lang-en">View products</span>
+                        <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section id="productos" class="py-16 sm:py-24 bg-brand-white">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="mb-12 sm:mb-16">
+                <h2 class="text-xs sm:text-sm font-bold tracking-widest text-gray-400 uppercase mb-2 sm:mb-3">
+                    <span class="lang-es">Catálogo</span><span class="lang-en">Catalog</span>
+                </h2>
+                <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
+                    <span class="lang-es">Nuestros Productos.</span><span class="lang-en">Our Products.</span>
+                </h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
+                <!-- Tarjeta 1 con Padding Hack -->
+                <a href="https://slotcarhome-star.github.io/KronoTV/" target="_blank" rel="noopener noreferrer" class="group flex flex-col gap-5 cursor-pointer block">
+                    <div class="relative w-full overflow-hidden rounded-3xl bg-gray-100" style="padding-bottom: 177.78%; height: 0;">
+                        <img src="app.jpg" alt="Krono Personal" loading="lazy" class="absolute top-0 left-0 w-full h-full object-cover block group-hover:scale-105 transition-transform duration-700 ease-out" onerror="this.src='https://placehold.co/400x700?text=Krono+Personal'">
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1 group-hover:text-gray-600 transition-colors">KRONO PERSONAL V.4.0</h4>
+                        <p class="text-gray-500 text-sm">
+                            <span class="lang-es">Es el gestor de tiempos ideal para entrenamientos personales. Esta aplicación no necesita instalación, es compatible Android, IOS, Windows y Linux.</span><span class="lang-en">It is the ideal time manager for personal training. This application does not require installation and is compatible with Android, iOS, Windows, and Linux.</span>
+                        </p>
+                    </div>
+                </a>
+
+                <!-- Tarjeta 2 con Padding Hack -->
+                <a href="https://slotcarhome-star.github.io/KronoDual-TV/" target="_blank" rel="noopener noreferrer" class="group flex flex-col gap-5 cursor-pointer block">
+                    <div class="relative w-full overflow-hidden rounded-3xl bg-gray-100" style="padding-bottom: 177.78%; height: 0;">
+                        <img src="datos.jpg" alt="Krono Dual" loading="lazy" class="absolute top-0 left-0 w-full h-full object-cover block group-hover:scale-105 transition-transform duration-700 ease-out" onerror="this.src='https://placehold.co/400x700?text=Krono+Dual'">
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1 group-hover:text-gray-600 transition-colors">KRONO DUAL V.4.0</h4>
+                        <p class="text-gray-500 text-sm">
+                            <span class="lang-es">Este es nuestro sistema diseñado para competiciones, los Detectores de cámara son para dos coches, máxima precisión. Esta aplicación no necesita instalación, es compatible Android, IOS, Windows y Linux.</span><span class="lang-en">This is our system designed for competitions, camera detectors are for two cars, maximum precision. This application requires no installation and is compatible with Android, iOS, Windows, and Linux.</span>
+                        </p>
+                    </div>
+                </a>
+
+                <!-- Tarjeta 3 con Padding Hack -->
+                <a href="https://slotcarhome-star.github.io/TracksVi/" target="_blank" rel="noopener noreferrer" class="group flex flex-col gap-5 cursor-pointer block">
+                    <div class="relative w-full overflow-hidden rounded-3xl bg-gray-100" style="padding-bottom: 177.78%; height: 0;">
+                        <img src="core.jpg" alt="Tracks Telemetry" loading="lazy" class="absolute top-0 left-0 w-full h-full object-cover block group-hover:scale-105 transition-transform duration-700 ease-out" onerror="this.src='https://placehold.co/400x700?text=Tracks+Telemetry'">
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1 group-hover:text-gray-600 transition-colors">TRACKS TELEMETRY</h4>
+                        <p class="text-gray-500 text-sm">
+                            <span class="lang-es">Estás a punto de llevar el análisis de tu pista a límites increíbles, desde el Diseño en 2D, analógico, Digital, Rally y Multicarril hasta 8 carriles, transformando tu Diseño en un motor potente en 3D, con controles de Motores, Neumáticos, Piñones, Coronas, Peso, Voltaje. Comunidad en la Web para compartir Circuitos, Visores de Coches Reales, Decoraciones de Circuitos y mucho más.</span><span class="lang-en">You are about to take your track analysis to incredible limits, from 2D Design, analog, Digital, Rally and Multi-lane up to 8 lanes, transforming your Design into a powerful 3D engine, with controls for Motors, Tires, Pinions, Crowns, Weight, Voltage. Web Community to share Circuits, Real Car Viewers, Circuit Decorations and much more.</span>
+                        </p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Botón Probar Demo -->
+            <div class="mt-12 sm:mt-16 flex justify-center">
+                <a href="https://slotcarhome-star.github.io/Demos-de-Apps/" target="_blank" class="group inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-full font-bold uppercase tracking-widest text-sm hover:bg-black hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
+                    <i data-lucide="gamepad-2" class="w-5 h-5 group-hover:rotate-12 transition-transform"></i>
+                    <span class="lang-es">Probar Demo</span><span class="lang-en">Try Demo</span>
+                </a>
+            </div>
+
+            <!-- Nuevas imágenes 16:9 y Vídeo 3D Slot Game -->
+            <div class="mt-16 sm:mt-20 flex flex-col gap-10 md:gap-16 max-w-4xl mx-auto">
+                <!-- EXPLICACIÓN KRONO TV -->
+                <div class="flex flex-col gap-6 md:gap-10">
+                    <a href="https://slotcarhome-star.github.io/KronoTV/" target="_blank" rel="noopener noreferrer" class="block w-full relative rounded-3xl overflow-hidden bg-gray-100 aspect-video shadow-[0_8px_30px_rgb(0,0,0,0.08)] group">
+                        <img src="k1.png" alt="Krono TV" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" onerror="this.src='https://placehold.co/1920x1080?text=Imagen+16:9'">
+                    </a>
+                    
+                    <div class="flex flex-col gap-4 text-center items-center px-4">
+                        <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
+                            <span class="lang-es">KRONO V.4.0: Fotodetector Profesional.</span>
+                            <span class="lang-en">KRONO V.4.0: Professional Photodetector.</span>
+                        </h3>
+                        <p class="text-gray-500 leading-relaxed text-base sm:text-lg">
+                            <span class="lang-es">KRONO V.4.0 es una innovadora aplicación de cronometraje y telemetría que transforma la cámara de tu dispositivo en un fotodetector profesional. Utiliza algoritmos de visión por IA para registrar automáticamente el paso de los vehículos, midiendo tiempos, deltas y velocidades con extrema precisión. Permite configurar modos de carrera por vueltas o tiempo, ofreciendo análisis avanzados de consistencia y asistencia auditiva con voz de ingeniero. Destaca por su espectacular "Modo TV", que sincroniza un panel de telemetría inmersivo y personalizable en una segunda pantalla vía nube. Incluye gestión de pilotos, historiales exportables a Excel, penalizaciones por salida nula y un ranking global integrado. Es la herramienta definitiva para competiciones de slot y radiocontrol, combinando tecnología de vanguardia con un diseño de alta competición.</span>
+                            <span class="lang-en">KRONO V.4.0 is an innovative timing and telemetry application that transforms your device's camera into a professional photodetector. It uses AI vision algorithms to automatically record passing vehicles, measuring times, deltas, and speeds with extreme precision. It allows setting up race modes by laps or time, offering advanced consistency analysis and audio assistance with an engineer's voice. It stands out for its spectacular "TV Mode," which synchronizes an immersive and customizable telemetry panel on a second screen via the cloud. It includes driver management, Excel-exportable history, false start penalties, and an integrated global ranking. It is the definitive tool for slot and radio-control competitions, combining cutting-edge technology with high-competition design.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- EXPLICACIÓN KRONODUAL TV -->
+                <div class="flex flex-col gap-6 md:gap-10">
+                    <a href="https://slotcarhome-star.github.io/KronoDual-TV/" target="_blank" rel="noopener noreferrer" class="block w-full relative rounded-3xl overflow-hidden bg-gray-100 aspect-video shadow-[0_8px_30px_rgb(0,0,0,0.08)] group">
+                        <img src="k2.png" alt="KronoDual TV" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" onerror="this.src='https://placehold.co/1920x1080?text=Imagen+16:9'">
+                    </a>
+                    
+                    <div class="flex flex-col gap-4 text-center items-center px-4">
+                        <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
+                            <span class="lang-es">KronoDual V.4.0: Telemetría Definitiva.</span>
+                            <span class="lang-en">KronoDual V.4.0: Ultimate Telemetry.</span>
+                        </h3>
+                        <p class="text-gray-500 leading-relaxed text-base sm:text-lg">
+                            <span class="lang-es">KronoDual V.4.0 es el sistema de cronometraje y telemetría definitivo para tus carreras de slot y Scalextric. Utilizando la cámara de tu dispositivo y tecnología de visión artificial, detecta el paso de los coches a 30fps sin necesidad de hardware adicional. Disfruta de modos de juego para 1 o 2 jugadores, registrando tiempos por vuelta, velocidad media, consistencia y récords con precisión milimétrica. Conecta cualquier Smart TV o monitor secundario a través de la nube para mostrar un espectacular panel de telemetría en tiempo real. Mantén el control total de la carrera con avisos por voz, alertas de salidas nulas, gestión de banderas amarillas y un sistema anti-rebotes inteligente. Al finalizar cada duelo, un innovador comentarista impulsado por IA analizará tu rendimiento y podrás exportar todos los datos a formato CSV. Transforma tu pista casera en un circuito profesional de alta competición con una configuración rápida, intuitiva y completamente personalizable.</span>
+                            <span class="lang-en">KronoDual V.4.0 is the definitive timing and telemetry system for your slot and Scalextric races. Using your device's camera and computer vision technology, it detects passing cars at 30fps without the need for additional hardware. Enjoy game modes for 1 or 2 players, recording lap times, average speed, consistency, and records with pinpoint accuracy. Connect any Smart TV or secondary monitor via the cloud to display a spectacular real-time telemetry panel. Maintain total control of the race with voice prompts, false start alerts, yellow flag management, and an intelligent anti-bounce system. At the end of each duel, an innovative AI-powered commentator will analyze your performance, and you can export all data to CSV format. Transform your home track into a professional high-competition circuit with a quick, intuitive, and completely customizable setup.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- EXPLICACIÓN DEL 3D SLOT GAME -->
+                <div class="flex flex-col gap-6 md:gap-10">
+                    <!-- Imagen del juego con enlace -->
+                    <a href="https://slotcarhome-star.github.io/Slot-Game/" target="_blank" rel="noopener noreferrer" class="block w-full relative rounded-3xl overflow-hidden bg-gray-100 aspect-video shadow-[0_8px_30px_rgb(0,0,0,0.08)] group">
+                        <img src="3dgame.png" alt="3D Slot Game" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" onerror="this.src='https://placehold.co/1920x1080?text=3D+Slot+Game'">
+                    </a>
+                    
+                    <!-- Contenido y explicación de la app -->
+                    <div class="flex flex-col gap-4 text-center items-center px-4">
+                        <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
+                            <span class="lang-es">3D SLOT GAME: Simulación Total.</span>
+                            <span class="lang-en">3D SLOT GAME: Total Simulation.</span>
+                        </h3>
+                        <p class="text-gray-500 leading-relaxed text-base sm:text-lg">
+                            <span class="lang-es">Conoce a fondo nuestra aplicación estrella. Basada en Three.js y PeerJS, convierte tus pistas en un entorno de conducción hiperrealista. Incluye <strong>físicas avanzadas de derrape</strong>, <strong>multijugador online P2P</strong> con chat de voz para retar a tus amigos, y telemetría completa.</span>
+                            <span class="lang-en">Take a deep dive into our flagship app. Based on Three.js and PeerJS, it converts your tracks into a hyper-realistic driving environment. It includes <strong>advanced drift physics</strong>, <strong>P2P online multiplayer</strong> with voice chat to challenge friends, and full telemetry.</span>
+                        </p>
+                        <div class="pt-4">
+                            <a href="https://slotcarhome-star.github.io/Demos-de-Apps/" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors w-max">
+                                <span class="lang-es">Probar Demo</span><span class="lang-en">Try Demo</span>
+                                <i data-lucide="external-link" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="servicios" class="py-16 sm:py-24 bg-brand-white">
+        <div class="container mx-auto px-6">
+            <div class="mb-12 sm:mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8">
+                <div>
+                    <h2 class="text-xs sm:text-sm font-bold tracking-widest text-gray-400 uppercase mb-2 sm:mb-3">
+                        <span class="lang-es">Qué hacemos</span><span class="lang-en">What we do</span>
+                    </h2>
+                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
+                        <span class="lang-es">Tecnología de Competición.</span><span class="lang-en">Competition Technology.</span>
+                    </h3>
+                </div>
+                <p class="text-gray-500 max-w-md text-balance">
+                    <span class="lang-es">Nos especializamos en crear ecosistemas digitales para slot, fusionando conectividad, gráficos 3D y análisis de datos.</span>
+                    <span class="lang-en">We specialize in creating digital ecosystems for slot racing, merging connectivity, 3D graphics, and data analysis.</span>
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                <div class="group p-8 rounded-3xl hover:bg-gray-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 border border-gray-100">
+                    <div class="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="camera" class="w-5 h-5"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">
+                        <span class="lang-es">Visión Artificial</span><span class="lang-en">Computer Vision</span>
+                    </h4>
+                    <p class="text-gray-500 leading-relaxed text-sm">
+                        <span class="lang-es">Sistemas de cronometraje sin hardware dedicado. Usamos tu cámara web y algoritmos de detección de movimiento para calcular tiempos por vuelta exactos.</span>
+                        <span class="lang-en">Timing systems without dedicated hardware. We use your webcam and motion detection algorithms to calculate exact lap times.</span>
+                    </p>
+                </div>
+
+                <div class="group p-8 rounded-3xl hover:bg-gray-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 border border-gray-100">
+                    <div class="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="monitor-play" class="w-5 h-5"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">
+                        <span class="lang-es">Simulación 3D</span><span class="lang-en">3D Simulation</span>
+                    </h4>
+                    <p class="text-gray-500 leading-relaxed text-sm">
+                        <span class="lang-es">Motores gráficos en navegador (Three.js) para recrear tus pistas. Físicas de gravedad, control de derrape y personalización de vehículos.</span>
+                        <span class="lang-en">Browser-based graphics engines (Three.js) to recreate your tracks. Gravity physics, drift control, and vehicle customization.</span>
+                    </p>
+                </div>
+
+                <div class="group p-8 rounded-3xl hover:bg-gray-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 border border-gray-100">
+                    <div class="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="wifi" class="w-5 h-5"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">
+                        <span class="lang-es">Multijugador P2P</span><span class="lang-en">P2P Multiplayer</span>
+                    </h4>
+                    <p class="text-gray-500 leading-relaxed text-sm">
+                        <span class="lang-es">Conexiones Peer-to-Peer directas. Compite en tiempo real con amigos de todo el mundo, comparte circuitos y comunícate por voz sin latencia.</span>
+                        <span class="lang-en">Direct Peer-to-Peer connections. Compete in real-time with friends worldwide, share circuits, and communicate via voice with zero latency.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="filosofia" class="py-20 sm:py-32 bg-black text-white">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <div>
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 sm:mb-8 text-balance leading-tight">
+                        <span class="lang-es">Pasión por el Slot.<br/><span class="text-gray-500">Tecnología al límite.</span></span>
+                        <span class="lang-en">Passion for Slot.<br/><span class="text-gray-500">Technology to the limit.</span></span>
+                    </h2>
+                </div>
+                <div class="flex flex-col gap-6 text-gray-400 text-base sm:text-lg lg:text-xl font-light leading-relaxed">
+                    <p>
+                        <span class="lang-es">En SlotSoftware no hacemos simples aplicaciones; creamos el ecosistema digital que el automodelismo de ranura merece. Entendemos que la velocidad y la precisión son lo único que importa en la pista.</span>
+                        <span class="lang-en">At SlotSoftware we don't just make apps; we create the digital ecosystem that slot car racing deserves. We understand that speed and precision are all that matter on the track.</span>
+                    </p>
+                    <p>
+                        <span class="lang-es">Optimizamos nuestras herramientas web para que disfrutes de físicas reales a 60FPS y detecciones de vuelta exactas usando solo la cámara de tu móvil o PC. Llevamos el hobby clásico a la era del juego en la nube y el multijugador global.</span>
+                        <span class="lang-en">We optimize our web tools so you can enjoy real physics at 60FPS and exact lap detections using only your phone or PC camera. We bring the classic hobby into the era of cloud gaming and global multiplayer.</span>
+                    </p>
+                    <div class="pt-6">
+                        <button onclick="openContactModal()" class="inline-flex items-center gap-2 px-8 py-4 bg-white text-black rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
+                            <span class="lang-es">Hablemos de tu idea</span><span class="lang-en">Let's talk about your idea</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contacto" class="py-12 border-t border-gray-100 bg-brand-white">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-8">
+                <a href="#" class="flex items-center transition-transform hover:scale-105">
+                    <img src="logo1.png" alt="SlotSoftware Logo" class="h-32 md:h-40 w-auto" onerror="this.src='https://placehold.co/200x80?text=SlotSoftware+Logo'">
+                </a>
+                
+                <div class="flex flex-col md:flex-row gap-6 md:gap-12 text-center md:text-left">
+                    <div>
+                        <h5 class="text-sm font-bold uppercase tracking-wider text-gray-900 mb-2">
+                            <span class="lang-es">Escríbenos</span><span class="lang-en">Email us</span>
+                        </h5>
+                        <a href="mailto:slotcarhome@gmail.com" class="text-gray-500 hover:text-black transition-colors">slotcarhome@gmail.com</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+                <p>&copy; 2026 SlotSoftware. <span class="lang-es">Todos los derechos reservados.</span><span class="lang-en">All rights reserved.</span></p>
+                
+                <!-- Contador de Visitas Reales -->
+                <div class="flex items-center gap-3 px-4 py-1.5 bg-gray-50 rounded-full border border-gray-200" title="Visitas totales reales">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                    </span>
+                    <span id="visitor-count" class="font-mono font-medium text-gray-900 tracking-tight">...</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-widest"><span class="lang-es">Visitas</span><span class="lang-en">Visits</span></span>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="openPrivacyModal()" class="hover:text-gray-900 transition-colors"><span class="lang-es">Privacidad</span><span class="lang-en">Privacy</span></button>
+                    <button onclick="openTermsModal()" class="hover:text-gray-900 transition-colors"><span class="lang-es">Términos</span><span class="lang-en">Terms</span></button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Contact Modal -->
+    <div id="contact-modal" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm overflow-y-auto opacity-0 pointer-events-none transition-all duration-500 ease-out flex items-center justify-center p-4 sm:p-6">
+        <div class="bg-brand-white w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-500 ease-out" id="contact-modal-content">
+            <div class="px-6 py-4 md:py-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl md:text-2xl font-bold tracking-tight">
+                    <span class="lang-es">Cuéntanos tu idea</span><span class="lang-en">Tell us your idea</span>
+                </h3>
+                <button onclick="closeContactModal()" class="w-10 h-10 md:w-12 md:h-12 bg-gray-50 rounded-full flex items-center justify-center hover:bg-gray-200 hover:rotate-90 transition-all duration-300 text-gray-900" aria-label="Cerrar">
+                    <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </button>
+            </div>
+            <div class="p-6 sm:p-8 md:p-10">
+                <form action="https://formsubmit.co/slotcarhome@gmail.com" method="POST" class="flex flex-col gap-6">
+                    <input type="hidden" name="_subject" value="Nuevo contacto desde SlotSoftware Web">
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_template" value="box">
+
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="lang-es">Tu nombre</span><span class="lang-en">Your name</span>
+                        </label>
+                        <input type="text" id="name" name="name" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-gray-50 focus:bg-white text-gray-900">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="lang-es">Correo electrónico</span><span class="lang-en">Email address</span>
+                        </label>
+                        <input type="email" id="email" name="email" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-gray-50 focus:bg-white text-gray-900">
+                    </div>
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="lang-es">¿Qué tienes en mente?</span><span class="lang-en">What's on your mind?</span>
+                        </label>
+                        <textarea id="message" name="message" rows="4" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-gray-50 focus:bg-white resize-none text-gray-900"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-4 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors mt-2">
+                        <span class="lang-es">Enviar mensaje</span><span class="lang-en">Send message</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div id="privacy-modal" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm overflow-y-auto opacity-0 pointer-events-none transition-all duration-500 ease-out flex items-center justify-center p-4 sm:p-6">
+        <div class="bg-brand-white w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-500 ease-out flex flex-col max-h-[90vh]" id="privacy-modal-content">
+            <div class="px-6 py-4 md:py-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-brand-white z-10">
+                <h3 class="text-xl md:text-2xl font-bold tracking-tight">
+                    <span class="lang-es">Política de Privacidad</span><span class="lang-en">Privacy Policy</span>
+                </h3>
+                <button onclick="closePrivacyModal()" class="w-10 h-10 md:w-12 md:h-12 bg-gray-50 rounded-full flex items-center justify-center hover:bg-gray-200 hover:rotate-90 transition-all duration-300 text-gray-900" aria-label="Cerrar">
+                    <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </button>
+            </div>
+            <div class="p-6 sm:p-8 md:p-10 overflow-y-auto text-gray-600 text-sm md:text-base space-y-6">
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">1. Recopilación de Datos</span><span class="lang-en">1. Data Collection</span></h4>
+                    <p>
+                        <span class="lang-es">En SlotSoftware priorizamos tu privacidad. Nuestras aplicaciones (como KronoDual y 3D Player) procesan la mayoría de los datos, incluido el flujo de la cámara web, localmente en tu dispositivo. No grabamos, almacenamos ni transmitimos el vídeo de tu cámara a nuestros servidores.</span>
+                        <span class="lang-en">At SlotSoftware we prioritize your privacy. Our applications (such as KronoDual and 3D Player) process most data, including webcam streams, locally on your device. We do not record, store, or transmit your camera video to our servers.</span>
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">2. Servicios de Terceros</span><span class="lang-en">2. Third-Party Services</span></h4>
+                    <p>
+                        <span class="lang-es">Utilizamos servicios estadísticos anónimos (CounterAPI) únicamente para contabilizar las visitas generales a la web. Los formularios de contacto se envían a través de servicios seguros de correo y los datos proporcionados (nombre, email) solo se usan para responder a tu solicitud.</span>
+                        <span class="lang-en">We use anonymous statistical services (CounterAPI) solely to count general visits to the website. Contact forms are sent through secure email services and the data provided (name, email) is only used to respond to your request.</span>
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">3. Conexiones P2P</span><span class="lang-en">3. P2P Connections</span></h4>
+                    <p>
+                        <span class="lang-es">Las funciones multijugador y de chat de voz utilizan tecnología Peer-to-Peer (PeerJS). Esto significa que la conexión y los datos de juego se establecen directamente entre los usuarios, sin pasar por servidores centrales de almacenamiento.</span>
+                        <span class="lang-en">Multiplayer and voice chat features use Peer-to-Peer technology (PeerJS). This means that the connection and game data are established directly between users, without passing through central storage servers.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div id="terms-modal" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm overflow-y-auto opacity-0 pointer-events-none transition-all duration-500 ease-out flex items-center justify-center p-4 sm:p-6">
+        <div class="bg-brand-white w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-500 ease-out flex flex-col max-h-[90vh]" id="terms-modal-content">
+            <div class="px-6 py-4 md:py-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-brand-white z-10">
+                <h3 class="text-xl md:text-2xl font-bold tracking-tight">
+                    <span class="lang-es">Términos y Condiciones</span><span class="lang-en">Terms and Conditions</span>
+                </h3>
+                <button onclick="closeTermsModal()" class="w-10 h-10 md:w-12 md:h-12 bg-gray-50 rounded-full flex items-center justify-center hover:bg-gray-200 hover:rotate-90 transition-all duration-300 text-gray-900" aria-label="Cerrar">
+                    <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </button>
+            </div>
+            <div class="p-6 sm:p-8 md:p-10 overflow-y-auto text-gray-600 text-sm md:text-base space-y-6">
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">1. Uso del Software</span><span class="lang-en">1. Software Usage</span></h4>
+                    <p>
+                        <span class="lang-es">Las aplicaciones y visores proporcionados por SlotSoftware están destinados a un uso recreativo y amateur en el ámbito del automodelismo de ranura. El usuario se compromete a no utilizar las plataformas para fines ilícitos o malintencionados.</span>
+                        <span class="lang-en">The applications and viewers provided by SlotSoftware are intended for recreational and amateur use in the field of slot car racing. The user agrees not to use the platforms for illicit or malicious purposes.</span>
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">2. Propiedad Intelectual</span><span class="lang-en">2. Intellectual Property</span></h4>
+                    <p>
+                        <span class="lang-es">Todo el código, diseño, algoritmos de detección visual y marca de SlotSoftware son propiedad exclusiva de sus desarrolladores. Queda prohibida la reproducción, distribución o modificación no autorizada con fines comerciales.</span>
+                        <span class="lang-en">All code, design, visual detection algorithms, and branding of SlotSoftware are the exclusive property of their developers. Unauthorized reproduction, distribution, or modification for commercial purposes is prohibited.</span>
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">3. Exención de Responsabilidad</span><span class="lang-en">3. Limitation of Liability</span></h4>
+                    <p>
+                        <span class="lang-es">El software se proporciona "tal cual". SlotSoftware no se hace responsable por fallos en el cronometraje, pérdida de datos de competición, ni de problemas derivados del hardware del usuario (cámaras, rendimiento del navegador o conexión a internet).</span>
+                        <span class="lang-en">The software is provided "as is". SlotSoftware is not responsible for timing failures, loss of competition data, or problems arising from the user's hardware (cameras, browser performance, or internet connection).</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleLanguage() {
+            const html = document.documentElement;
+            const currentLang = html.getAttribute('lang') || 'es';
+            const newLang = currentLang === 'es' ? 'en' : 'es';
+            
+            html.setAttribute('lang', newLang);
+        }
+
+        // Funciones para el Modal de Contacto
+        function openContactModal() {
+            const modal = document.getElementById('contact-modal');
+            const content = document.getElementById('contact-modal-content');
+            document.body.style.overflow = 'hidden';
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100', 'pointer-events-auto');
+            
+            setTimeout(() => {
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeContactModal() {
+            const modal = document.getElementById('contact-modal');
+            const content = document.getElementById('contact-modal-content');
+            
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.remove('opacity-100', 'pointer-events-auto');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        // Modales de Privacidad y Términos
+        function openPrivacyModal() {
+            const modal = document.getElementById('privacy-modal');
+            const content = document.getElementById('privacy-modal-content');
+            document.body.style.overflow = 'hidden';
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100', 'pointer-events-auto');
+            setTimeout(() => { content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
+        }
+
+        function closePrivacyModal() {
+            const modal = document.getElementById('privacy-modal');
+            const content = document.getElementById('privacy-modal-content');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.remove('opacity-100', 'pointer-events-auto');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        function openTermsModal() {
+            const modal = document.getElementById('terms-modal');
+            const content = document.getElementById('terms-modal-content');
+            document.body.style.overflow = 'hidden';
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100', 'pointer-events-auto');
+            setTimeout(() => { content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
+        }
+
+        function closeTermsModal() {
+            const modal = document.getElementById('terms-modal');
+            const content = document.getElementById('terms-modal-content');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.remove('opacity-100', 'pointer-events-auto');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        // Lógica del Contador de Visitas REAL
+        async function initCounter() {
+            const counterEl = document.getElementById('visitor-count');
+            if (!counterEl) return;
+
+            // Utilizamos CounterAPI, una base de datos gratuita para llevar el conteo real
+            // El sufijo '/up' hace que automáticamente sume 1 visita en el servidor cada vez que alguien entra
+            const namespace = 'slotsoftware-app-stats'; 
+            const key = 'visitas-reales';
+            const apiUrl = `https://api.counterapi.dev/v1/${namespace}/${key}/up`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error('Error en la red');
+                const data = await response.json();
+                
+                // Añadimos el offset de 1876 visitas perdidas al contador real
+                const totalVisits = data.count + 1876;
+                
+                // Animación rápida desde 0 hasta el número real
+                let currentDisplay = 0;
+                const step = Math.ceil(totalVisits / 20); // Velocidad de la animación
+                
+                const updateDisplay = setInterval(() => {
+                    currentDisplay += step;
+                    if (currentDisplay >= totalVisits) {
+                        currentDisplay = totalVisits;
+                        clearInterval(updateDisplay);
+                    }
+                    // Muestra el número con puntos (ej: 1.204)
+                    counterEl.innerText = new Intl.NumberFormat('es-ES').format(currentDisplay);
+                }, 40);
+
+            } catch (error) {
+                console.error('Error al conectar con el servidor de visitas:', error);
+                counterEl.innerText = "-"; // Fallback discreto si el usuario tiene bloqueadores de anuncios o falla el internet
+            }
+        }
+
+        // Arrancar el contador
+        initCounter();
+    </script>
+</body>
+</html>
