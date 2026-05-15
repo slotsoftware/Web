@@ -13,6 +13,10 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         
         .toast-enter { animation: slideIn 0.3s ease-out forwards; }
         .toast-exit { animation: slideOut 0.3s ease-in forwards; }
@@ -152,7 +156,12 @@
                 <i data-lucide="activity" class="text-cyan-400 w-6 h-6"></i>
                 Últimas Novedades
             </h2>
-            <div class="flex gap-2 text-sm text-slate-400">
+            <div class="flex gap-2 items-center text-sm text-slate-400">
+                <!-- BOTÓN DE NOTIFICACIONES SIEMPRE VISIBLE -->
+                <button id="notify-btn" onclick="window.requestNotifications()" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 rounded-lg transition-colors border border-indigo-500/20 text-xs font-bold shadow-lg shadow-indigo-500/10">
+                    <i id="notify-icon" data-lucide="bell" class="w-3.5 h-3.5"></i> 
+                    <span id="notify-text" class="hidden sm:inline">Activar Avisos</span>
+                </button>
                 <span class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> En vivo</span>
             </div>
         </div>
@@ -170,69 +179,31 @@
         <span id="toast-message" class="font-medium text-sm">Acción completada</span>
     </div>
 
-    <script>
-        // --- INICIALIZACIÓN Y ESTADO ---
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         lucide.createIcons();
 
-        // Datos iniciales de prueba (se muestran si no hay nada guardado)
-        const dummyData = [
-            {
-                id: 1,
-                title: "Bienvenido al nuevo Canal de Novedades",
-                program: "Krono",
-                type: "info",
-                content: "Hemos lanzado este nuevo canal para mantenerte informado sobre todas las actualizaciones, alertas y nuevas funciones de SlotSoftware. \n\n¡Gracias por confiar en nosotros!",
-                link: "",
-                date: new Date().toISOString()
-            }
-        ];
+        // --- ESTADO GLOBAL ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'slot-software-news';
+        let firebaseConfig = null;
+        try {
+            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        } catch (e) { console.error("Error cargando configuración", e); }
 
-        // Migración automática de datos para la nueva estructura
-        let newsData = JSON.parse(localStorage.getItem('slotNews_v3'));
-        if (!newsData) {
-            const oldData = JSON.parse(localStorage.getItem('slotNews_v2'));
-            if (oldData && oldData.length > 0) {
-                newsData = oldData.map(item => ({...item, program: "Krono"})); 
-            } else {
-                newsData = dummyData;
-            }
-        }
-        
-        // Modo Admin oculto por defecto. 
-        // Para activarlo en tu web real, añade "?admin=krono" al final del enlace (ej. index.html?admin=krono)
+        let db, auth, userId;
+        let newsData = [];
+        let openComments = new Set();
         let isAdmin = false;
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('admin') === 'krono') {
-            isAdmin = true;
-        }
-
-        // TRUCO PARA ESTA VISTA PREVIA: Doble clic en la palabra "SlotSoftware" arriba a la izquierda para activar/desactivar
-        document.querySelector('header h1').addEventListener('dblclick', () => {
-            isAdmin = !isAdmin;
-            if (isAdmin) {
-                document.getElementById('admin-panel').classList.remove('hidden');
-                document.getElementById('admin-badge').classList.remove('hidden');
-                document.getElementById('admin-badge').classList.add('flex');
-                showToast('Modo Administrador Activado');
-            } else {
-                document.getElementById('admin-panel').classList.add('hidden');
-                document.getElementById('admin-badge').classList.add('hidden');
-                document.getElementById('admin-badge').classList.remove('flex');
-                showToast('Modo Administrador Desactivado');
-            }
-            renderNews(); // Recargar las noticias para mostrar u ocultar los botones de borrar
-        });
 
         const newsFeed = document.getElementById('news-feed');
         const newsForm = document.getElementById('news-form');
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
 
-        // --- FUNCIONES DE UTILIDAD ---
-        function saveNews() {
-            localStorage.setItem('slotNews_v3', JSON.stringify(newsData));
-        }
-
+        // --- UTILIDADES ---
         function formatDate(dateString) {
             const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' };
             return new Date(dateString).toLocaleDateString('es-ES', options);
@@ -241,39 +212,139 @@
         function showToast(message) {
             toastMessage.textContent = message;
             toast.classList.remove('translate-x-[150%]');
-            setTimeout(() => {
-                toast.classList.add('translate-x-[150%]');
-            }, 3000);
+            setTimeout(() => { toast.classList.add('translate-x-[150%]'); }, 3000);
         }
 
-        // --- ESTILOS SEGÚN EL TIPO DE NOTICIA ---
         function getTypeStyles(type) {
             switch(type) {
-                case 'update':
-                    return { icon: 'refresh-cw', bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', label: 'Actualización' };
-                case 'feature':
-                    return { icon: 'star', bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/20', label: 'Nueva Función' };
-                case 'alert':
-                    return { icon: 'alert-triangle', bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/20', label: 'Aviso Importante' };
-                default:
-                    return { icon: 'info', bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20', label: 'Información' };
+                case 'update': return { icon: 'refresh-cw', bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', label: 'Actualización' };
+                case 'feature': return { icon: 'star', bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/20', label: 'Nueva Función' };
+                case 'alert': return { icon: 'alert-triangle', bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/20', label: 'Aviso Importante' };
+                default: return { icon: 'info', bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20', label: 'Información' };
             }
         }
 
-        // --- BORRADO SEGURO (Accesible globalmente) ---
-        window.deleteNewsSafely = function(id) {
-            // Se filtra el array para quitar el elemento con ese ID
-            newsData = newsData.filter(item => item.id !== id);
-            saveNews(); // Guardamos en local
-            renderNews(); // Recargamos la vista
-            showToast('Novedad eliminada correctamente');
+        // --- SISTEMA DE NOTIFICACIONES PUSH (NAVEGADOR) ---
+        function updateNotificationUI() {
+            const btn = document.getElementById('notify-btn');
+            const icon = document.getElementById('notify-icon');
+            const text = document.getElementById('notify-text');
+
+            if (!("Notification" in window)) {
+                btn.style.display = 'none';
+                return;
+            }
+
+            if (Notification.permission === 'granted') {
+                btn.className = "flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-400 rounded-lg border border-green-500/20 text-xs font-bold cursor-default";
+                icon.setAttribute('data-lucide', 'bell-ring');
+                text.textContent = "Avisos Activados";
+            } else if (Notification.permission === 'denied') {
+                btn.className = "flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 rounded-lg border border-red-500/20 text-xs font-bold cursor-help";
+                icon.setAttribute('data-lucide', 'bell-off');
+                text.textContent = "Avisos Bloqueados";
+                btn.title = "Desbloquea las notificaciones en la configuración de tu navegador (el candado junto a la URL)";
+            } else {
+                btn.className = "flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 rounded-lg transition-colors border border-indigo-500/20 text-xs font-bold shadow-lg shadow-indigo-500/10 cursor-pointer";
+                icon.setAttribute('data-lucide', 'bell');
+                text.textContent = "Activar Avisos";
+            }
+            lucide.createIcons();
+        }
+
+        window.requestNotifications = async function() {
+            if (!("Notification" in window)) {
+                showToast("Tu navegador no soporta notificaciones.");
+                return;
+            }
+            if (Notification.permission === 'granted' || Notification.permission === 'denied') return;
+
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    showToast("¡Avisos activados con éxito!");
+                } else {
+                    showToast("Permiso denegado para avisos.");
+                }
+                updateNotificationUI();
+            } catch (error) {
+                console.error("Error al pedir permiso:", error);
+            }
         };
 
-        // --- RENDERIZADO PRINCIPAL ---
+        // --- INTERACCIONES CON LA NUBE ---
+        window.deleteNewsSafely = async function(id) {
+            if (!userId) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'news_posts', id));
+                showToast('Novedad eliminada de la nube');
+            } catch (e) { console.error("Error al borrar", e); }
+        };
+
+        window.toggleLike = async function(id) {
+            if (!userId) return;
+            const item = newsData.find(i => i.id === id);
+            if (!item) return;
+
+            // Revisar si este usuario ya le dio like
+            let updatedLikes = [...(item.likes || [])];
+            if (updatedLikes.includes(userId)) {
+                updatedLikes = updatedLikes.filter(uid => uid !== userId); // Quitar like
+            } else {
+                updatedLikes.push(userId); // Dar like
+            }
+
+            try {
+                // Actualizar documento en la nube
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'news_posts', id), { likes: updatedLikes });
+            } catch (e) { console.error("Error en like", e); }
+        };
+
+        window.toggleComments = function(id) {
+            if (openComments.has(id)) openComments.delete(id);
+            else openComments.add(id);
+            renderNews();
+        };
+
+        window.addComment = async function(id) {
+            if (!userId) return;
+            const input = document.getElementById(`comment-input-${id}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const item = newsData.find(i => i.id === id);
+            if (!item) return;
+
+            const newComment = {
+                id: Date.now().toString(),
+                text: text,
+                date: new Date().toISOString(),
+                userId: userId
+            };
+
+            const updatedComments = [...(item.comments || []), newComment];
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'news_posts', id), { comments: updatedComments });
+                input.value = '';
+            } catch (e) { console.error("Error al comentar", e); }
+        };
+
+        window.deleteCommentSafely = async function(newsId, commentId) {
+            if (!userId) return;
+            const item = newsData.find(i => i.id === newsId);
+            if (!item) return;
+
+            const updatedComments = (item.comments || []).filter(c => c.id !== commentId);
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'news_posts', newsId), { comments: updatedComments });
+                showToast('Comentario eliminado');
+            } catch (e) { console.error("Error al borrar comentario", e); }
+        };
+
+        // --- RENDERIZADO VISUAL ---
         function renderNews() {
-            newsFeed.innerHTML = ''; // Limpiar el contenedor
+            newsFeed.innerHTML = '';
             
-            // Estado vacío
             if (newsData.length === 0) {
                 newsFeed.innerHTML = `
                     <div class="text-center py-20 bg-slate-800/30 rounded-3xl border border-white/5 shadow-inner">
@@ -288,28 +359,16 @@
                 return;
             }
 
-            // Crear cada artículo usando DOM Elements para asegurar que los eventos funcionen bien
             newsData.forEach(item => {
                 const article = document.createElement('article');
                 article.className = 'group relative bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-white/10 shadow-xl hover:shadow-cyan-500/10 hover:border-cyan-500/30 transition-all duration-300';
                 
                 const typeStyle = getTypeStyles(item.type);
                 
-                // Botón de borrar condicional
                 const deleteBtnHTML = isAdmin ? `
                     <button class="delete-btn opacity-0 group-hover:opacity-100 transition-opacity p-2.5 bg-slate-900/50 border border-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 rounded-xl" data-id="${item.id}" title="Eliminar novedad">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
-                ` : '';
-
-                // Enlace condicional
-                const linkHTML = item.link ? `
-                    <div class="mt-6 pt-5 border-t border-white/5">
-                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 font-bold group/link transition-colors bg-cyan-500/10 hover:bg-cyan-500/20 px-4 py-2 rounded-lg border border-cyan-500/20">
-                            <span>Ver más detalles</span>
-                            <i data-lucide="external-link" class="w-4 h-4 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform"></i>
-                        </a>
-                    </div>
                 ` : '';
 
                 const imageHTML = item.imageUrl ? `
@@ -327,7 +386,32 @@
                     </div>
                 ` : '';
 
-                // Estructura interna
+                // Estado de Likes y Comentarios a partir de los datos de la Nube
+                const isLiked = item.likes && item.likes.includes(userId);
+                const likesCount = item.likes ? item.likes.length : 0;
+                const commentsList = item.comments || [];
+                const isCommentsOpen = openComments.has(item.id);
+
+                const commentsHTML = commentsList.map(c => `
+                    <div class="bg-slate-900/50 rounded-xl p-3 sm:p-4 border border-white/5 flex gap-3 group/comment relative">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex-shrink-0 flex items-center justify-center text-white font-bold text-xs shadow-inner border border-white/10">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                        </div>
+                        <div class="flex-1 pr-6">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs font-bold ${c.userId === userId ? 'text-cyan-400' : 'text-slate-300'}">${c.userId === userId ? 'Tú' : 'Usuario'}</span>
+                                <span class="text-[10px] text-slate-500">${formatDate(c.date)}</span>
+                            </div>
+                            <p class="text-sm text-slate-200">${c.text}</p>
+                        </div>
+                        ${(isAdmin || c.userId === userId) ? `
+                            <button onclick="window.deleteCommentSafely('${item.id}', '${c.id}')" class="absolute top-2 right-2 p-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg opacity-0 group-hover/comment:opacity-100 transition-opacity" title="Borrar comentario">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                `).join('');
+
                 article.innerHTML = `
                     <div class="flex items-start justify-between gap-4 mb-5">
                         <div class="flex items-center gap-3">
@@ -351,7 +435,37 @@
                     
                     ${imageHTML}
                     ${videoHTML}
-                    ${linkHTML}
+                    
+                    <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+                        <div class="flex items-center gap-2 sm:gap-4">
+                            <button onclick="window.toggleLike('${item.id}')" class="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors ${isLiked ? 'bg-pink-500/10 text-pink-500 border border-pink-500/20 shadow-[0_0_15px_rgba(236,72,153,0.15)]' : 'text-slate-400 hover:bg-white/5 hover:text-pink-400'}">
+                                <i data-lucide="heart" class="w-4 h-4 sm:w-5 sm:h-5 ${isLiked ? 'fill-current' : ''}"></i>
+                                <span class="font-bold text-sm">${likesCount}</span>
+                            </button>
+                            <button onclick="window.toggleComments('${item.id}')" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-slate-400 hover:bg-white/5 hover:text-cyan-400 transition-colors">
+                                <i data-lucide="message-square" class="w-4 h-4 sm:w-5 sm:h-5 ${isCommentsOpen ? 'fill-current opacity-20' : ''}"></i>
+                                <span class="font-bold text-sm">${commentsList.length}</span>
+                            </button>
+                        </div>
+                        ${item.link ? `
+                            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-cyan-400 hover:text-cyan-300 font-bold group/link transition-colors bg-cyan-500/10 hover:bg-cyan-500/20 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg border border-cyan-500/20">
+                                <span>Detalles</span>
+                                <i data-lucide="external-link" class="w-3.5 h-3.5 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform"></i>
+                            </a>
+                        ` : ''}
+                    </div>
+
+                    <div class="${isCommentsOpen ? 'block' : 'hidden'} mt-4 pt-4 border-t border-white/5">
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" id="comment-input-${item.id}" placeholder="Escribe un comentario público..." class="flex-1 bg-slate-900/80 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all">
+                            <button onclick="window.addComment('${item.id}')" class="bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 hover:text-cyan-300 px-4 py-2 rounded-xl transition-colors border border-cyan-500/20 flex items-center justify-center">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                            ${commentsList.length > 0 ? commentsHTML : '<p class="text-xs text-slate-500 text-center py-2">Sé el primero en comentar.</p>'}
+                        </div>
+                    </div>
                 `;
 
                 newsFeed.appendChild(article);
@@ -359,25 +473,27 @@
 
             lucide.createIcons();
             
-            // Asignar eventos a los botones de borrar RECIÉN CREADOS
             if (isAdmin) {
-                const deleteButtons = document.querySelectorAll('.delete-btn');
-                deleteButtons.forEach(btn => {
+                document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', function(e) {
                         e.preventDefault();
-                        const id = parseInt(this.getAttribute('data-id'));
+                        const id = this.getAttribute('data-id');
                         window.deleteNewsSafely(id);
                     });
                 });
             }
         }
 
-        // --- MANEJO DEL FORMULARIO ---
-        newsForm.addEventListener('submit', (e) => {
+        // --- GESTIÓN DE PUBLICACIÓN ---
+        newsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!userId) {
+                showToast("Error de conexión");
+                return;
+            }
             
+            const newId = Date.now().toString();
             const newNews = {
-                id: Date.now(), // ID único basado en timestamp
                 title: document.getElementById('title').value,
                 program: document.getElementById('program').value,
                 type: document.getElementById('type').value,
@@ -385,37 +501,110 @@
                 link: document.getElementById('link').value,
                 imageUrl: document.getElementById('imageUrl').value,
                 videoUrl: document.getElementById('videoUrl').value,
-                date: new Date().toISOString()
+                likes: [],
+                comments: [],
+                date: new Date().toISOString(),
+                authorId: userId // Guardamos quién la publicó para no auto-notificarle
             };
 
-            // Añadir al principio del array
-            newsData.unshift(newNews);
-            saveNews();
-            renderNews();
-            
-            newsForm.reset(); // Limpiar formulario
-            showToast('¡Novedad publicada con éxito!');
+            try {
+                // Guardar nueva publicación directo a Firestore
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'news_posts', newId), newNews);
+                newsForm.reset();
+                showToast('¡Novedad publicada en la nube!');
+            } catch (error) {
+                console.error("Error publicando:", error);
+                showToast('Hubo un error al publicar');
+            }
         });
 
         // --- ARRANQUE DE LA APLICACIÓN ---
-        function initApp() {
-            const adminPanel = document.getElementById('admin-panel');
-            const adminBadge = document.getElementById('admin-badge');
+        async function initApp() {
+            // Doble clic oculto para ser Admin
+            document.querySelector('header h1').addEventListener('dblclick', () => {
+                isAdmin = !isAdmin;
+                const adminPanel = document.getElementById('admin-panel');
+                const adminBadge = document.getElementById('admin-badge');
+                if (isAdmin) {
+                    adminPanel.classList.remove('hidden');
+                    adminBadge.classList.remove('hidden');
+                    adminBadge.classList.add('flex');
+                    showToast('Modo Admin Activado');
+                } else {
+                    adminPanel.classList.add('hidden');
+                    adminBadge.classList.add('hidden');
+                    adminBadge.classList.remove('flex');
+                    showToast('Modo Admin Desactivado');
+                }
+                renderNews();
+            });
 
-            if (isAdmin) {
-                adminPanel.classList.remove('hidden');
-                adminBadge.classList.remove('hidden');
-                adminBadge.classList.add('flex');
-            } else {
-                // Seguro extra: forzar que todo lo de admin esté oculto al arrancar
-                adminPanel.classList.add('hidden');
-                adminBadge.classList.add('hidden');
-                adminBadge.classList.remove('flex');
+            // Mensaje de carga inicial
+            newsFeed.innerHTML = '<div class="text-center py-20 text-cyan-400 font-bold animate-pulse flex flex-col items-center justify-center gap-3"><i data-lucide="cloud" class="w-8 h-8"></i> Conectando al servidor en la nube...</div>';
+            lucide.createIcons();
+
+            if (!firebaseConfig) {
+                newsFeed.innerHTML = '<div class="text-center py-20 text-red-400">Error: Conexión a la nube no configurada.</div>';
+                return;
             }
-            renderNews();
+
+            try {
+                // Inicializar Firebase
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Autenticación Segura
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                userId = auth.currentUser.uid;
+                
+                updateNotificationUI();
+
+                // Escuchar Novedades en TIEMPO REAL
+                const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_posts');
+                let initialLoad = true;
+
+                onSnapshot(newsRef, (snapshot) => {
+                    // Lógica para enviar notificación si detecta un documento nuevo
+                    if (!initialLoad && "Notification" in window && Notification.permission === 'granted') {
+                        snapshot.docChanges().forEach((change) => {
+                            if (change.type === 'added') {
+                                const docData = change.doc.data();
+                                // Disparar notificación solo si la noticia no la publicó el propio usuario que está mirando
+                                if (docData.authorId !== userId) {
+                                    new Notification("SlotSoftware: " + (docData.program || "Novedad"), {
+                                        body: docData.title,
+                                        icon: "https://slotsoftware.github.io/Web/logo.png" // Usará tu icono de forma predeterminada
+                                    });
+                                }
+                            }
+                        });
+                    }
+
+                    newsData = [];
+                    snapshot.forEach(doc => {
+                        newsData.push({ id: doc.id, ...doc.data() });
+                    });
+                    // Ordenar por fecha (las más nuevas primero)
+                    newsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    renderNews();
+                    
+                    initialLoad = false;
+                }, (error) => {
+                    console.error("Firestore error:", error);
+                    newsFeed.innerHTML = '<div class="text-center py-20 text-red-400">Error al sincronizar con la nube.</div>';
+                });
+
+            } catch (error) {
+                console.error("Auth init error:", error);
+                newsFeed.innerHTML = '<div class="text-center py-20 text-red-400">No se pudo establecer conexión segura.</div>';
+            }
         }
 
-        // Ejecutar al cargar
         initApp();
     </script>
 </body>
