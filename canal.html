@@ -144,7 +144,6 @@
 
     <main class="flex-grow max-w-2xl mx-auto w-full px-4 py-6 flex flex-col gap-6 relative z-10">
         
-        <!-- PANEL DE ADMINISTRADOR -->
         <div id="admin-panel" class="hidden glass-panel rounded-2xl p-6 border border-blue-500/40 shadow-[0_0_40px_rgba(59,130,246,0.15)] relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 blur-3xl rounded-full"></div>
             <h2 class="text-sm font-bold text-white mb-5 flex items-center gap-2">
@@ -178,7 +177,6 @@
             </form>
         </div>
 
-        <!-- FILTROS -->
         <div class="overflow-x-auto hide-scrollbar -mx-4 px-4 pb-2 sticky top-20 z-40">
             <div class="flex gap-2 min-w-max p-1 bg-slate-900/50 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl" id="filters-container">
                 <button onclick="setFilter('ALL')" class="filter-btn active px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg transition-all">Explorar Todo</button>
@@ -189,7 +187,6 @@
             </div>
         </div>
 
-        <!-- FEED DE NOTICIAS -->
         <div id="feed-container" class="flex flex-col gap-6 pb-10">
             <div id="loading-state" class="flex flex-col items-center justify-center py-20 text-cyan-500">
                 <div class="relative">
@@ -209,7 +206,6 @@
         </div>
     </main>
 
-    <!-- MODAL NICKNAME -->
     <div id="nickname-modal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)] transform transition-all">
             <div class="flex justify-center mb-4">
@@ -229,7 +225,6 @@
         </div>
     </div>
 
-    <!-- MODAL BORRAR -->
     <div id="confirm-modal" class="fixed inset-0 z-[300] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.2)] transform transition-all text-center">
             <div class="flex justify-center mb-4">
@@ -246,7 +241,6 @@
         </div>
     </div>
 
-    <!-- TOAST -->
     <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.5)] text-sm font-bold transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-3 border border-slate-700">
         <i id="toast-icon" data-lucide="info" class="w-5 h-5"></i>
         <span id="toast-msg">Mensaje</span>
@@ -255,8 +249,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Carga de almacenamiento local como red de seguridad
         let allNews = JSON.parse(localStorage.getItem('slot_news_backup')) || [];
         let currentFilter = 'ALL';
         let isAdmin = false;
@@ -269,6 +264,7 @@
         let openComments = new Set(); 
         let pendingDeleteAction = null;
 
+        // --- SISTEMA DE ADMINISTRADOR ---
         function enableAdmin() {
             isAdmin = true;
             document.getElementById('admin-panel').classList.remove('hidden');
@@ -281,6 +277,7 @@
             enableAdmin();
         }
 
+        // --- FUNCIONES AUXILIARES ---
         window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
@@ -341,11 +338,13 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Lógica principal de renderizado y chat ---
         window.renderNews = function() {
             const container = document.getElementById('feed-container');
             const loadingState = document.getElementById('loading-state');
             const emptyState = document.getElementById('empty-state');
             
+            // Ocultar mensaje de "Conectando..." siempre que se renderice
             if(loadingState) loadingState.style.display = 'none';
 
             const existingCards = container.querySelectorAll('.news-card-el');
@@ -407,6 +406,7 @@
                     card.appendChild(mediaContainer);
                 }
 
+                // --- BOTONES: LIKE Y CHAT ---
                 const bottomBar = document.createElement('div');
                 bottomBar.className = 'flex flex-wrap justify-between items-center mt-2 pt-4 border-t border-white/5 gap-3';
                 const leftActions = document.createElement('div');
@@ -421,7 +421,6 @@
                 likeBtn.onclick = () => toggleLike(news.id, isLiked);
                 leftActions.appendChild(likeBtn);
 
-                // --- BOTÓN DE CHAT ---
                 const commentCount = news.comments ? news.comments.length : 0;
                 const commentBtn = document.createElement('button');
                 commentBtn.className = `flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-all border text-slate-400 bg-slate-800/50 border-slate-700 hover:text-cyan-400`;
@@ -435,6 +434,7 @@
 
                 bottomBar.appendChild(leftActions);
 
+                // --- BOTONES: ENLACE Y BORRAR ---
                 const rightActions = document.createElement('div');
                 rightActions.className = 'flex gap-2 ml-auto';
 
@@ -457,8 +457,8 @@
 
                 if(rightActions.childNodes.length > 0) bottomBar.appendChild(rightActions);
                 card.appendChild(bottomBar);
-                
-                // --- SECCIÓN DEL CHAT ---
+
+                // --- SECCIÓN DEL CHAT Y COMENTARIOS ---
                 const commentsSection = document.createElement('div');
                 commentsSection.className = `comments-section mt-2 ${openComments.has(news.id) ? 'open' : ''}`;
                 
@@ -501,7 +501,7 @@
             lucide.createIcons();
         }
 
-        // --- STREAMING_CHUNK:Acción principal - Botón de Fuerza Bruta ---
+        // --- STREAMING_CHUNK:Lógica de Forzado y Chat ---
         document.getElementById('news-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isAdmin) return;
@@ -517,7 +517,8 @@
                 comments: []
             };
 
-            allNews.unshift(newPost); 
+            // Inyectamos a la lista y actualizamos el almacenamiento local inmediatamente
+            allNews.unshift(newPost);
             localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
             
             setFilter('ALL'); 
@@ -533,7 +534,7 @@
                     delete postToSave.id; 
                     await addDoc(colRef, postToSave);
                 } catch (error) {
-                    console.error("Error guardando en la nube:", error);
+                    console.error("Modo Offline: Guardado localmente.");
                 }
             }
         });
@@ -541,7 +542,7 @@
         window.deleteNewsItem = function(docId) {
             askConfirmDialog(async () => {
                 allNews = allNews.filter(n => String(n.id) !== String(docId));
-                localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
+                localStorage.setItem('slot_news_backup', JSON.stringify(allNews)); // Guardar cambio en local
                 renderNews(); 
                 if (db && !docId.toString().startsWith('temp-')) {
                     try {
@@ -558,16 +559,18 @@
                 if (!newsItem.likedBy) newsItem.likedBy = [];
                 if (currentlyLiked) newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
                 else newsItem.likedBy.push(uid);
+                localStorage.setItem('slot_news_backup', JSON.stringify(allNews)); // Guardar cambio
                 renderNews();
             }
             if (db && !docId.toString().startsWith('temp-')) {
-                const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
-                if (currentlyLiked) await updateDoc(postRef, { likedBy: arrayRemove(uid) });
-                else await updateDoc(postRef, { likedBy: arrayUnion(uid) });
+                try {
+                    const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
+                    if (currentlyLiked) await updateDoc(postRef, { likedBy: arrayRemove(uid) });
+                    else await updateDoc(postRef, { likedBy: arrayUnion(uid) });
+                } catch(e) {}
             }
         };
 
-        // --- LÓGICA DEL CHAT Y NICKNAME ---
         window.closeNicknameModal = function() {
             document.getElementById('nickname-modal').classList.add('hidden');
             pendingCommentNewsId = null;
@@ -600,27 +603,33 @@
                 if (!newsItem.comments) newsItem.comments = [];
                 const newComment = { author: userNickname, text: text, timestamp: Date.now() };
                 newsItem.comments.push(newComment);
-                openComments.add(newsId);
                 
+                localStorage.setItem('slot_news_backup', JSON.stringify(allNews)); // ¡Crítico para que no se borre el chat!
+                openComments.add(newsId);
                 renderNews();
 
                 if (db && !String(newsId).startsWith('temp-')) {
                     try {
                         const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
                         await updateDoc(postRef, { comments: arrayUnion(newComment) });
-                    } catch(e) { console.error("Error sincronizando comentario:", e); }
+                    } catch(e) { console.error("Error offline"); }
                 }
             }
         };
 
-        // --- STREAMING_CHUNK:Arranque del sistema ---
+        // --- STREAMING_CHUNK:Inicialización segura de Firebase ---
         async function initApp() {
             try {
+                // Hacemos que "Conectando..." desaparezca inmediatamente por si acaso falla la red
+                const loading = document.getElementById('loading-state');
+                if (loading) loading.style.display = 'none';
+
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
                 const firebaseConfig = JSON.parse(configStr);
                 
                 if (!firebaseConfig.projectId) {
-                    throw new Error("Modo Local (Sin Firebase)");
+                    renderNews(); // Lanzar la vista local de inmediato
+                    return; // Detenemos la carga de Firebase porque no hay conexión
                 }
 
                 const app = initializeApp(firebaseConfig);
@@ -650,8 +659,7 @@
                     }
                 });
             } catch (error) {
-                document.getElementById('loading-state').style.display = 'none';
-                renderNews();
+                renderNews(); // Si hay cualquier fallo, fuerza a cargar la app local
             }
         }
 
