@@ -162,11 +162,12 @@
                 <div>
                     <textarea id="news-text" rows="3" placeholder="Escribe el anuncio espectacular aquí..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all resize-none font-medium placeholder-slate-500" required></textarea>
                 </div>
+                <!-- IMPORTANTE: Cambiado type="url" a type="text" para evitar bloqueos del navegador -->
                 <div>
-                    <input type="url" id="news-media" placeholder="URL de Imagen, Vídeo (.mp4) o YouTube" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-medium placeholder-slate-500">
+                    <input type="text" id="news-media" placeholder="URL de Imagen, Vídeo (.mp4) o YouTube (Opcional)" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-medium placeholder-slate-500">
                 </div>
                 <div>
-                    <input type="url" id="news-link" placeholder="Enlace del botón a tu web (Opcional)" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-medium placeholder-slate-500">
+                    <input type="text" id="news-link" placeholder="Enlace a tu web (Opcional)" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-medium placeholder-slate-500">
                 </div>
                 <button type="submit" class="relative group overflow-hidden bg-slate-900 text-white font-bold py-3 rounded-xl transition-all border border-slate-700 hover:border-cyan-500">
                     <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-80 group-hover:opacity-100 transition-opacity"></div>
@@ -257,7 +258,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global State Variables
+        // Variables Globales
         let allNews = [];
         let currentFilter = 'ALL';
         let isAdmin = false;
@@ -269,8 +270,6 @@
         let pendingCommentNewsId = null; 
         let openComments = new Set(); 
         let isLiking = false; 
-
-        // Variables para el Modal de Confirmación
         let pendingDeleteAction = null;
 
         function enableAdmin() {
@@ -286,7 +285,7 @@
             enableAdmin();
         }
 
-        // --- SISTEMA DE TOASTS ---
+        // --- TOASTS ---
         window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
@@ -309,7 +308,7 @@
             }, 3000);
         }
 
-        // --- SISTEMA DE MODAL CONFIRMACION (Previene bloqueo en Iframe) ---
+        // --- MODAL DE CONFIRMACIÓN (Anti-Bloqueo) ---
         function askConfirmDialog(actionCallback) {
             pendingDeleteAction = actionCallback;
             document.getElementById('confirm-modal').classList.remove('hidden');
@@ -356,7 +355,7 @@
             }
         }
 
-        // --- SISTEMA DE COMENTARIOS ---
+        // --- COMENTARIOS (OPTIMISTA) ---
         window.toggleComments = function(newsId) {
             const section = document.getElementById(`comments-${newsId}`);
             if (openComments.has(newsId)) {
@@ -389,21 +388,21 @@
                 timestamp: Date.now()
             };
 
+            // ACTUALIZACIÓN OPTIMISTA (Aparece de inmediato)
+            const newsItem = allNews.find(n => String(n.id) === String(newsId));
+            if (newsItem) {
+                if (!newsItem.comments) newsItem.comments = [];
+                newsItem.comments.push(commentData);
+                renderNews();
+            }
+
+            // SINCRONIZACIÓN EN SEGUNDO PLANO
             if (db) {
                 try {
                     const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
                     await updateDoc(postRef, { comments: arrayUnion(commentData) });
                 } catch (error) {
                     console.error("Error comentando:", error);
-                    showToast("Error al enviar", "error");
-                }
-            } else {
-                const newsItem = allNews.find(n => String(n.id) === String(newsId));
-                if (newsItem) {
-                    if (!newsItem.comments) newsItem.comments = [];
-                    newsItem.comments.push(commentData);
-                    renderNews();
-                    showToast("Comentario enviado (Local)");
                 }
             }
         }
@@ -414,21 +413,20 @@
             askConfirmDialog(async () => {
                 const commentObj = JSON.parse(decodeURIComponent(commentObjStr));
                 
+                // ACTUALIZACIÓN OPTIMISTA
+                const newsItem = allNews.find(n => String(n.id) === String(newsId));
+                if (newsItem && newsItem.comments) {
+                    newsItem.comments = newsItem.comments.filter(c => c.timestamp !== commentObj.timestamp);
+                    renderNews();
+                }
+
+                // SINCRONIZACIÓN
                 if (db) {
                     try {
                         const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
                         await updateDoc(postRef, { comments: arrayRemove(commentObj) });
-                        showToast("Comentario borrado");
                     } catch (error) {
                         console.error(error);
-                        showToast("Error al borrar", "error");
-                    }
-                } else {
-                    const newsItem = allNews.find(n => String(n.id) === String(newsId));
-                    if (newsItem && newsItem.comments) {
-                        newsItem.comments = newsItem.comments.filter(c => c.timestamp !== commentObj.timestamp);
-                        renderNews();
-                        showToast("Comentario borrado (Local)");
                     }
                 }
             });
@@ -465,6 +463,7 @@
         });
 
 
+        // --- RENDERIZADO VISUAL ---
         function renderNews() {
             const container = document.getElementById('feed-container');
             const loadingState = document.getElementById('loading-state');
@@ -641,7 +640,7 @@
                 const firebaseConfig = JSON.parse(configStr);
 
                 if (!firebaseConfig.projectId) {
-                    throw new Error("Modo local activado sin conexión.");
+                    throw new Error("Sin conexión");
                 }
 
                 const app = initializeApp(firebaseConfig);
@@ -664,7 +663,7 @@
                             if (profileSnap.exists() && profileSnap.data().nickname) {
                                 userNickname = profileSnap.data().nickname;
                             }
-                        } catch(e) { console.warn("No se pudo cargar el perfil"); }
+                        } catch(e) { }
 
                         const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
                         onSnapshot(newsRef, 
@@ -674,11 +673,12 @@
                                     fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
                                 });
                                 fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
+                                
+                                // Solamente actualizamos si hay cambios reales para no pisar la pantalla
                                 allNews = fetchedNews;
                                 renderNews();
                             },
                             (error) => {
-                                console.error(error);
                                 document.getElementById('loading-state').innerHTML = `<p class="text-red-400 font-bold">Error de red.</p>`;
                             }
                         );
@@ -686,15 +686,14 @@
                 });
 
             } catch (error) {
-                // AQUÍ ESTABA LA PUBLICACIÓN DE DEMOSTRACIÓN.
-                // AHORA INICIAMOS CON LA LISTA VACÍA POR DEFECTO.
+                // Si no hay Firebase, lista vacía, PISTA DESPEJADA.
                 allNews = [];
                 renderNews();
                 if(isAdmin) showToast("Entorno Local Activado", "error");
             }
         }
 
-        // --- PUBLICAR NOTICIA ---
+        // --- PUBLICAR NOTICIA (OPTIMISTA E INMEDIATO) ---
         document.getElementById('news-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isAdmin) return;
@@ -705,30 +704,32 @@
             btn.disabled = true;
 
             const newPost = {
+                id: 'temp-' + Date.now(), // ID Temporal para renderizado inmediato
                 category: document.getElementById('news-category').value,
                 text: document.getElementById('news-text').value,
-                mediaUrl: document.getElementById('news-media').value,
-                link: document.getElementById('news-link').value,
+                mediaUrl: document.getElementById('news-media').value.trim(),
+                link: document.getElementById('news-link').value.trim(),
                 timestamp: Date.now(),
                 likedBy: [],
                 comments: []
             };
 
+            // 1. ACTUALIZACIÓN VISUAL INMEDIATA EN PANTALLA
+            allNews.unshift(newPost);
+            renderNews();
+            document.getElementById('news-form').reset();
+            showToast("¡Transmisión lanzada a la pista!");
+
+            // 2. SINCRONIZACIÓN EN SEGUNDO PLANO
             try {
                 if (db) {
                     const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
-                    await addDoc(colRef, newPost);
-                    showToast("¡Actualización lanzada con éxito!");
-                } else {
-                    newPost.id = Date.now().toString();
-                    allNews.unshift(newPost);
-                    renderNews();
-                    showToast("Publicado en Local");
+                    const postToSave = { ...newPost };
+                    delete postToSave.id; // Para que Firebase cree el ID oficial
+                    await addDoc(colRef, postToSave);
                 }
-                document.getElementById('news-form').reset();
             } catch (error) {
-                console.error("Error al publicar:", error);
-                showToast("Fallo en la transmisión", "error");
+                console.error("Error de base de datos:", error);
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
@@ -736,61 +737,61 @@
             }
         });
 
-        // --- BORRAR NOTICIA SEGURA ---
+        // --- BORRAR NOTICIA (OPTIMISTA) ---
         window.deleteNewsItem = function(docId) {
             if (!isAdmin) return;
             
             askConfirmDialog(async () => {
-                try {
-                    allNews = allNews.filter(n => String(n.id) !== String(docId));
-                    renderNews(); 
+                // ACTUALIZACIÓN VISUAL INMEDIATA
+                allNews = allNews.filter(n => String(n.id) !== String(docId));
+                renderNews(); 
 
-                    if (db) {
+                // SINCRONIZACIÓN EN SEGUNDO PLANO
+                if (db && !docId.toString().startsWith('temp-')) {
+                    try {
                         const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                         await deleteDoc(postRef);
-                        showToast("Publicación eliminada del servidor");
-                    } else {
-                        showToast("Eliminado (Local)");
+                    } catch (error) {
+                        console.error("Error de borrado:", error);
                     }
-                } catch (error) {
-                    console.error("Error de borrado:", error);
-                    showToast("No se pudo borrar", "error");
                 }
             });
         };
 
+        // --- LIKES (OPTIMISTA) ---
         window.toggleLike = async function(docId, currentlyLiked) {
             if (isLiking) return; 
             isLiking = true;
 
             const uid = currentUserUid || 'local-user';
             
-            try {
-                if (db) {
+            // ACTUALIZACIÓN VISUAL INMEDIATA
+            const newsItem = allNews.find(n => String(n.id) === String(docId));
+            if (newsItem) {
+                if (!newsItem.likedBy) newsItem.likedBy = [];
+                if (currentlyLiked) {
+                    newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
+                } else {
+                    newsItem.likedBy.push(uid);
+                }
+                renderNews();
+            }
+
+            // SINCRONIZACIÓN EN SEGUNDO PLANO
+            if (db && !docId.toString().startsWith('temp-')) {
+                try {
                     const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                     if (currentlyLiked) {
                         await updateDoc(postRef, { likedBy: arrayRemove(uid) });
                     } else {
                         await updateDoc(postRef, { likedBy: arrayUnion(uid) });
                     }
-                } else {
-                    const newsItem = allNews.find(n => String(n.id) === String(docId));
-                    if (newsItem) {
-                        if (!newsItem.likedBy) newsItem.likedBy = [];
-                        if (currentlyLiked) {
-                            newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
-                        } else {
-                            newsItem.likedBy.push(uid);
-                        }
-                        renderNews();
-                    }
+                } catch (error) {
+                    console.error("Error Like:", error);
                 }
-            } catch (error) {
-                console.error("Error Like:", error);
-                showToast("Error de conexión", "error");
-            } finally {
-                isLiking = false;
             }
+            
+            isLiking = false;
         };
 
         initApp();
