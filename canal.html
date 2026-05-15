@@ -271,7 +271,6 @@
         let openComments = new Set(); 
         let isLiking = false; 
         let pendingDeleteAction = null;
-        let isPosting = false; 
 
         function enableAdmin() {
             isAdmin = true;
@@ -669,21 +668,17 @@
                         const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
                         onSnapshot(newsRef, 
                             (snapshot) => {
-                                // Si estamos en medio de publicar, no actualizamos la vista con los datos remotos
-                                // para evitar que la publicación optimista desaparezca.
-                                if (isPosting) return;
-
                                 const fetchedNews = [];
                                 snapshot.forEach((docSnap) => {
                                     fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
                                 });
                                 fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
                                 
-                                // Solamente actualizamos si hay cambios reales para no pisar la pantalla
                                 allNews = fetchedNews;
                                 renderNews();
                             },
                             (error) => {
+                                console.error("Error de red: ", error);
                                 document.getElementById('loading-state').innerHTML = `<p class="text-red-400 font-bold">Error de red.</p>`;
                             }
                         );
@@ -698,21 +693,19 @@
             }
         }
 
-        // --- PUBLICAR NOTICIA (OPTIMISTA E INMEDIATO) ---
+        // --- PUBLICAR NOTICIA ---
         document.getElementById('news-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isAdmin) return;
-
-            isPosting = true;
 
             const btn = document.querySelector('#news-form button[type="submit"]');
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<div class="absolute inset-0 bg-blue-600"></div><span class="relative flex items-center gap-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Lanzando...</span>';
             btn.disabled = true;
 
+            const category = document.getElementById('news-category').value;
             const newPost = {
-                id: 'temp-' + Date.now(), // ID Temporal para renderizado inmediato
-                category: document.getElementById('news-category').value,
+                category: category,
                 text: document.getElementById('news-text').value,
                 mediaUrl: document.getElementById('news-media').value.trim(),
                 link: document.getElementById('news-link').value.trim(),
@@ -721,40 +714,29 @@
                 comments: []
             };
 
-            // 1. ACTUALIZACIÓN VISUAL INMEDIATA EN PANTALLA
-            allNews.unshift(newPost);
-            
-            // Si hay un filtro aplicado que no coincide con la nueva noticia, lo quitamos
-            // para que el admin pueda ver lo que acaba de publicar
-            if (currentFilter !== 'ALL' && currentFilter !== newPost.category) {
-                setFilter('ALL'); // Esto ya llama a renderNews()
-            } else {
-                renderNews();
-            }
-
-            document.getElementById('news-form').reset();
-            showToast("¡Transmisión lanzada a la pista!");
-
-            // 2. SINCRONIZACIÓN EN SEGUNDO PLANO
             try {
-                if (db) {
+                if (db && auth.currentUser) {
                     const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
-                    const postToSave = { ...newPost };
-                    delete postToSave.id; // Para que Firebase cree el ID oficial
-                    await addDoc(colRef, postToSave);
+                    // Al usar addDoc, la tecnología nativa de Firebase actualizará la pantalla al instante
+                    await addDoc(colRef, newPost);
+                    
+                    document.getElementById('news-form').reset();
+                    showToast("¡Transmisión lanzada a la pista!");
+                    
+                    // Si estamos filtrando otra categoría, cambiamos a "Explorar Todo" para poder verla
+                    if (currentFilter !== 'ALL' && currentFilter !== category) {
+                        setFilter('ALL');
+                    }
+                } else {
+                    throw new Error("No hay conexión con el servidor");
                 }
             } catch (error) {
                 console.error("Error de base de datos:", error);
-                // Si falla, podríamos querer quitar la noticia optimista o mostrar un error
                 showToast("Error al guardar la transmisión.", "error");
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 lucide.createIcons();
-                // para asegurar que el onSnapshot que se dispara por nuestro propio addDoc no nos borre
-                setTimeout(() => {
-                    isPosting = false;
-                }, 1000);
             }
         });
 
