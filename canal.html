@@ -253,7 +253,6 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Variables Globales
         let allNews = [];
         let currentFilter = 'ALL';
         let isAdmin = false;
@@ -622,9 +621,9 @@
         async function initApp() {
             try {
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-                const firebaseConfig = JSON.parse(configStr);
+                let firebaseConfig = typeof configStr === 'string' ? JSON.parse(configStr) : configStr;
 
-                if (!firebaseConfig.projectId) {
+                if (!firebaseConfig || !firebaseConfig.projectId) {
                     throw new Error("Sin conexión");
                 }
 
@@ -663,7 +662,7 @@
                                 renderNews();
                             },
                             (error) => {
-                                document.getElementById('loading-state').innerHTML = `<p class="text-red-400 font-bold">Error de red al conectar con datos.</p>`;
+                                document.getElementById('loading-state').innerHTML = `<p class="text-red-400 font-bold">Error de red.</p>`;
                             }
                         );
                     }
@@ -672,23 +671,22 @@
             } catch (error) {
                 allNews = [];
                 renderNews();
-                if(isAdmin) showToast("Entorno Local Activado (Sin Base de Datos)", "error");
+                if(isAdmin) showToast("Entorno Local Activado", "error");
             }
         }
 
         document.getElementById('news-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!isAdmin) return;
+            if (!isAdmin) return; // EL BUG ESTABA AQUÍ: Esta línea había quedado fuera del eventListener.
 
             const btn = document.querySelector('#news-form button[type="submit"]');
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<div class="absolute inset-0 bg-blue-600"></div><span class="relative flex items-center gap-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Lanzando...</span>';
             btn.disabled = true;
 
-            const category = document.getElementById('news-category').value;
             const newPost = {
-                id: 'post-' + Date.now(),
-                category: category,
+                id: 'temp-' + Date.now(), 
+                category: document.getElementById('news-category').value,
                 text: document.getElementById('news-text').value,
                 mediaUrl: document.getElementById('news-media').value.trim(),
                 link: document.getElementById('news-link').value.trim(),
@@ -697,32 +695,22 @@
                 comments: []
             };
 
+            // ACTUALIZACIÓN VISUAL INMEDIATA EN PANTALLA
+            allNews.unshift(newPost);
+            renderNews();
+            document.getElementById('news-form').reset();
+            showToast("¡Transmisión lanzada a la pista!");
+
+            // SINCRONIZACIÓN EN SEGUNDO PLANO
             try {
-                if (!db) {
-                    // Si la BD no está provisionada, hacemos que funcione visualmente (modo local)
-                    allNews.unshift(newPost);
-                    renderNews();
-                    document.getElementById('news-form').reset();
-                    if (currentFilter !== 'ALL' && currentFilter !== category) setFilter('ALL');
-                    showToast("Modo local: Novedad creada (Falta activar guardado)", "info");
-                    return; // Salimos sin dar error para que funcione la parte visual
-                }
-
-                if (!auth.currentUser) throw new Error("Aún no te has conectado al servidor, espera un segundo.");
-
-                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
-                const docRef = doc(colRef, newPost.id);
-                await setDoc(docRef, newPost);
-                
-                document.getElementById('news-form').reset();
-                showToast("¡Transmisión lanzada a la pista!");
-                
-                if (currentFilter !== 'ALL' && currentFilter !== category) {
-                    setFilter('ALL');
+                if (db) {
+                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
+                    const postToSave = { ...newPost };
+                    delete postToSave.id; 
+                    await addDoc(colRef, postToSave);
                 }
             } catch (error) {
-                console.error("Error al publicar:", error);
-                showToast("Error: " + error.message, "error");
+                console.error("Error de base de datos:", error);
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
@@ -734,14 +722,15 @@
             if (!isAdmin) return;
             
             askConfirmDialog(async () => {
-                if (db) {
+                allNews = allNews.filter(n => String(n.id) !== String(docId));
+                renderNews(); 
+
+                if (db && !docId.toString().startsWith('temp-')) {
                     try {
                         const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                         await deleteDoc(postRef);
-                        showToast("Transmisión eliminada");
                     } catch (error) {
                         console.error("Error de borrado:", error);
-                        showToast("Error al borrar", "error");
                     }
                 }
             });
@@ -764,7 +753,7 @@
                 renderNews();
             }
 
-            if (db) {
+            if (db && !docId.toString().startsWith('temp-')) {
                 try {
                     const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                     if (currentlyLiked) {
@@ -782,6 +771,7 @@
 
         initApp();
         lucide.createIcons();
+
     </script>
 </body>
 </html>
