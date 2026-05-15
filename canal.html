@@ -399,10 +399,18 @@
 
         // --- ARRANQUE DE LA APLICACIÓN ---
         function initApp() {
+            const adminPanel = document.getElementById('admin-panel');
+            const adminBadge = document.getElementById('admin-badge');
+
             if (isAdmin) {
-                document.getElementById('admin-panel').classList.remove('hidden');
-                document.getElementById('admin-badge').classList.remove('hidden');
-                document.getElementById('admin-badge').classList.add('flex');
+                adminPanel.classList.remove('hidden');
+                adminBadge.classList.remove('hidden');
+                adminBadge.classList.add('flex');
+            } else {
+                // Seguro extra: forzar que todo lo de admin esté oculto al arrancar
+                adminPanel.classList.add('hidden');
+                adminBadge.classList.add('hidden');
+                adminBadge.classList.remove('flex');
             }
             renderNews();
         }
