@@ -421,7 +421,7 @@
                 likeBtn.onclick = () => toggleLike(news.id, isLiked);
                 leftActions.appendChild(likeBtn);
 
-                // BOTON DE CHAT AÑADIDO
+                // --- BOTÓN DE CHAT ---
                 const commentCount = news.comments ? news.comments.length : 0;
                 const commentBtn = document.createElement('button');
                 commentBtn.className = `flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-all border text-slate-400 bg-slate-800/50 border-slate-700 hover:text-cyan-400`;
@@ -457,7 +457,8 @@
 
                 if(rightActions.childNodes.length > 0) bottomBar.appendChild(rightActions);
                 card.appendChild(bottomBar);
-
+                
+                // --- SECCIÓN DEL CHAT ---
                 const commentsSection = document.createElement('div');
                 commentsSection.className = `comments-section mt-2 ${openComments.has(news.id) ? 'open' : ''}`;
                 
@@ -500,8 +501,7 @@
             lucide.createIcons();
         }
 
-        document.getElementById('news-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // --- STREAMING_CHUNK:Acción principal - Botón de Fuerza Bruta ---
             if (!isAdmin) return;
 
             const newPost = {
@@ -556,8 +556,6 @@
                 if (!newsItem.likedBy) newsItem.likedBy = [];
                 if (currentlyLiked) newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
                 else newsItem.likedBy.push(uid);
-                
-                localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
                 renderNews();
             }
             if (db && !docId.toString().startsWith('temp-')) {
@@ -567,6 +565,7 @@
             }
         };
 
+        // --- LÓGICA DEL CHAT Y NICKNAME ---
         window.closeNicknameModal = function() {
             document.getElementById('nickname-modal').classList.add('hidden');
             pendingCommentNewsId = null;
@@ -584,6 +583,7 @@
         });
 
         window.submitComment = function(newsId, text) {
+            userNickname = userNickname || localStorage.getItem('slot_nickname');
             if (!userNickname) {
                 pendingCommentNewsId = { id: newsId, text: text };
                 document.getElementById('nickname-modal').classList.remove('hidden');
@@ -600,7 +600,6 @@
                 newsItem.comments.push(newComment);
                 openComments.add(newsId);
                 
-                localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
                 renderNews();
 
                 if (db && !String(newsId).startsWith('temp-')) {
@@ -612,6 +611,7 @@
             }
         };
 
+        // --- STREAMING_CHUNK:Arranque del sistema ---
         async function initApp() {
             try {
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
