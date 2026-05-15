@@ -198,8 +198,30 @@
             }
         }
         
-        // FORZAMOS MODO ADMIN PARA LA VISTA PREVIA
-        let isAdmin = true;
+        // Modo Admin oculto por defecto. 
+        // Para activarlo en tu web real, añade "?admin=krono" al final del enlace (ej. index.html?admin=krono)
+        let isAdmin = false;
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('admin') === 'krono') {
+            isAdmin = true;
+        }
+
+        // TRUCO PARA ESTA VISTA PREVIA: Doble clic en la palabra "SlotSoftware" arriba a la izquierda para activar/desactivar
+        document.querySelector('header h1').addEventListener('dblclick', () => {
+            isAdmin = !isAdmin;
+            if (isAdmin) {
+                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('admin-badge').classList.remove('hidden');
+                document.getElementById('admin-badge').classList.add('flex');
+                showToast('Modo Administrador Activado');
+            } else {
+                document.getElementById('admin-panel').classList.add('hidden');
+                document.getElementById('admin-badge').classList.add('hidden');
+                document.getElementById('admin-badge').classList.remove('flex');
+                showToast('Modo Administrador Desactivado');
+            }
+            renderNews(); // Recargar las noticias para mostrar u ocultar los botones de borrar
+        });
 
         const newsFeed = document.getElementById('news-feed');
         const newsForm = document.getElementById('news-form');
