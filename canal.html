@@ -271,6 +271,7 @@
         let openComments = new Set(); 
         let isLiking = false; 
         let pendingDeleteAction = null;
+        let isPosting = false; 
 
         function enableAdmin() {
             isAdmin = true;
@@ -668,6 +669,10 @@
                         const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
                         onSnapshot(newsRef, 
                             (snapshot) => {
+                                // Si estamos en medio de publicar, no actualizamos la vista con los datos remotos
+                                // para evitar que la publicación optimista desaparezca.
+                                if (isPosting) return;
+
                                 const fetchedNews = [];
                                 snapshot.forEach((docSnap) => {
                                     fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
@@ -698,6 +703,8 @@
             e.preventDefault();
             if (!isAdmin) return;
 
+            isPosting = true;
+
             const btn = document.querySelector('#news-form button[type="submit"]');
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<div class="absolute inset-0 bg-blue-600"></div><span class="relative flex items-center gap-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Lanzando...</span>';
@@ -716,7 +723,15 @@
 
             // 1. ACTUALIZACIÓN VISUAL INMEDIATA EN PANTALLA
             allNews.unshift(newPost);
-            renderNews();
+            
+            // Si hay un filtro aplicado que no coincide con la nueva noticia, lo quitamos
+            // para que el admin pueda ver lo que acaba de publicar
+            if (currentFilter !== 'ALL' && currentFilter !== newPost.category) {
+                setFilter('ALL'); // Esto ya llama a renderNews()
+            } else {
+                renderNews();
+            }
+
             document.getElementById('news-form').reset();
             showToast("¡Transmisión lanzada a la pista!");
 
@@ -730,10 +745,16 @@
                 }
             } catch (error) {
                 console.error("Error de base de datos:", error);
+                // Si falla, podríamos querer quitar la noticia optimista o mostrar un error
+                showToast("Error al guardar la transmisión.", "error");
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 lucide.createIcons();
+                // para asegurar que el onSnapshot que se dispara por nuestro propio addDoc no nos borre
+                setTimeout(() => {
+                    isPosting = false;
+                }, 1000);
             }
         });
 
