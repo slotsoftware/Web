@@ -228,7 +228,7 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmación de Borrado (Sustituye al confirm nativo que fallaba) -->
+    <!-- Modal de Confirmación de Borrado -->
     <div id="confirm-modal" class="fixed inset-0 z-[300] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.2)] transform transition-all text-center">
             <div class="flex justify-center mb-4">
@@ -251,6 +251,7 @@
         <span id="toast-msg">Mensaje</span>
     </div>
 
+    <!-- Firebase SDK (Modular) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -410,7 +411,6 @@
         window.deleteComment = function(newsId, commentObjStr) {
             if (!isAdmin) return;
             
-            // Usamos la alerta personalizada segura
             askConfirmDialog(async () => {
                 const commentObj = JSON.parse(decodeURIComponent(commentObjStr));
                 
@@ -465,7 +465,6 @@
         });
 
 
-        // --- STREAMING_CHUNK:Rendering Feed Function... ---
         function renderNews() {
             const container = document.getElementById('feed-container');
             const loadingState = document.getElementById('loading-state');
@@ -636,7 +635,6 @@
             lucide.createIcons();
         }
 
-        // --- STREAMING_CHUNK:Firebase Core Logic... ---
         async function initApp() {
             try {
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
@@ -668,7 +666,6 @@
                             }
                         } catch(e) { console.warn("No se pudo cargar el perfil"); }
 
-                        // Listener robusto
                         const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
                         onSnapshot(newsRef, 
                             (snapshot) => {
@@ -689,19 +686,9 @@
                 });
 
             } catch (error) {
-                // FALLBACK MODO DEMO
-                allNews = [
-                    { 
-                        id: '1', 
-                        category: 'TRACKS TELEMETRY V.1.0', 
-                        text: '¡Atención pilotos! El sistema de Tracks Telemetry acaba de recibir una actualización masiva. Ahora la visualización de datos es en tiempo real a 60FPS.', 
-                        mediaUrl: 'https://placehold.co/1280x720/0f172a/06b6d4?text=NUEVA+TELEMETRIA', 
-                        link: 'https://slotsoftware.github.io/Telemetria/', 
-                        timestamp: Date.now(),
-                        likedBy: [],
-                        comments: []
-                    }
-                ];
+                // AQUÍ ESTABA LA PUBLICACIÓN DE DEMOSTRACIÓN.
+                // AHORA INICIAMOS CON LA LISTA VACÍA POR DEFECTO.
+                allNews = [];
                 renderNews();
                 if(isAdmin) showToast("Entorno Local Activado", "error");
             }
@@ -753,10 +740,8 @@
         window.deleteNewsItem = function(docId) {
             if (!isAdmin) return;
             
-            // Usamos la alerta personalizada, no la nativa del navegador.
             askConfirmDialog(async () => {
                 try {
-                    // Borrado Inmediato Visual
                     allNews = allNews.filter(n => String(n.id) !== String(docId));
                     renderNews(); 
 
