@@ -502,6 +502,8 @@
         }
 
         // --- STREAMING_CHUNK:Acción principal - Botón de Fuerza Bruta ---
+        document.getElementById('news-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
             if (!isAdmin) return;
 
             const newPost = {
