@@ -619,17 +619,19 @@
 
         // --- STREAMING_CHUNK:Inicialización segura de Firebase ---
         async function initApp() {
-            try {
-                // Hacemos que "Conectando..." desaparezca inmediatamente por si acaso falla la red
-                const loading = document.getElementById('loading-state');
-                if (loading) loading.style.display = 'none';
+            // Fuerza la eliminación del mensaje "Conectando..." inmediatamente
+            const loading = document.getElementById('loading-state');
+            if (loading) loading.style.display = 'none';
 
+            try {
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
                 const firebaseConfig = JSON.parse(configStr);
                 
+                // Si no hay configuración válida, saltamos directamente al modo local
                 if (!firebaseConfig.projectId) {
-                    renderNews(); // Lanzar la vista local de inmediato
-                    return; // Detenemos la carga de Firebase porque no hay conexión
+                    console.log("Iniciando en modo local (sin Firebase configurado)");
+                    renderNews();
+                    return;
                 }
 
                 const app = initializeApp(firebaseConfig);
@@ -653,16 +655,19 @@
                             });
                             fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
                             allNews = fetchedNews;
+                            // Sincronizar el backup local con lo que llega de Firebase
                             localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
                             renderNews(); 
                         });
                     }
                 });
             } catch (error) {
+                console.warn("Fallo al conectar con Firebase. Entrando en modo Offline.", error);
                 renderNews(); // Si hay cualquier fallo, fuerza a cargar la app local
             }
         }
 
+        // Ejecutar inicialización y renderizar iconos base
         initApp();
         lucide.createIcons();
     </script>
