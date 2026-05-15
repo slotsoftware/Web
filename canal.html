@@ -168,10 +168,10 @@
                 <div>
                     <input type="text" id="news-link" placeholder="Enlace a tu web (Opcional)" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-medium placeholder-slate-500">
                 </div>
-                <button type="submit" class="relative group overflow-hidden bg-slate-900 text-white font-bold py-3 rounded-xl transition-all border border-slate-700 hover:border-cyan-500">
+                <button type="submit" class="relative group overflow-hidden bg-slate-900 text-white font-bold py-3 rounded-xl transition-all border border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)]">
                     <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-80 group-hover:opacity-100 transition-opacity"></div>
                     <div class="relative flex justify-center items-center gap-2">
-                        <i data-lucide="send" class="w-4 h-4"></i> Lanzar Actualización
+                        <i data-lucide="zap" class="w-5 h-5 text-yellow-300"></i> FORZAR ENVÍO A PISTA
                     </div>
                 </button>
             </form>
@@ -193,7 +193,7 @@
                     <div class="absolute inset-0 bg-cyan-500 blur-xl opacity-20 rounded-full animate-pulse"></div>
                     <i data-lucide="aperture" class="w-10 h-10 animate-spin relative z-10"></i>
                 </div>
-                <p class="text-sm font-bold mt-4 tracking-widest uppercase bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">Sincronizando Datos...</p>
+                <p class="text-sm font-bold mt-4 tracking-widest uppercase bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">Conectando...</p>
             </div>
             
             <div id="empty-state" class="hidden flex-col items-center justify-center py-24 text-center px-6 animate-float">
@@ -201,12 +201,11 @@
                     <i data-lucide="satellite" class="w-10 h-10 text-slate-500"></i>
                 </div>
                 <h3 class="text-xl font-bold text-white mb-2 tracking-tight">Pista Despejada</h3>
-                <p class="text-slate-400 text-sm max-w-xs">Aún no hay transmisiones en esta frecuencia. Vuelve pronto para ver las novedades.</p>
+                <p class="text-slate-400 text-sm max-w-xs">Aún no hay transmisiones. ¡Sé el primero en lanzar una!</p>
             </div>
         </div>
     </main>
 
-    <!-- Modal de Identificación (Nickname) -->
     <div id="nickname-modal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)] transform transition-all">
             <div class="flex justify-center mb-4">
@@ -215,20 +214,17 @@
                 </div>
             </div>
             <h3 class="text-xl font-bold text-center text-white mb-2">Identificación de Piloto</h3>
-            <p class="text-sm text-slate-400 text-center mb-6">Para poder chatear y comentar, dinos cómo te llamas o tu alias en la pista.</p>
-            
+            <p class="text-sm text-slate-400 text-center mb-6">Dinos cómo te llamas para poder comentar.</p>
             <form id="nickname-form" class="flex flex-col gap-4">
-                <input type="text" id="nickname-input" placeholder="Ej: PacoSlot, KronoRacer..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg font-bold text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" required maxlength="20">
-                
+                <input type="text" id="nickname-input" placeholder="Ej: KronoRacer" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg font-bold text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" required maxlength="20">
                 <div class="flex gap-3 mt-2">
                     <button type="button" onclick="closeNicknameModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-all">Cancelar</button>
-                    <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40">Guardar</button>
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-cyan-500/20">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal de Confirmación de Borrado -->
     <div id="confirm-modal" class="fixed inset-0 z-[300] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.2)] transform transition-all text-center">
             <div class="flex justify-center mb-4">
@@ -237,7 +233,7 @@
                 </div>
             </div>
             <h3 class="text-xl font-bold text-white mb-2">¿Confirmar Borrado?</h3>
-            <p class="text-sm text-slate-400 mb-6">Esta acción es permanente y no se puede deshacer.</p>
+            <p class="text-sm text-slate-400 mb-6">Esta acción es permanente.</p>
             <div class="flex gap-3 mt-2">
                 <button id="btn-cancel-delete" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-all">Cancelar</button>
                 <button id="btn-confirm-delete" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-red-500/20">Borrar</button>
@@ -245,7 +241,6 @@
         </div>
     </div>
 
-    <!-- Modal de Mensajes (Toasts) -->
     <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.5)] text-sm font-bold transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-3 border border-slate-700">
         <i id="toast-icon" data-lucide="info" class="w-5 h-5"></i>
         <span id="toast-msg">Mensaje</span>
@@ -256,7 +251,6 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Variables Globales
         let allNews = [];
         let currentFilter = 'ALL';
         let isAdmin = false;
@@ -270,16 +264,12 @@
         let isLiking = false; 
         let pendingDeleteAction = null;
 
+        // Activar Admin
         function enableAdmin() {
             isAdmin = true;
-            const adminPanel = document.getElementById('admin-panel');
-            const adminBadge = document.getElementById('admin-badge');
-            if (adminPanel) adminPanel.classList.remove('hidden');
-            if (adminBadge) {
-                adminBadge.classList.remove('hidden');
-                adminBadge.classList.add('flex');
-            }
-            renderNews();
+            document.getElementById('admin-panel').classList.remove('hidden');
+            document.getElementById('admin-badge').classList.remove('hidden');
+            document.getElementById('admin-badge').classList.add('flex');
         }
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -287,14 +277,13 @@
             enableAdmin();
         }
 
-        // --- TOASTS ---
+        // Toasts
         window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
             const toastIcon = document.getElementById('toast-icon');
             
             toastMsg.innerText = message;
-            
             if (type === 'success') {
                 toastIcon.setAttribute('data-lucide', 'check-circle-2');
                 toast.className = "fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900 text-green-400 px-6 py-3 rounded-full shadow-[0_0_30px_rgba(74,222,128,0.2)] text-sm font-bold transition-all duration-300 opacity-100 translate-y-0 pointer-events-none z-[100] flex items-center gap-3 border border-green-500/30";
@@ -303,34 +292,28 @@
                 toast.className = "fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900 text-red-400 px-6 py-3 rounded-full shadow-[0_0_30px_rgba(248,113,113,0.2)] text-sm font-bold transition-all duration-300 opacity-100 translate-y-0 pointer-events-none z-[100] flex items-center gap-3 border border-red-500/30";
             }
             lucide.createIcons();
-
             setTimeout(() => {
                 toast.classList.remove('opacity-100', 'translate-y-0');
                 toast.classList.add('opacity-0', 'translate-y-4');
             }, 3000);
         }
 
-        // --- MODAL DE CONFIRMACIÓN ---
+        // Modal Borrar
         function askConfirmDialog(actionCallback) {
             pendingDeleteAction = actionCallback;
             document.getElementById('confirm-modal').classList.remove('hidden');
         }
-
         document.getElementById('btn-cancel-delete').addEventListener('click', () => {
-            pendingDeleteAction = null;
             document.getElementById('confirm-modal').classList.add('hidden');
         });
-
         document.getElementById('btn-confirm-delete').addEventListener('click', () => {
             if (pendingDeleteAction) pendingDeleteAction();
-            pendingDeleteAction = null;
             document.getElementById('confirm-modal').classList.add('hidden');
         });
 
-        // --- FILTROS UI ---
+        // Filtros
         window.setFilter = function(category) {
             currentFilter = category;
-            
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 if (btn.innerText.toUpperCase() === category || (category === 'ALL' && btn.innerText === 'Explorar Todo')) {
                     btn.className = 'filter-btn active px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg transition-all';
@@ -342,7 +325,7 @@
         };
 
         function formatDate(timestamp) {
-            if (!timestamp) return 'AHORA';
+            if (!timestamp) return 'AHORA MISMO';
             const date = new Date(timestamp);
             return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' }).toUpperCase();
         }
@@ -357,133 +340,29 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Comments and likes handlers ---
-        window.toggleComments = function(newsId) {
-            const section = document.getElementById(`comments-${newsId}`);
-            if (openComments.has(newsId)) {
-                openComments.delete(newsId);
-                section.classList.remove('open');
-            } else {
-                openComments.add(newsId);
-                section.classList.add('open');
-            }
-        }
-
-        window.submitComment = async function(newsId) {
-            const inputEl = document.getElementById(`comment-input-${newsId}`);
-            const text = inputEl.value.trim();
-            if (!text) return;
-
-            if (!userNickname) {
-                pendingCommentNewsId = newsId;
-                document.getElementById('nickname-modal').classList.remove('hidden');
-                setTimeout(() => document.getElementById('nickname-input').focus(), 100);
-                return;
-            }
-
-            inputEl.value = ''; 
-            
-            const commentData = {
-                uid: currentUserUid || 'local-user',
-                name: userNickname,
-                text: text,
-                timestamp: Date.now()
-            };
-
-            if (db) {
-                try {
-                    const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
-                    await updateDoc(postRef, { comments: arrayUnion(commentData) });
-                } catch (error) {
-                    console.error("Error comentando:", error);
-                }
-            } else {
-                // Modo local
-                const newsItem = allNews.find(n => String(n.id) === String(newsId));
-                if (newsItem) {
-                    if (!newsItem.comments) newsItem.comments = [];
-                    newsItem.comments.push(commentData);
-                    renderNews();
-                }
-            }
-        }
-
-        window.deleteComment = function(newsId, commentObjStr) {
-            if (!isAdmin) return;
-            
-            askConfirmDialog(async () => {
-                const commentObj = JSON.parse(decodeURIComponent(commentObjStr));
-                
-                if (db) {
-                    try {
-                        const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
-                        await updateDoc(postRef, { comments: arrayRemove(commentObj) });
-                    } catch (error) {
-                        console.error(error);
-                    }
-                } else {
-                    const newsItem = allNews.find(n => String(n.id) === String(newsId));
-                    if (newsItem && newsItem.comments) {
-                        newsItem.comments = newsItem.comments.filter(c => c.timestamp !== commentObj.timestamp);
-                        renderNews();
-                    }
-                }
-            });
-        }
-
-        window.closeNicknameModal = function() {
-            document.getElementById('nickname-modal').classList.add('hidden');
-            pendingCommentNewsId = null;
-        }
-
-        document.getElementById('nickname-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const inputName = document.getElementById('nickname-input').value.trim();
-            if (!inputName) return;
-
-            userNickname = inputName;
-            
-            if (db && currentUserUid) {
-                try {
-                    const profileRef = doc(db, 'artifacts', appId, 'users', currentUserUid, 'profile', 'info');
-                    await setDoc(profileRef, { nickname: userNickname });
-                } catch (error) {
-                    console.error("Error guardando perfil:", error);
-                }
-            }
-            
-            showToast(`¡Bienvenido a la pista, ${userNickname}!`);
-            closeNicknameModal();
-
-            if (pendingCommentNewsId) {
-                submitComment(pendingCommentNewsId);
-                pendingCommentNewsId = null;
-            }
-        });
-
-        // --- STREAMING_CHUNK:Rendering UI function ---
-        function renderNews() {
+        // --- STREAMING_CHUNK:Lógica de Renderizado Forzoso ---
+        window.renderNews = function() {
             const container = document.getElementById('feed-container');
             const loadingState = document.getElementById('loading-state');
             const emptyState = document.getElementById('empty-state');
             
-            if (loadingState) loadingState.style.display = 'none';
+            if(loadingState) loadingState.style.display = 'none';
 
+            // LIMPIAR PISTA ANTES DE PINTAR
             const existingCards = container.querySelectorAll('.news-card-el');
             existingCards.forEach(card => card.remove());
 
             let filteredNews = currentFilter === 'ALL' ? allNews : allNews.filter(n => n.category === currentFilter);
 
             if (filteredNews.length === 0) {
-                if (emptyState) emptyState.style.display = 'flex';
+                if(emptyState) emptyState.style.display = 'flex';
                 return;
             } else {
-                if (emptyState) emptyState.style.display = 'none';
+                if(emptyState) emptyState.style.display = 'none';
             }
 
             filteredNews.forEach((news) => {
                 const card = document.createElement('div');
-                card.id = `news-card-${news.id}`;
                 card.className = `news-card-el news-card glass-panel rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden`;
                 
                 const glow = document.createElement('div');
@@ -513,7 +392,6 @@
                 if (news.mediaUrl) {
                     const mediaContainer = document.createElement('div');
                     mediaContainer.className = 'relative mt-2 rounded-xl overflow-hidden border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] group cursor-pointer bg-slate-900';
-                    
                     const ytMatch = news.mediaUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
                     const videoMatch = news.mediaUrl.match(/\.(mp4|webm|ogg)$/i);
                     
@@ -525,7 +403,6 @@
                         const img = document.createElement('img');
                         img.src = news.mediaUrl;
                         img.className = 'w-full h-auto object-cover max-h-80 transition-transform duration-700 group-hover:scale-105';
-                        img.onerror = () => { mediaContainer.style.display = 'none'; };
                         mediaContainer.appendChild(img);
                     }
                     card.appendChild(mediaContainer);
@@ -533,26 +410,17 @@
 
                 const bottomBar = document.createElement('div');
                 bottomBar.className = 'flex flex-wrap justify-between items-center mt-2 pt-4 border-t border-white/5 gap-3';
-
                 const leftActions = document.createElement('div');
                 leftActions.className = 'flex gap-2';
 
-                const isLiked = news.likedBy && news.likedBy.includes(currentUserUid || 'local-user');
+                const isLiked = news.likedBy && news.likedBy.includes(currentUserUid || 'local');
                 const likeCount = news.likedBy ? news.likedBy.length : 0;
                 
                 const likeBtn = document.createElement('button');
-                likeBtn.className = `flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-all border ${isLiked ? 'text-pink-400 bg-pink-500/10 border-pink-500/30 shadow-[0_0_15px_rgba(244,114,182,0.2)] heart-active' : 'text-slate-400 bg-slate-800/50 border-slate-700 hover:bg-slate-800 hover:text-pink-400 hover:border-pink-500/30'}`;
-                likeBtn.innerHTML = `<i data-lucide="heart" class="w-4 h-4 ${isLiked ? 'fill-current' : ''}"></i> <span>${likeCount > 0 ? likeCount : 'Espectacular'}</span>`;
+                likeBtn.className = `flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-all border ${isLiked ? 'text-pink-400 bg-pink-500/10 border-pink-500/30 heart-active' : 'text-slate-400 bg-slate-800/50 border-slate-700 hover:text-pink-400'}`;
+                likeBtn.innerHTML = `<i data-lucide="heart" class="w-4 h-4 ${isLiked ? 'fill-current' : ''}"></i> <span>${likeCount > 0 ? likeCount : 'Like'}</span>`;
                 likeBtn.onclick = () => toggleLike(news.id, isLiked);
                 leftActions.appendChild(likeBtn);
-
-                const commentsArray = news.comments || [];
-                const commentsCount = commentsArray.length;
-                const chatBtn = document.createElement('button');
-                chatBtn.className = `flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-all border border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-800 hover:border-cyan-500/30 hover:text-cyan-400`;
-                chatBtn.innerHTML = `<i data-lucide="message-square" class="w-4 h-4"></i> <span>${commentsCount > 0 ? commentsCount : 'Comentar'}</span>`;
-                chatBtn.onclick = () => toggleComments(news.id);
-                leftActions.appendChild(chatBtn);
 
                 bottomBar.appendChild(leftActions);
 
@@ -563,17 +431,14 @@
                     const linkBtn = document.createElement('a');
                     linkBtn.href = news.link;
                     linkBtn.target = '_blank';
-                    linkBtn.className = 'group relative inline-flex items-center gap-2 text-sm font-bold text-white px-5 py-2.5 rounded-xl overflow-hidden border border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)] transition-all';
-                    linkBtn.innerHTML = `
-                        <div class="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-600 opacity-80 group-hover:opacity-100 transition-opacity"></div>
-                        <span class="relative z-10 flex items-center gap-2">Acceder <i data-lucide="arrow-right-circle" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i></span>
-                    `;
+                    linkBtn.className = 'inline-flex items-center gap-2 text-sm font-bold text-white px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 transition-colors';
+                    linkBtn.innerHTML = `Ver <i data-lucide="external-link" class="w-4 h-4"></i>`;
                     rightActions.appendChild(linkBtn);
                 }
 
                 if (isAdmin) {
                     const delBtn = document.createElement('button');
-                    delBtn.className = 'inline-flex items-center justify-center w-10 h-10 rounded-xl text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:text-red-300 transition-all';
+                    delBtn.className = 'inline-flex items-center justify-center w-10 h-10 rounded-xl text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors';
                     delBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i>';
                     delBtn.onclick = () => deleteNewsItem(news.id);
                     rightActions.appendChild(delBtn);
@@ -581,65 +446,86 @@
 
                 if(rightActions.childNodes.length > 0) bottomBar.appendChild(rightActions);
                 card.appendChild(bottomBar);
-
-                const commentsSection = document.createElement('div');
-                commentsSection.id = `comments-${news.id}`;
-                commentsSection.className = `comments-section mt-4 pt-4 border-t border-slate-700/50 flex flex-col gap-3 ${openComments.has(news.id) ? 'open' : ''}`;
-                
-                if (commentsArray.length > 0) {
-                    const commentsList = document.createElement('div');
-                    commentsList.className = 'flex flex-col gap-3 max-h-60 overflow-y-auto pr-2 custom-scroll';
-                    
-                    commentsArray.forEach(c => {
-                        const cDiv = document.createElement('div');
-                        cDiv.className = 'bg-slate-900/50 rounded-xl p-3 border border-white/5';
-                        
-                        let deleteHtml = '';
-                        if (isAdmin || c.uid === (currentUserUid || 'local-user')) {
-                            const cObjStr = encodeURIComponent(JSON.stringify(c));
-                            deleteHtml = `<button onclick="deleteComment('${news.id}', '${cObjStr}')" class="text-red-500/50 hover:text-red-400 transition-colors" title="Borrar"><i data-lucide="x-circle" class="w-4 h-4"></i></button>`;
-                        }
-
-                        cDiv.innerHTML = `
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-xs font-bold text-cyan-400">${c.name || 'Piloto'}</span>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[10px] text-slate-500">${formatDate(c.timestamp)}</span>
-                                    ${deleteHtml}
-                                </div>
-                            </div>
-                            <p class="text-sm text-slate-300 leading-snug">${c.text}</p>
-                        `;
-                        commentsList.appendChild(cDiv);
-                    });
-                    commentsSection.appendChild(commentsList);
-                }
-
-                const inputDiv = document.createElement('div');
-                inputDiv.className = 'flex gap-2 mt-1';
-                inputDiv.innerHTML = `
-                    <input type="text" id="comment-input-${news.id}" placeholder="Escribe un comentario..." class="flex-grow bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all" onkeypress="if(event.key === 'Enter') submitComment('${news.id}')">
-                    <button onclick="submitComment('${news.id}')" class="bg-blue-600 hover:bg-cyan-500 text-white rounded-xl px-4 py-2 transition-colors flex items-center justify-center">
-                        <i data-lucide="send" class="w-4 h-4"></i>
-                    </button>
-                `;
-                commentsSection.appendChild(inputDiv);
-
-                card.appendChild(commentsSection);
                 container.appendChild(card);
             });
 
             lucide.createIcons();
         }
 
-        // --- STREAMING_CHUNK:Firebase Initialization ---
+        // --- STREAMING_CHUNK:Acción principal - Botón de Fuerza Bruta ---
+        document.getElementById('news-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isAdmin) return;
+
+            // 1. Recoger datos
+            const newPost = {
+                id: 'temp-' + Date.now(), 
+                category: document.getElementById('news-category').value,
+                text: document.getElementById('news-text').value,
+                mediaUrl: document.getElementById('news-media').value.trim(),
+                link: document.getElementById('news-link').value.trim(),
+                timestamp: Date.now(),
+                likedBy: [],
+                comments: []
+            };
+
+            // 2. FORZAR RENDERIZADO INMEDIATO A LA PISTA (Localmente)
+            allNews.unshift(newPost); // Meter primero en la lista
+            setFilter('ALL'); // Cambiar filtro a "Todo" por si acaso
+            renderNews(); // PINTAR EN PANTALLA INMEDIATAMENTE
+            
+            document.getElementById('news-form').reset(); // Limpiar formulario
+            showToast("¡NOVEDAD EN PISTA!");
+
+            // 3. Guardado en segundo plano (silencioso)
+            if (db) {
+                try {
+                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
+                    const postToSave = { ...newPost };
+                    delete postToSave.id; 
+                    await addDoc(colRef, postToSave);
+                } catch (error) {
+                    console.error("Error guardando en la nube:", error);
+                }
+            }
+        });
+
+
+        // Funciones auxiliares
+        window.deleteNewsItem = function(docId) {
+            askConfirmDialog(async () => {
+                allNews = allNews.filter(n => String(n.id) !== String(docId));
+                renderNews(); 
+                if (db && !docId.toString().startsWith('temp-')) {
+                    try {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId)));
+                    } catch (e) {}
+                }
+            });
+        };
+
+        window.toggleLike = async function(docId, currentlyLiked) {
+            const uid = currentUserUid || 'local';
+            const newsItem = allNews.find(n => String(n.id) === String(docId));
+            if (newsItem) {
+                if (!newsItem.likedBy) newsItem.likedBy = [];
+                if (currentlyLiked) newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
+                else newsItem.likedBy.push(uid);
+                renderNews();
+            }
+            if (db && !docId.toString().startsWith('temp-')) {
+                const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
+                if (currentlyLiked) await updateDoc(postRef, { likedBy: arrayRemove(uid) });
+                else await updateDoc(postRef, { likedBy: arrayUnion(uid) });
+            }
+        };
+
+        // --- STREAMING_CHUNK:Arranque del sistema ---
         async function initApp() {
             try {
-                const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
-                if (!configStr || configStr === '{}') throw new Error("Sin configuración Firebase");
-                
-                const firebaseConfig = typeof configStr === 'string' ? JSON.parse(configStr) : configStr;
-                if (!firebaseConfig.projectId) throw new Error("Configuración inválida");
+                const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+                const firebaseConfig = JSON.parse(configStr);
+                if (!firebaseConfig.projectId) throw new Error("Sin Firebase");
 
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
@@ -651,149 +537,30 @@
                     await signInAnonymously(auth);
                 }
 
-                onAuthStateChanged(auth, async (user) => {
+                onAuthStateChanged(auth, (user) => {
                     if (user) {
                         currentUserUid = user.uid;
-                        
-                        try {
-                            const profileRef = doc(db, 'artifacts', appId, 'users', currentUserUid, 'profile', 'info');
-                            const profileSnap = await getDoc(profileRef);
-                            if (profileSnap.exists() && profileSnap.data().nickname) {
-                                userNickname = profileSnap.data().nickname;
-                            }
-                        } catch(e) {}
-
-                        // Conectamos la base de datos a la pantalla (se auto-actualiza sola)
                         const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
                         onSnapshot(newsRef, (snapshot) => {
                             const fetchedNews = [];
                             snapshot.forEach((docSnap) => {
                                 fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
                             });
-                            // Ordenamos de más nueva a más antigua
                             fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
                             allNews = fetchedNews;
-                            renderNews();
-                        }, (error) => {
-                            console.error("Error sincronizando:", error);
+                            renderNews(); // Renderizado normal de Firebase
                         });
-                    } else {
-                        currentUserUid = null;
                     }
                 });
-
             } catch (error) {
-                console.warn("Iniciando en modo local:", error);
+                // Modo sin conexión
+                document.getElementById('loading-state').style.display = 'none';
                 renderNews();
-                if(isAdmin) showToast("Entorno Local (Sin Nube)", "error");
             }
         }
 
-        // --- STREAMING_CHUNK:Publishing Form Logic ---
-        document.getElementById('news-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!isAdmin) return;
-
-            const btn = document.querySelector('#news-form button[type="submit"]');
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<div class="absolute inset-0 bg-blue-600"></div><span class="relative flex items-center gap-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Lanzando...</span>';
-            btn.disabled = true;
-
-            const newPost = {
-                category: document.getElementById('news-category').value,
-                text: document.getElementById('news-text').value,
-                mediaUrl: document.getElementById('news-media').value.trim(),
-                link: document.getElementById('news-link').value.trim(),
-                timestamp: Date.now(),
-                likedBy: [],
-                comments: []
-            };
-
-            try {
-                if (db && auth && auth.currentUser) {
-                    // Modo Nube: Se lanza y Firebase actualiza la pantalla automáticamente al instante
-                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
-                    await addDoc(colRef, newPost);
-                } else {
-                    // Modo Local (si no hay nube activa)
-                    newPost.id = 'local-' + Date.now();
-                    allNews.unshift(newPost);
-                    renderNews();
-                }
-
-                // Limpiamos el formulario y forzamos ver "Todo"
-                document.getElementById('news-form').reset();
-                setFilter('ALL'); 
-                showToast("¡Transmisión en pista!");
-
-            } catch (error) {
-                console.error("Error publicando:", error);
-                showToast("Error al lanzar novedad", "error");
-            } finally {
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
-                lucide.createIcons();
-            }
-        });
-
-        // --- STREAMING_CHUNK:Deleting News ---
-        window.deleteNewsItem = function(docId) {
-            if (!isAdmin) return;
-            
-            askConfirmDialog(async () => {
-                if (db && !docId.toString().startsWith('local-')) {
-                    try {
-                        const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
-                        await deleteDoc(postRef);
-                    } catch (error) {
-                        console.error("Error de borrado:", error);
-                    }
-                } else {
-                    // Borrado local
-                    allNews = allNews.filter(n => String(n.id) !== String(docId));
-                    renderNews(); 
-                }
-            });
-        };
-
-        // --- STREAMING_CHUNK:Handling likes ---
-        window.toggleLike = async function(docId, currentlyLiked) {
-            if (isLiking) return; 
-            isLiking = true;
-
-            const uid = currentUserUid || 'local-user';
-            
-            if (db && !docId.toString().startsWith('local-')) {
-                try {
-                    const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
-                    if (currentlyLiked) {
-                        await updateDoc(postRef, { likedBy: arrayRemove(uid) });
-                    } else {
-                        await updateDoc(postRef, { likedBy: arrayUnion(uid) });
-                    }
-                } catch (error) {
-                    console.error("Error Like:", error);
-                }
-            } else {
-                // Like Local
-                const newsItem = allNews.find(n => String(n.id) === String(docId));
-                if (newsItem) {
-                    if (!newsItem.likedBy) newsItem.likedBy = [];
-                    if (currentlyLiked) {
-                        newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
-                    } else {
-                        newsItem.likedBy.push(uid);
-                    }
-                    renderNews();
-                }
-            }
-            isLiking = false;
-        };
-
-        // Arrancamos
         initApp();
         lucide.createIcons();
-
     </script>
 </body>
 </html>
