@@ -92,7 +92,6 @@
         }
         .heart-active i { animation: heartBurst 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         
-        /* Animación suave para desplegar comentarios */
         .comments-section {
             transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
             max-height: 0;
@@ -129,7 +128,6 @@
             </div>
             
             <div class="flex items-center gap-2 sm:gap-3">
-                <!-- NUEVO BOTÓN: Enlace a la Web Principal -->
                 <a href="https://slotsoftware.github.io/Web/" title="Visitar Web Principal" class="flex items-center gap-1.5 sm:gap-2 text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all text-slate-300 hover:text-white group shadow-lg hover:shadow-cyan-500/20">
                     <i data-lucide="layout-dashboard" class="w-4 h-4 group-hover:text-cyan-400 transition-colors"></i>
                     <span class="hidden sm:inline">Web Oficial</span>
@@ -249,9 +247,9 @@
         let appId;
         let publicNewsCollectionRef;
         let currentUserUid = null;
-        let userNickname = null; // Almacena el nombre del piloto
-        let pendingCommentNewsId = null; // Guarda el ID de la noticia si pide el nombre a medias
-        let openComments = new Set(); // Guarda los IDs de las noticias con el panel de chat abierto
+        let userNickname = null;
+        let pendingCommentNewsId = null;
+        let openComments = new Set();
 
         function enableAdmin() {
             isAdmin = true;
@@ -267,7 +265,7 @@
         }
 
         // --- TOASTS ---
-        function showToast(message, type = 'success') {
+        window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
             const toastIcon = document.getElementById('toast-icon');
@@ -333,6 +331,7 @@
 
         window.submitComment = async function(newsId) {
             const inputEl = document.getElementById(`comment-input-${newsId}`);
+            if (!inputEl) return;
             const text = inputEl.value.trim();
             if (!text) return;
 
@@ -344,9 +343,8 @@
                 return;
             }
 
-            inputEl.value = ''; // Limpiar input rápidamente
+            inputEl.value = ''; 
             
-            // Crear el objeto del comentario
             const commentData = {
                 uid: currentUserUid || 'local-user',
                 name: userNickname,
@@ -360,7 +358,7 @@
                     await updateDoc(postRef, { comments: arrayUnion(commentData) });
                 } catch (error) {
                     console.error("Error comentando:", error);
-                    showToast("Error al enviar", "error");
+                    window.showToast("Error al enviar", "error");
                 }
             } else {
                 // Modo Local / Demo
@@ -369,7 +367,7 @@
                     if (!newsItem.comments) newsItem.comments = [];
                     newsItem.comments.push(commentData);
                     renderNews();
-                    showToast("Comentario enviado (Local)");
+                    window.showToast("Comentario enviado (Local)");
                 }
             }
         }
@@ -383,23 +381,22 @@
                     const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
                     try {
                         await updateDoc(postRef, { comments: arrayRemove(commentObj) });
-                        showToast("Comentario borrado");
+                        window.showToast("Comentario borrado");
                     } catch (error) {
-                        showToast("Error al borrar", "error");
+                        window.showToast("Error al borrar", "error");
                     }
                 } else {
-                    // Modo Local / Demo
                     const newsItem = allNews.find(n => String(n.id) === String(newsId));
                     if (newsItem && newsItem.comments) {
                         newsItem.comments = newsItem.comments.filter(c => c.timestamp !== commentObj.timestamp);
                         renderNews();
-                        showToast("Comentario borrado (Local)");
+                        window.showToast("Comentario borrado (Local)");
                     }
                 }
             }
         }
 
-        // Manejo del Nickname Modal
+        // Manejo del Nickname Modal (Corregido para que guarde SIEMPRE, incluso sin red)
         window.closeNicknameModal = function() {
             document.getElementById('nickname-modal').classList.add('hidden');
             pendingCommentNewsId = null;
@@ -408,24 +405,29 @@
         document.getElementById('nickname-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const inputName = document.getElementById('nickname-input').value.trim();
-            if (!inputName || !currentUserUid) return;
+            if (!inputName) return; 
 
-            userNickname = inputName;
+            userNickname = inputName; // Lo guardamos localmente siempre
             
-            // Guardar en la base de datos privada del usuario
-            try {
-                const profileRef = doc(db, 'artifacts', appId, 'users', currentUserUid, 'profile', 'info');
-                await setDoc(profileRef, { nickname: userNickname });
-                showToast(`¡Bienvenido a la pista, ${userNickname}!`);
-            } catch (error) {
-                console.error("Error guardando perfil:", error);
+            // Si hay conexión, lo guardamos en el servidor también
+            if (currentUserUid && db) {
+                try {
+                    const profileRef = doc(db, 'artifacts', appId, 'users', currentUserUid, 'profile', 'info');
+                    await setDoc(profileRef, { nickname: userNickname });
+                    window.showToast(`¡Bienvenido a la pista, ${userNickname}!`);
+                } catch (error) {
+                    console.error("Error guardando perfil en nube:", error);
+                    window.showToast(`¡Bienvenido, ${userNickname}! (Modo Local)`);
+                }
+            } else {
+                window.showToast(`¡Bienvenido, ${userNickname}! (Sin conexión)`);
             }
 
             closeNicknameModal();
 
             // Si estaba a medias de enviar un comentario, lo enviamos
             if (pendingCommentNewsId) {
-                submitComment(pendingCommentNewsId);
+                window.submitComment(pendingCommentNewsId);
                 pendingCommentNewsId = null;
             }
         });
@@ -453,6 +455,7 @@
 
             filteredNews.forEach((news, index) => {
                 const card = document.createElement('div');
+                card.id = `news-card-${news.id}`; // Asignado ID único para borrado visual
                 card.className = `news-card-el news-card glass-panel rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden`;
                 
                 const glow = document.createElement('div');
@@ -503,7 +506,7 @@
                     card.appendChild(mediaContainer);
                 }
 
-                // BARRA INFERIOR (Likes, Comentarios, Link/Borrar)
+                // BARRA INFERIOR
                 const bottomBar = document.createElement('div');
                 bottomBar.className = 'flex flex-wrap justify-between items-center mt-2 pt-4 border-t border-white/5 gap-3';
 
@@ -511,13 +514,17 @@
                 leftActions.className = 'flex gap-2';
 
                 // LIKES
-                const isLiked = news.likedBy && news.likedBy.includes(currentUserUid);
+                const currentUidForLike = currentUserUid || 'local-user';
+                const isLiked = news.likedBy && news.likedBy.includes(currentUidForLike);
                 const likeCount = news.likedBy ? news.likedBy.length : 0;
                 
                 const likeBtn = document.createElement('button');
                 likeBtn.className = `flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-all border ${isLiked ? 'text-pink-400 bg-pink-500/10 border-pink-500/30 shadow-[0_0_15px_rgba(244,114,182,0.2)] heart-active' : 'text-slate-400 bg-slate-800/50 border-slate-700 hover:bg-slate-800 hover:text-pink-400 hover:border-pink-500/30'}`;
                 likeBtn.innerHTML = `<i data-lucide="heart" class="w-4 h-4 ${isLiked ? 'fill-current' : ''}"></i> <span>${likeCount > 0 ? likeCount : 'Espectacular'}</span>`;
-                likeBtn.onclick = () => toggleLike(news.id, isLiked);
+                likeBtn.onclick = () => {
+                    likeBtn.disabled = true; // Prevenir múltiples clics rápidos
+                    window.toggleLike(news.id, isLiked);
+                };
                 leftActions.appendChild(likeBtn);
 
                 // BOTÓN CHAT/COMENTARIOS
@@ -551,7 +558,7 @@
                     const delBtn = document.createElement('button');
                     delBtn.className = 'inline-flex items-center justify-center w-10 h-10 rounded-xl text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:text-red-300 transition-all';
                     delBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i>';
-                    delBtn.onclick = () => deleteNewsItem(news.id);
+                    delBtn.onclick = () => window.deleteNewsItem(news.id);
                     rightActions.appendChild(delBtn);
                 }
 
@@ -634,7 +641,6 @@
                     if (user) {
                         currentUserUid = user.uid;
                         
-                        // Intentar recuperar el nombre de piloto guardado
                         try {
                             const profileRef = doc(db, 'artifacts', appId, 'users', currentUserUid, 'profile', 'info');
                             const profileSnap = await getDoc(profileRef);
@@ -680,7 +686,7 @@
                     }
                 ];
                 renderNews();
-                if(isAdmin) showToast("Entorno Local Activado", "error");
+                if(isAdmin) window.showToast("Entorno Local Activado", "error");
             }
         }
 
@@ -701,24 +707,23 @@
                 link: document.getElementById('news-link').value,
                 timestamp: Date.now(),
                 likedBy: [],
-                comments: [] // Iniciamos con cero comentarios
+                comments: []
             };
 
             if (publicNewsCollectionRef) {
                 try {
                     await addDoc(publicNewsCollectionRef, newPost);
                     document.getElementById('news-form').reset();
-                    showToast("¡Actualización lanzada con éxito!");
+                    window.showToast("¡Actualización lanzada con éxito!");
                 } catch (error) {
-                    showToast("Fallo en la transmisión", "error");
+                    window.showToast("Fallo en la transmisión", "error");
                 }
             } else {
-                // Modo Local / Demo
                 newPost.id = Date.now().toString();
                 allNews.unshift(newPost);
                 document.getElementById('news-form').reset();
                 renderNews();
-                showToast("¡Actualización lanzada! (Local)");
+                window.showToast("¡Actualización lanzada! (Local)");
             }
             
             btn.innerHTML = originalHTML;
@@ -726,24 +731,37 @@
             lucide.createIcons();
         });
 
-        // --- BORRAR Y LIKES ---
+        // --- BORRAR Y LIKES (Corregido con Borrado Optimista) ---
         window.deleteNewsItem = async function(docId) {
             if (!isAdmin) return;
-            if (confirm("¿Abortar misión y borrar este anuncio?")) {
+            if (confirm("¿Abortar misión y borrar este anuncio permanentemente?")) {
+                
+                // Ocultar tarjeta inmediatamente (Borrado optimista)
+                const card = document.getElementById(`news-card-${docId}`);
+                if (card) {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.9)';
+                    setTimeout(() => card.style.display = 'none', 300);
+                }
+
                 if (publicNewsCollectionRef && db) {
                     try {
                         const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                         await deleteDoc(postRef);
-                        showToast("Registro borrado del sistema");
+                        window.showToast("Registro borrado del sistema");
                     } catch (error) {
                         console.error(error);
-                        showToast("Error crítico al eliminar", "error");
+                        if(card) {
+                            card.style.display = 'flex';
+                            card.style.opacity = '1';
+                            card.style.transform = 'scale(1)';
+                        }
+                        window.showToast("Error crítico al eliminar", "error");
                     }
                 } else {
-                    // Modo Local / Demo
                     allNews = allNews.filter(n => String(n.id) !== String(docId));
                     renderNews();
-                    showToast("Registro borrado (Modo Local)");
+                    window.showToast("Registro borrado (Modo Local)");
                 }
             }
         };
@@ -760,7 +778,7 @@
                         await updateDoc(postRef, { likedBy: arrayUnion(uid) });
                     }
                 } catch (error) {
-                    showToast("Fallo de conexión", "error");
+                    window.showToast("Fallo de conexión", "error");
                 }
             } else {
                 // Modo Local / Demo
@@ -770,7 +788,9 @@
                     if (currentlyLiked) {
                         newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
                     } else {
-                        newsItem.likedBy.push(uid);
+                        if (!newsItem.likedBy.includes(uid)) { // Verificación extra local
+                            newsItem.likedBy.push(uid);
+                        }
                     }
                     renderNews();
                 }
