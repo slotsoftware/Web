@@ -91,18 +91,6 @@
             100% { transform: scale(1); }
         }
         .heart-active i { animation: heartBurst 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        
-        .comments-section {
-            transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-        }
-        .comments-section.open {
-            max-height: 800px;
-            opacity: 1;
-            overflow-y: auto;
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans antialiased relative">
@@ -206,25 +194,6 @@
         </div>
     </main>
 
-    <div id="nickname-modal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)] transform transition-all">
-            <div class="flex justify-center mb-4">
-                <div class="w-16 h-16 bg-gradient-to-tr from-blue-600 to-cyan-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white/10">
-                    <i data-lucide="user-plus" class="w-8 h-8 text-white"></i>
-                </div>
-            </div>
-            <h3 class="text-xl font-bold text-center text-white mb-2">Identificación de Piloto</h3>
-            <p class="text-sm text-slate-400 text-center mb-6">Dinos cómo te llamas para poder comentar.</p>
-            <form id="nickname-form" class="flex flex-col gap-4">
-                <input type="text" id="nickname-input" placeholder="Ej: KronoRacer" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg font-bold text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" required maxlength="20">
-                <div class="flex gap-3 mt-2">
-                    <button type="button" onclick="closeNicknameModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-all">Cancelar</button>
-                    <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-cyan-500/20">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <div id="confirm-modal" class="fixed inset-0 z-[300] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.2)] transform transition-all text-center">
             <div class="flex justify-center mb-4">
@@ -249,7 +218,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         let allNews = [];
         let currentFilter = 'ALL';
@@ -258,26 +227,18 @@
         let auth = null;
         let appId = typeof __app_id !== 'undefined' ? __app_id : 'slotsoftware-news';
         let currentUserUid = null;
-        let userNickname = null; 
-        let pendingCommentNewsId = null; 
-        let openComments = new Set(); 
-        let isLiking = false; 
         let pendingDeleteAction = null;
 
-        // Activar Admin
-        function enableAdmin() {
+        // Activar Admin si está en la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('admin') === 'krono') {
             isAdmin = true;
             document.getElementById('admin-panel').classList.remove('hidden');
             document.getElementById('admin-badge').classList.remove('hidden');
             document.getElementById('admin-badge').classList.add('flex');
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('admin') === 'krono') {
-            enableAdmin();
-        }
-
-        // Toasts
+        // Utilidades UI
         window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
@@ -298,20 +259,6 @@
             }, 3000);
         }
 
-        // Modal Borrar
-        function askConfirmDialog(actionCallback) {
-            pendingDeleteAction = actionCallback;
-            document.getElementById('confirm-modal').classList.remove('hidden');
-        }
-        document.getElementById('btn-cancel-delete').addEventListener('click', () => {
-            document.getElementById('confirm-modal').classList.add('hidden');
-        });
-        document.getElementById('btn-confirm-delete').addEventListener('click', () => {
-            if (pendingDeleteAction) pendingDeleteAction();
-            document.getElementById('confirm-modal').classList.add('hidden');
-        });
-
-        // Filtros
         window.setFilter = function(category) {
             currentFilter = category;
             document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -340,7 +287,7 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Lógica de Renderizado Forzoso ---
+        // --- STREAMING_CHUNK:Función de Renderizado Central ---
         window.renderNews = function() {
             const container = document.getElementById('feed-container');
             const loadingState = document.getElementById('loading-state');
@@ -348,9 +295,8 @@
             
             if(loadingState) loadingState.style.display = 'none';
 
-            // LIMPIAR PISTA ANTES DE PINTAR
-            const existingCards = container.querySelectorAll('.news-card-el');
-            existingCards.forEach(card => card.remove());
+            // Limpiar pista
+            container.querySelectorAll('.news-card-el').forEach(card => card.remove());
 
             let filteredNews = currentFilter === 'ALL' ? allNews : allNews.filter(n => n.category === currentFilter);
 
@@ -452,12 +398,21 @@
             lucide.createIcons();
         }
 
-        // --- STREAMING_CHUNK:Acción principal - Botón de Fuerza Bruta ---
+        // --- STREAMING_CHUNK:Lógica de Fuerza Bruta para Enviar Noticia ---
         document.getElementById('news-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isAdmin) return;
 
-            // 1. Recoger datos
+            // Mostrar estado cargando en el botón
+            const btn = document.querySelector('#news-form button[type="submit"]');
+            const originalBtnContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<div class="absolute inset-0 bg-slate-800 opacity-80"></div>
+                             <div class="relative flex justify-center items-center gap-2">
+                                <i data-lucide="loader-2" class="w-5 h-5 text-cyan-400 animate-spin"></i> ENVIANDO...
+                             </div>`;
+            lucide.createIcons();
+
             const newPost = {
                 id: 'temp-' + Date.now(), 
                 category: document.getElementById('news-category').value,
@@ -465,38 +420,39 @@
                 mediaUrl: document.getElementById('news-media').value.trim(),
                 link: document.getElementById('news-link').value.trim(),
                 timestamp: Date.now(),
-                likedBy: [],
-                comments: []
+                likedBy: []
             };
 
-            // 2. FORZAR RENDERIZADO INMEDIATO A LA PISTA (Localmente)
-            allNews.unshift(newPost); // Meter primero en la lista
-            setFilter('ALL'); // Cambiar filtro a "Todo" por si acaso
-            renderNews(); // PINTAR EN PANTALLA INMEDIATAMENTE
-            
-            document.getElementById('news-form').reset(); // Limpiar formulario
-            showToast("¡NOVEDAD EN PISTA!");
+            // 1. FORZAR EN PANTALLA INMEDIATAMENTE
+            allNews.unshift(newPost);
+            setFilter('ALL'); 
+            renderNews(); 
+            document.getElementById('news-form').reset();
+            showToast("¡NOVEDAD EN PISTA (Local)!");
 
-            // 3. Guardado en segundo plano (silencioso)
+            // 2. ENVIAR A LA NUBE (En segundo plano)
             if (db) {
                 try {
                     const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
                     const postToSave = { ...newPost };
                     delete postToSave.id; 
                     await addDoc(colRef, postToSave);
+                    showToast("¡NOVEDAD EN LA NUBE!");
                 } catch (error) {
-                    console.error("Error guardando en la nube:", error);
-                    showToast("Guardado localmente (sin conexión).", "info");
+                    console.error("Error nube:", error);
                 }
-            } else {
-                 showToast("Guardado localmente (sin Firebase).", "info");
             }
+
+            // Restaurar botón
+            btn.disabled = false;
+            btn.innerHTML = originalBtnContent;
+            lucide.createIcons();
         });
 
 
-        // Funciones auxiliares
         window.deleteNewsItem = function(docId) {
-            askConfirmDialog(async () => {
+            document.getElementById('confirm-modal').classList.remove('hidden');
+            pendingDeleteAction = async () => {
                 allNews = allNews.filter(n => String(n.id) !== String(docId));
                 renderNews(); 
                 if (db && !docId.toString().startsWith('temp-')) {
@@ -504,8 +460,16 @@
                         await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId)));
                     } catch (e) {}
                 }
-            });
+            };
         };
+        
+        document.getElementById('btn-cancel-delete').addEventListener('click', () => {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        });
+        document.getElementById('btn-confirm-delete').addEventListener('click', () => {
+            if (pendingDeleteAction) pendingDeleteAction();
+            document.getElementById('confirm-modal').classList.add('hidden');
+        });
 
         window.toggleLike = async function(docId, currentlyLiked) {
             const uid = currentUserUid || 'local';
@@ -523,19 +487,12 @@
             }
         };
 
-        // --- STREAMING_CHUNK:Arranque del sistema ---
+        // --- STREAMING_CHUNK:Inicialización de App ---
         async function initApp() {
             try {
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
                 const firebaseConfig = JSON.parse(configStr);
-                
-                // Si estamos en el entorno de previsualización sin Firebase real
-                if (!firebaseConfig.projectId || Object.keys(firebaseConfig).length === 0) {
-                    console.warn("Sin configuración de Firebase. Funcionando en modo local.");
-                    document.getElementById('loading-state').style.display = 'none';
-                    renderNews();
-                    return; // Salir aquí para no intentar inicializar Firebase vacío
-                }
+                if (!firebaseConfig.projectId) throw new Error("Sin Firebase");
 
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
@@ -556,14 +513,18 @@
                             snapshot.forEach((docSnap) => {
                                 fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
                             });
-                            fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
-                            allNews = fetchedNews;
-                            renderNews(); // Renderizado normal de Firebase
+                            
+                            // Mantener las noticias locales (fuerza bruta) que aún no han bajado de Firebase
+                            const tempPosts = allNews.filter(n => String(n.id).startsWith('temp-'));
+                            const uniqueTemp = tempPosts.filter(temp => !fetchedNews.some(f => f.text === temp.text && Math.abs(f.timestamp - temp.timestamp) < 5000));
+                            
+                            allNews = [...fetchedNews, ...uniqueTemp];
+                            allNews.sort((a, b) => b.timestamp - a.timestamp);
+                            renderNews(); 
                         });
                     }
                 });
             } catch (error) {
-                // Modo sin conexión
                 document.getElementById('loading-state').style.display = 'none';
                 renderNews();
             }
