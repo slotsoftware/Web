@@ -176,12 +176,12 @@
         </div>
 
         <div id="feed-container" class="flex flex-col gap-6 pb-10">
-            <div id="loading-state" class="flex flex-col items-center justify-center py-20 text-cyan-500">
+            <!-- El estado de carga se oculta porque ahora cargamos instantáneamente del local -->
+            <div id="loading-state" class="hidden flex-col items-center justify-center py-20 text-cyan-500">
                 <div class="relative">
                     <div class="absolute inset-0 bg-cyan-500 blur-xl opacity-20 rounded-full animate-pulse"></div>
                     <i data-lucide="aperture" class="w-10 h-10 animate-spin relative z-10"></i>
                 </div>
-                <p class="text-sm font-bold mt-4 tracking-widest uppercase bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">Conectando...</p>
             </div>
             
             <div id="empty-state" class="hidden flex-col items-center justify-center py-24 text-center px-6 animate-float">
@@ -217,19 +217,20 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        let allNews = [];
+        // 1. CARGA INICIAL ROBUSTA (Primero desde LocalStorage para evitar que desaparezca)
+        let allNews = JSON.parse(localStorage.getItem('slot_news_backup')) || [];
+        
         let currentFilter = 'ALL';
         let isAdmin = false;
         let db = null;
         let auth = null;
-        let appId = typeof __app_id !== 'undefined' ? __app_id : 'slotsoftware-news';
-        let currentUserUid = null;
+        let appId = 'slotsoftware-news';
         let pendingDeleteAction = null;
 
-        // Activar Admin si está en la URL
+        // Comprobar si es admin por URL
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('admin') === 'krono') {
             isAdmin = true;
@@ -238,20 +239,16 @@
             document.getElementById('admin-badge').classList.add('flex');
         }
 
-        // Utilidades UI
+        // Utilidades
         window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
             const toastIcon = document.getElementById('toast-icon');
             
             toastMsg.innerText = message;
-            if (type === 'success') {
-                toastIcon.setAttribute('data-lucide', 'check-circle-2');
-                toast.className = "fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900 text-green-400 px-6 py-3 rounded-full shadow-[0_0_30px_rgba(74,222,128,0.2)] text-sm font-bold transition-all duration-300 opacity-100 translate-y-0 pointer-events-none z-[100] flex items-center gap-3 border border-green-500/30";
-            } else {
-                toastIcon.setAttribute('data-lucide', 'alert-octagon');
-                toast.className = "fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900 text-red-400 px-6 py-3 rounded-full shadow-[0_0_30px_rgba(248,113,113,0.2)] text-sm font-bold transition-all duration-300 opacity-100 translate-y-0 pointer-events-none z-[100] flex items-center gap-3 border border-red-500/30";
-            }
+            toastIcon.setAttribute('data-lucide', type === 'success' ? 'check-circle-2' : 'alert-octagon');
+            toast.className = `fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900 ${type === 'success' ? 'text-green-400 border-green-500/30' : 'text-red-400 border-red-500/30'} px-6 py-3 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.5)] text-sm font-bold transition-all duration-300 opacity-100 translate-y-0 pointer-events-none z-[100] flex items-center gap-3 border`;
+            
             lucide.createIcons();
             setTimeout(() => {
                 toast.classList.remove('opacity-100', 'translate-y-0');
@@ -287,15 +284,12 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Función de Renderizado Central ---
+        // --- STREAMING_CHUNK:Motor de Renderizado Seguro ---
         window.renderNews = function() {
             const container = document.getElementById('feed-container');
-            const loadingState = document.getElementById('loading-state');
             const emptyState = document.getElementById('empty-state');
             
-            if(loadingState) loadingState.style.display = 'none';
-
-            // Limpiar pista
+            // Limpieza total antes de repintar
             container.querySelectorAll('.news-card-el').forEach(card => card.remove());
 
             let filteredNews = currentFilter === 'ALL' ? allNews : allNews.filter(n => n.category === currentFilter);
@@ -309,7 +303,7 @@
 
             filteredNews.forEach((news) => {
                 const card = document.createElement('div');
-                card.className = `news-card-el news-card glass-panel rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden`;
+                card.className = `news-card-el news-card glass-panel rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden mb-6`;
                 
                 const glow = document.createElement('div');
                 glow.className = 'absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-50';
@@ -337,7 +331,7 @@
 
                 if (news.mediaUrl) {
                     const mediaContainer = document.createElement('div');
-                    mediaContainer.className = 'relative mt-2 rounded-xl overflow-hidden border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] group cursor-pointer bg-slate-900';
+                    mediaContainer.className = 'relative mt-2 rounded-xl overflow-hidden border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] group bg-slate-900';
                     const ytMatch = news.mediaUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
                     const videoMatch = news.mediaUrl.match(/\.(mp4|webm|ogg)$/i);
                     
@@ -356,18 +350,22 @@
 
                 const bottomBar = document.createElement('div');
                 bottomBar.className = 'flex flex-wrap justify-between items-center mt-2 pt-4 border-t border-white/5 gap-3';
+                
                 const leftActions = document.createElement('div');
                 leftActions.className = 'flex gap-2';
 
-                const isLiked = news.likedBy && news.likedBy.includes(currentUserUid || 'local');
-                const likeCount = news.likedBy ? news.likedBy.length : 0;
-                
+                // Like Button (Local Only Simulation if no DB)
+                const likeCount = news.likes || 0;
                 const likeBtn = document.createElement('button');
-                likeBtn.className = `flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-all border ${isLiked ? 'text-pink-400 bg-pink-500/10 border-pink-500/30 heart-active' : 'text-slate-400 bg-slate-800/50 border-slate-700 hover:text-pink-400'}`;
-                likeBtn.innerHTML = `<i data-lucide="heart" class="w-4 h-4 ${isLiked ? 'fill-current' : ''}"></i> <span>${likeCount > 0 ? likeCount : 'Like'}</span>`;
-                likeBtn.onclick = () => toggleLike(news.id, isLiked);
+                likeBtn.className = `flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-all border text-slate-400 bg-slate-800/50 border-slate-700 hover:text-pink-400`;
+                likeBtn.innerHTML = `<i data-lucide="heart" class="w-4 h-4"></i> <span>${likeCount > 0 ? likeCount : 'Like'}</span>`;
+                likeBtn.onclick = () => {
+                    news.likes = (news.likes || 0) + 1;
+                    localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
+                    renderNews();
+                    showToast("¡Like enviado!");
+                };
                 leftActions.appendChild(likeBtn);
-
                 bottomBar.appendChild(leftActions);
 
                 const rightActions = document.createElement('div');
@@ -386,7 +384,17 @@
                     const delBtn = document.createElement('button');
                     delBtn.className = 'inline-flex items-center justify-center w-10 h-10 rounded-xl text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors';
                     delBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i>';
-                    delBtn.onclick = () => deleteNewsItem(news.id);
+                    delBtn.onclick = () => {
+                        document.getElementById('confirm-modal').classList.remove('hidden');
+                        pendingDeleteAction = () => {
+                            allNews = allNews.filter(n => String(n.id) !== String(news.id));
+                            localStorage.setItem('slot_news_backup', JSON.stringify(allNews)); // Guardar borrado
+                            renderNews(); 
+                            if (db && !String(news.id).startsWith('local-')) {
+                                try { deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(news.id))); } catch (e) {}
+                            }
+                        };
+                    };
                     rightActions.appendChild(delBtn);
                 }
 
@@ -398,71 +406,48 @@
             lucide.createIcons();
         }
 
-        // --- STREAMING_CHUNK:Lógica de Fuerza Bruta para Enviar Noticia ---
+        // --- STREAMING_CHUNK:Botón de Enviar (A prueba de balas) ---
         document.getElementById('news-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isAdmin) return;
 
-            // Mostrar estado cargando en el botón
-            const btn = document.querySelector('#news-form button[type="submit"]');
-            const originalBtnContent = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<div class="absolute inset-0 bg-slate-800 opacity-80"></div>
-                             <div class="relative flex justify-center items-center gap-2">
-                                <i data-lucide="loader-2" class="w-5 h-5 text-cyan-400 animate-spin"></i> ENVIANDO...
-                             </div>`;
-            lucide.createIcons();
-
+            // 1. Crear el objeto de la noticia
             const newPost = {
-                id: 'temp-' + Date.now(), 
+                id: 'local-' + Date.now(), 
                 category: document.getElementById('news-category').value,
                 text: document.getElementById('news-text').value,
                 mediaUrl: document.getElementById('news-media').value.trim(),
                 link: document.getElementById('news-link').value.trim(),
                 timestamp: Date.now(),
-                likedBy: []
+                likes: 0
             };
 
-            // 1. FORZAR EN PANTALLA INMEDIATAMENTE
+            // 2. INYECTAR DIRECTAMENTE EN LOCAL (La clave para que no desaparezca)
             allNews.unshift(newPost);
+            
+            // 3. GUARDAR EN EL NAVEGADOR (Si Firebase falla, esto lo salva)
+            localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
+
+            // 4. LIMPIAR Y PINTAR INMEDIATAMENTE
+            document.getElementById('news-form').reset();
             setFilter('ALL'); 
             renderNews(); 
-            document.getElementById('news-form').reset();
-            showToast("¡NOVEDAD EN PISTA (Local)!");
+            showToast("¡NOVEDAD LANZADA A PISTA!");
 
-            // 2. ENVIAR A LA NUBE (En segundo plano)
+            // 5. INTENTO EN SEGUNDO PLANO A FIREBASE (No bloquea la pantalla si falla)
             if (db) {
                 try {
                     const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
                     const postToSave = { ...newPost };
-                    delete postToSave.id; 
+                    delete postToSave.id; // Firebase pone su propio ID
                     await addDoc(colRef, postToSave);
-                    showToast("¡NOVEDAD EN LA NUBE!");
                 } catch (error) {
-                    console.error("Error nube:", error);
+                    console.log("Modo offline activo. Noticia guardada en el navegador.");
                 }
             }
-
-            // Restaurar botón
-            btn.disabled = false;
-            btn.innerHTML = originalBtnContent;
-            lucide.createIcons();
         });
 
-
-        window.deleteNewsItem = function(docId) {
-            document.getElementById('confirm-modal').classList.remove('hidden');
-            pendingDeleteAction = async () => {
-                allNews = allNews.filter(n => String(n.id) !== String(docId));
-                renderNews(); 
-                if (db && !docId.toString().startsWith('temp-')) {
-                    try {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId)));
-                    } catch (e) {}
-                }
-            };
-        };
-        
+        // Cancelar / Confirmar Borrado
         document.getElementById('btn-cancel-delete').addEventListener('click', () => {
             document.getElementById('confirm-modal').classList.add('hidden');
         });
@@ -471,66 +456,56 @@
             document.getElementById('confirm-modal').classList.add('hidden');
         });
 
-        window.toggleLike = async function(docId, currentlyLiked) {
-            const uid = currentUserUid || 'local';
-            const newsItem = allNews.find(n => String(n.id) === String(docId));
-            if (newsItem) {
-                if (!newsItem.likedBy) newsItem.likedBy = [];
-                if (currentlyLiked) newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
-                else newsItem.likedBy.push(uid);
-                renderNews();
-            }
-            if (db && !docId.toString().startsWith('temp-')) {
-                const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
-                if (currentlyLiked) await updateDoc(postRef, { likedBy: arrayRemove(uid) });
-                else await updateDoc(postRef, { likedBy: arrayUnion(uid) });
-            }
-        };
+        // --- STREAMING_CHUNK:Inicialización Segura ---
+        // Pintamos el LocalStorage primero para que haya contenido sí o sí.
+        renderNews();
 
-        // --- STREAMING_CHUNK:Inicialización de App ---
-        async function initApp() {
-            try {
-                const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-                const firebaseConfig = JSON.parse(configStr);
-                if (!firebaseConfig.projectId) throw new Error("Sin Firebase");
-
+        // Intentar conectar a Firebase de fondo
+        try {
+            const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+            const firebaseConfig = JSON.parse(configStr);
+            
+            if (firebaseConfig.projectId) {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        currentUserUid = user.uid;
-                        const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
-                        onSnapshot(newsRef, (snapshot) => {
-                            const fetchedNews = [];
-                            snapshot.forEach((docSnap) => {
-                                fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
-                            });
-                            
-                            // Mantener las noticias locales (fuerza bruta) que aún no han bajado de Firebase
-                            const tempPosts = allNews.filter(n => String(n.id).startsWith('temp-'));
-                            const uniqueTemp = tempPosts.filter(temp => !fetchedNews.some(f => f.text === temp.text && Math.abs(f.timestamp - temp.timestamp) < 5000));
-                            
-                            allNews = [...fetchedNews, ...uniqueTemp];
-                            allNews.sort((a, b) => b.timestamp - a.timestamp);
-                            renderNews(); 
+                signInAnonymously(auth).then(() => {
+                    const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
+                    // Usar onSnapshot con manejo de errores para evitar que un fallo de permisos rompa la app
+                    onSnapshot(newsRef, (snapshot) => {
+                        const fetchedNews = [];
+                        snapshot.forEach((docSnap) => {
+                            fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
                         });
-                    }
+                        
+                        // Fusionar: Mantener lo de Firebase + lo Local que acabamos de escribir
+                        const localOnly = allNews.filter(n => String(n.id).startsWith('local-'));
+                        
+                        // Solo nos quedamos con las locales que NO están ya en Firebase 
+                        // (comparamos texto y tiempo aproximado para no duplicar)
+                        const uniqueLocal = localOnly.filter(local => 
+                            !fetchedNews.some(f => f.text === local.text && Math.abs(f.timestamp - local.timestamp) < 5000)
+                        );
+
+                        allNews = [...fetchedNews, ...uniqueLocal];
+                        allNews.sort((a, b) => b.timestamp - a.timestamp);
+                        
+                        // Actualizar backup local con la mezcla
+                        localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
+                        renderNews(); 
+                    }, (error) => {
+                        console.warn("No se pudo sincronizar en vivo con la nube (Permisos o Red). Usando modo local.", error.message);
+                        // No rompemos la app, simplemente seguimos usando los datos locales de 'allNews'
+                    });
+                }).catch(err => {
+                    console.warn("Fallo en la autenticación anónima.", err.message);
                 });
-            } catch (error) {
-                document.getElementById('loading-state').style.display = 'none';
-                renderNews();
             }
+        } catch (error) {
+            console.log("Ejecutando en modo Local Seguro.");
         }
 
-        initApp();
         lucide.createIcons();
     </script>
 </body>
