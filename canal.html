@@ -92,7 +92,6 @@
         }
         .heart-active i { animation: heartBurst 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         
-        /* Animación suave para desplegar comentarios */
         .comments-section {
             transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
             max-height: 0;
@@ -229,29 +228,49 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmación de Borrado (Sustituye al confirm nativo que fallaba) -->
+    <div id="confirm-modal" class="fixed inset-0 z-[300] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.2)] transform transition-all text-center">
+            <div class="flex justify-center mb-4">
+                <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center border-2 border-red-500/30">
+                    <i data-lucide="alert-triangle" class="w-8 h-8 text-red-500"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">¿Confirmar Borrado?</h3>
+            <p class="text-sm text-slate-400 mb-6">Esta acción es permanente y no se puede deshacer.</p>
+            <div class="flex gap-3 mt-2">
+                <button id="btn-cancel-delete" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-all">Cancelar</button>
+                <button id="btn-confirm-delete" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-red-500/20">Borrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de Mensajes (Toasts) -->
     <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.5)] text-sm font-bold transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-3 border border-slate-700">
         <i id="toast-icon" data-lucide="info" class="w-5 h-5"></i>
         <span id="toast-msg">Mensaje</span>
     </div>
 
-    <!-- Firebase SDK (Modular) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Global State Variables
         let allNews = [];
         let currentFilter = 'ALL';
         let isAdmin = false;
-        let db;
-        let appId;
-        let publicNewsCollectionRef;
+        let db = null;
+        let auth = null;
+        let appId = typeof __app_id !== 'undefined' ? __app_id : 'slotsoftware-news';
         let currentUserUid = null;
-        let userNickname = null;
-        let pendingCommentNewsId = null;
-        let openComments = new Set();
-        let isLiking = false; // Bloqueo para evitar doble clic en likes
+        let userNickname = null; 
+        let pendingCommentNewsId = null; 
+        let openComments = new Set(); 
+        let isLiking = false; 
+
+        // Variables para el Modal de Confirmación
+        let pendingDeleteAction = null;
 
         function enableAdmin() {
             isAdmin = true;
@@ -266,8 +285,8 @@
             enableAdmin();
         }
 
-        // --- TOASTS ---
-        function showToast(message, type = 'success') {
+        // --- SISTEMA DE TOASTS ---
+        window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
             const toastIcon = document.getElementById('toast-icon');
@@ -288,6 +307,23 @@
                 toast.classList.add('opacity-0', 'translate-y-4');
             }, 3000);
         }
+
+        // --- SISTEMA DE MODAL CONFIRMACION (Previene bloqueo en Iframe) ---
+        function askConfirmDialog(actionCallback) {
+            pendingDeleteAction = actionCallback;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        document.getElementById('btn-cancel-delete').addEventListener('click', () => {
+            pendingDeleteAction = null;
+            document.getElementById('confirm-modal').classList.add('hidden');
+        });
+
+        document.getElementById('btn-confirm-delete').addEventListener('click', () => {
+            if (pendingDeleteAction) pendingDeleteAction();
+            pendingDeleteAction = null;
+            document.getElementById('confirm-modal').classList.add('hidden');
+        });
 
         // --- FILTROS UI ---
         window.setFilter = function(category) {
@@ -319,7 +355,7 @@
             }
         }
 
-        // --- SISTEMA DE COMENTARIOS (CHAT) ---
+        // --- SISTEMA DE COMENTARIOS ---
         window.toggleComments = function(newsId) {
             const section = document.getElementById(`comments-${newsId}`);
             if (openComments.has(newsId)) {
@@ -336,10 +372,6 @@
             const text = inputEl.value.trim();
             if (!text) return;
 
-            // En modo demo o local generaremos un UID ficticio si no existe
-            const safeUid = currentUserUid || 'local-user-' + Date.now();
-
-            // Pedir apodo si no hay
             if (!userNickname) {
                 pendingCommentNewsId = newsId;
                 document.getElementById('nickname-modal').classList.remove('hidden');
@@ -350,22 +382,21 @@
             inputEl.value = ''; 
             
             const commentData = {
-                uid: safeUid,
+                uid: currentUserUid || 'local-user',
                 name: userNickname,
                 text: text,
                 timestamp: Date.now()
             };
 
-            if (publicNewsCollectionRef && db) {
-                const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
+            if (db) {
                 try {
+                    const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
                     await updateDoc(postRef, { comments: arrayUnion(commentData) });
                 } catch (error) {
                     console.error("Error comentando:", error);
                     showToast("Error al enviar", "error");
                 }
             } else {
-                // Modo Local / Demo
                 const newsItem = allNews.find(n => String(n.id) === String(newsId));
                 if (newsItem) {
                     if (!newsItem.comments) newsItem.comments = [];
@@ -376,17 +407,20 @@
             }
         }
 
-        window.deleteComment = async function(newsId, commentObjStr) {
+        window.deleteComment = function(newsId, commentObjStr) {
             if (!isAdmin) return;
-            if (confirm("¿Borrar este comentario del usuario?")) {
+            
+            // Usamos la alerta personalizada segura
+            askConfirmDialog(async () => {
                 const commentObj = JSON.parse(decodeURIComponent(commentObjStr));
                 
-                if (publicNewsCollectionRef && db) {
-                    const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
+                if (db) {
                     try {
+                        const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
                         await updateDoc(postRef, { comments: arrayRemove(commentObj) });
                         showToast("Comentario borrado");
                     } catch (error) {
+                        console.error(error);
                         showToast("Error al borrar", "error");
                     }
                 } else {
@@ -397,10 +431,9 @@
                         showToast("Comentario borrado (Local)");
                     }
                 }
-            }
+            });
         }
 
-        // Manejo del Nickname Modal
         window.closeNicknameModal = function() {
             document.getElementById('nickname-modal').classList.add('hidden');
             pendingCommentNewsId = null;
@@ -413,8 +446,7 @@
 
             userNickname = inputName;
             
-            // Guardar en la BD si existe usuario (Sino lo guardamos solo en memoria para la sesión)
-            if (currentUserUid && db) {
+            if (db && currentUserUid) {
                 try {
                     const profileRef = doc(db, 'artifacts', appId, 'users', currentUserUid, 'profile', 'info');
                     await setDoc(profileRef, { nickname: userNickname });
@@ -433,7 +465,7 @@
         });
 
 
-        // --- RENDERIZADO DE NOTICIAS ---
+        // --- STREAMING_CHUNK:Rendering Feed Function... ---
         function renderNews() {
             const container = document.getElementById('feed-container');
             const loadingState = document.getElementById('loading-state');
@@ -453,16 +485,15 @@
                 emptyState.style.display = 'none';
             }
 
-            filteredNews.forEach((news, index) => {
+            filteredNews.forEach((news) => {
                 const card = document.createElement('div');
-                card.id = `news-card-${news.id}`; // Agregamos ID para localizarla al borrar
+                card.id = `news-card-${news.id}`;
                 card.className = `news-card-el news-card glass-panel rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden`;
                 
                 const glow = document.createElement('div');
                 glow.className = 'absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-50';
                 card.appendChild(glow);
 
-                // CABECERA
                 const header = document.createElement('div');
                 header.className = 'flex justify-between items-center mb-1';
                 
@@ -478,13 +509,11 @@
                 header.appendChild(dateText);
                 card.appendChild(header);
 
-                // TEXTO PRINCIPAL
                 const text = document.createElement('p');
                 text.className = 'text-[15px] text-slate-100 font-medium leading-relaxed whitespace-pre-wrap';
                 text.innerText = news.text;
                 card.appendChild(text);
 
-                // MULTIMEDIA
                 if (news.mediaUrl) {
                     const mediaContainer = document.createElement('div');
                     mediaContainer.className = 'relative mt-2 rounded-xl overflow-hidden border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] group cursor-pointer bg-slate-900';
@@ -506,16 +535,13 @@
                     card.appendChild(mediaContainer);
                 }
 
-                // BARRA INFERIOR (Likes, Comentarios, Link/Borrar)
                 const bottomBar = document.createElement('div');
                 bottomBar.className = 'flex flex-wrap justify-between items-center mt-2 pt-4 border-t border-white/5 gap-3';
 
                 const leftActions = document.createElement('div');
                 leftActions.className = 'flex gap-2';
 
-                // LIKES
-                const safeUid = currentUserUid || 'local-user';
-                const isLiked = news.likedBy && news.likedBy.includes(safeUid);
+                const isLiked = news.likedBy && news.likedBy.includes(currentUserUid || 'local-user');
                 const likeCount = news.likedBy ? news.likedBy.length : 0;
                 
                 const likeBtn = document.createElement('button');
@@ -524,7 +550,6 @@
                 likeBtn.onclick = () => toggleLike(news.id, isLiked);
                 leftActions.appendChild(likeBtn);
 
-                // BOTÓN CHAT/COMENTARIOS
                 const commentsArray = news.comments || [];
                 const commentsCount = commentsArray.length;
                 const chatBtn = document.createElement('button');
@@ -535,7 +560,6 @@
 
                 bottomBar.appendChild(leftActions);
 
-                // BOTONES DERECHA
                 const rightActions = document.createElement('div');
                 rightActions.className = 'flex gap-2 ml-auto';
 
@@ -562,7 +586,6 @@
                 if(rightActions.childNodes.length > 0) bottomBar.appendChild(rightActions);
                 card.appendChild(bottomBar);
 
-                // --- SECCIÓN DE COMENTARIOS (Desplegable) ---
                 const commentsSection = document.createElement('div');
                 commentsSection.id = `comments-${news.id}`;
                 commentsSection.className = `comments-section mt-4 pt-4 border-t border-slate-700/50 flex flex-col gap-3 ${openComments.has(news.id) ? 'open' : ''}`;
@@ -576,7 +599,7 @@
                         cDiv.className = 'bg-slate-900/50 rounded-xl p-3 border border-white/5';
                         
                         let deleteHtml = '';
-                        if (isAdmin || c.uid === (currentUserUid || safeUid)) {
+                        if (isAdmin || c.uid === (currentUserUid || 'local-user')) {
                             const cObjStr = encodeURIComponent(JSON.stringify(c));
                             deleteHtml = `<button onclick="deleteComment('${news.id}', '${cObjStr}')" class="text-red-500/50 hover:text-red-400 transition-colors" title="Borrar"><i data-lucide="x-circle" class="w-4 h-4"></i></button>`;
                         }
@@ -613,17 +636,18 @@
             lucide.createIcons();
         }
 
-        // --- INICIALIZACIÓN DE FIREBASE ---
+        // --- STREAMING_CHUNK:Firebase Core Logic... ---
         async function initApp() {
             try {
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
                 const firebaseConfig = JSON.parse(configStr);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'slotsoftware-news';
 
-                if (!firebaseConfig.projectId) throw new Error("Sin conexión");
+                if (!firebaseConfig.projectId) {
+                    throw new Error("Modo local activado sin conexión.");
+                }
 
                 const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
+                auth = getAuth(app);
                 db = getFirestore(app);
 
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -644,9 +668,9 @@
                             }
                         } catch(e) { console.warn("No se pudo cargar el perfil"); }
 
-                        publicNewsCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
-                        
-                        onSnapshot(publicNewsCollectionRef, 
+                        // Listener robusto
+                        const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
+                        onSnapshot(newsRef, 
                             (snapshot) => {
                                 const fetchedNews = [];
                                 snapshot.forEach((docSnap) => {
@@ -657,27 +681,25 @@
                                 renderNews();
                             },
                             (error) => {
-                                document.getElementById('loading-state').innerHTML = `<p class="text-red-400 font-bold">Error de sincronización con la base madre.</p>`;
+                                console.error(error);
+                                document.getElementById('loading-state').innerHTML = `<p class="text-red-400 font-bold">Error de red.</p>`;
                             }
                         );
                     }
                 });
 
             } catch (error) {
-                // MODO DEMO ESPECTACULAR
+                // FALLBACK MODO DEMO
                 allNews = [
                     { 
                         id: '1', 
                         category: 'TRACKS TELEMETRY V.1.0', 
-                        text: '¡Atención pilotos! El sistema de Tracks Telemetry acaba de recibir una actualización masiva. Ahora la visualización de datos es en tiempo real a 60FPS con nuevos gráficos de desgaste de neumáticos.', 
+                        text: '¡Atención pilotos! El sistema de Tracks Telemetry acaba de recibir una actualización masiva. Ahora la visualización de datos es en tiempo real a 60FPS.', 
                         mediaUrl: 'https://placehold.co/1280x720/0f172a/06b6d4?text=NUEVA+TELEMETRIA', 
                         link: 'https://slotsoftware.github.io/Telemetria/', 
                         timestamp: Date.now(),
-                        likedBy: ['user1'],
-                        comments: [
-                            { uid: 'u1', name: 'PacoSlot', text: '¡Qué brutal! Lo pruebo esta misma tarde.', timestamp: Date.now() - 3600000 },
-                            { uid: 'u2', name: 'Racer99', text: '¿Afecta al consumo del PC?', timestamp: Date.now() - 1800000 }
-                        ]
+                        likedBy: [],
+                        comments: []
                     }
                 ];
                 renderNews();
@@ -690,7 +712,7 @@
             e.preventDefault();
             if (!isAdmin) return;
 
-            const btn = e.target.querySelector('button[type="submit"]');
+            const btn = document.querySelector('#news-form button[type="submit"]');
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<div class="absolute inset-0 bg-blue-600"></div><span class="relative flex items-center gap-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Lanzando...</span>';
             btn.disabled = true;
@@ -705,83 +727,83 @@
                 comments: []
             };
 
-            if (publicNewsCollectionRef) {
-                try {
-                    await addDoc(publicNewsCollectionRef, newPost);
-                    document.getElementById('news-form').reset();
+            try {
+                if (db) {
+                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
+                    await addDoc(colRef, newPost);
                     showToast("¡Actualización lanzada con éxito!");
-                } catch (error) {
-                    showToast("Fallo en la transmisión", "error");
+                } else {
+                    newPost.id = Date.now().toString();
+                    allNews.unshift(newPost);
+                    renderNews();
+                    showToast("Publicado en Local");
                 }
-            } else {
-                newPost.id = Date.now().toString();
-                allNews.unshift(newPost);
                 document.getElementById('news-form').reset();
-                renderNews();
-                showToast("¡Actualización lanzada! (Local)");
+            } catch (error) {
+                console.error("Error al publicar:", error);
+                showToast("Fallo en la transmisión", "error");
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                lucide.createIcons();
             }
-            
-            btn.innerHTML = originalHTML;
-            btn.disabled = false;
-            lucide.createIcons();
         });
 
-        // --- BORRAR (Instantáneo) Y LIKES ---
-        window.deleteNewsItem = async function(docId) {
+        // --- BORRAR NOTICIA SEGURA ---
+        window.deleteNewsItem = function(docId) {
             if (!isAdmin) return;
-            if (confirm("¿Abortar misión y borrar este anuncio permanentemente?")) {
-                
-                // Borrado optimista: Actualizamos la UI instantáneamente
-                allNews = allNews.filter(n => String(n.id) !== String(docId));
-                renderNews(); 
+            
+            // Usamos la alerta personalizada, no la nativa del navegador.
+            askConfirmDialog(async () => {
+                try {
+                    // Borrado Inmediato Visual
+                    allNews = allNews.filter(n => String(n.id) !== String(docId));
+                    renderNews(); 
 
-                // Procedemos a borrar en Firebase por detrás
-                if (publicNewsCollectionRef && db) {
-                    try {
+                    if (db) {
                         const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                         await deleteDoc(postRef);
-                        showToast("Registro borrado del sistema");
-                    } catch (error) {
-                        console.error(error);
-                        showToast("Error crítico al eliminar en BD", "error");
+                        showToast("Publicación eliminada del servidor");
+                    } else {
+                        showToast("Eliminado (Local)");
                     }
-                } else {
-                    showToast("Registro borrado (Modo Local)");
+                } catch (error) {
+                    console.error("Error de borrado:", error);
+                    showToast("No se pudo borrar", "error");
                 }
-            }
+            });
         };
 
         window.toggleLike = async function(docId, currentlyLiked) {
-            if (isLiking) return; // Evita doble clic rápido
+            if (isLiking) return; 
             isLiking = true;
 
-            const safeUid = currentUserUid || 'local-user';
+            const uid = currentUserUid || 'local-user';
             
-            if (publicNewsCollectionRef && db) {
-                const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
-                try {
+            try {
+                if (db) {
+                    const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                     if (currentlyLiked) {
-                        await updateDoc(postRef, { likedBy: arrayRemove(safeUid) });
+                        await updateDoc(postRef, { likedBy: arrayRemove(uid) });
                     } else {
-                        await updateDoc(postRef, { likedBy: arrayUnion(safeUid) });
+                        await updateDoc(postRef, { likedBy: arrayUnion(uid) });
                     }
-                } catch (error) {
-                    showToast("Fallo de conexión", "error");
-                } finally {
-                    isLiking = false;
-                }
-            } else {
-                // Modo Local / Demo
-                const newsItem = allNews.find(n => String(n.id) === String(docId));
-                if (newsItem) {
-                    if (!newsItem.likedBy) newsItem.likedBy = [];
-                    if (currentlyLiked) {
-                        newsItem.likedBy = newsItem.likedBy.filter(id => id !== safeUid);
-                    } else {
-                        newsItem.likedBy.push(safeUid);
+                } else {
+                    const newsItem = allNews.find(n => String(n.id) === String(docId));
+                    if (newsItem) {
+                        if (!newsItem.likedBy) newsItem.likedBy = [];
+                        if (currentlyLiked) {
+                            newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
+                        } else {
+                            newsItem.likedBy.push(uid);
+                        }
+                        renderNews();
                     }
-                    renderNews();
                 }
+            } catch (error) {
+                console.error("Error Like:", error);
+                showToast("Error de conexión", "error");
+            } finally {
                 isLiking = false;
             }
         };
