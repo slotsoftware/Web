@@ -92,6 +92,7 @@
         }
         .heart-active i { animation: heartBurst 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         
+        /* Animación suave para desplegar comentarios */
         .comments-section {
             transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
             max-height: 0;
@@ -250,6 +251,7 @@
         let userNickname = null;
         let pendingCommentNewsId = null;
         let openComments = new Set();
+        let isLiking = false; // Bloqueo para evitar doble clic en likes
 
         function enableAdmin() {
             isAdmin = true;
@@ -265,7 +267,7 @@
         }
 
         // --- TOASTS ---
-        window.showToast = function(message, type = 'success') {
+        function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
             const toastIcon = document.getElementById('toast-icon');
@@ -331,11 +333,13 @@
 
         window.submitComment = async function(newsId) {
             const inputEl = document.getElementById(`comment-input-${newsId}`);
-            if (!inputEl) return;
             const text = inputEl.value.trim();
             if (!text) return;
 
-            // Si el usuario no tiene apodo guardado, se lo pedimos
+            // En modo demo o local generaremos un UID ficticio si no existe
+            const safeUid = currentUserUid || 'local-user-' + Date.now();
+
+            // Pedir apodo si no hay
             if (!userNickname) {
                 pendingCommentNewsId = newsId;
                 document.getElementById('nickname-modal').classList.remove('hidden');
@@ -346,7 +350,7 @@
             inputEl.value = ''; 
             
             const commentData = {
-                uid: currentUserUid || 'local-user',
+                uid: safeUid,
                 name: userNickname,
                 text: text,
                 timestamp: Date.now()
@@ -358,7 +362,7 @@
                     await updateDoc(postRef, { comments: arrayUnion(commentData) });
                 } catch (error) {
                     console.error("Error comentando:", error);
-                    window.showToast("Error al enviar", "error");
+                    showToast("Error al enviar", "error");
                 }
             } else {
                 // Modo Local / Demo
@@ -367,7 +371,7 @@
                     if (!newsItem.comments) newsItem.comments = [];
                     newsItem.comments.push(commentData);
                     renderNews();
-                    window.showToast("Comentario enviado (Local)");
+                    showToast("Comentario enviado (Local)");
                 }
             }
         }
@@ -381,22 +385,22 @@
                     const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
                     try {
                         await updateDoc(postRef, { comments: arrayRemove(commentObj) });
-                        window.showToast("Comentario borrado");
+                        showToast("Comentario borrado");
                     } catch (error) {
-                        window.showToast("Error al borrar", "error");
+                        showToast("Error al borrar", "error");
                     }
                 } else {
                     const newsItem = allNews.find(n => String(n.id) === String(newsId));
                     if (newsItem && newsItem.comments) {
                         newsItem.comments = newsItem.comments.filter(c => c.timestamp !== commentObj.timestamp);
                         renderNews();
-                        window.showToast("Comentario borrado (Local)");
+                        showToast("Comentario borrado (Local)");
                     }
                 }
             }
         }
 
-        // Manejo del Nickname Modal (Corregido para que guarde SIEMPRE, incluso sin red)
+        // Manejo del Nickname Modal
         window.closeNicknameModal = function() {
             document.getElementById('nickname-modal').classList.add('hidden');
             pendingCommentNewsId = null;
@@ -405,29 +409,25 @@
         document.getElementById('nickname-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const inputName = document.getElementById('nickname-input').value.trim();
-            if (!inputName) return; 
+            if (!inputName) return;
 
-            userNickname = inputName; // Lo guardamos localmente siempre
+            userNickname = inputName;
             
-            // Si hay conexión, lo guardamos en el servidor también
+            // Guardar en la BD si existe usuario (Sino lo guardamos solo en memoria para la sesión)
             if (currentUserUid && db) {
                 try {
                     const profileRef = doc(db, 'artifacts', appId, 'users', currentUserUid, 'profile', 'info');
                     await setDoc(profileRef, { nickname: userNickname });
-                    window.showToast(`¡Bienvenido a la pista, ${userNickname}!`);
                 } catch (error) {
-                    console.error("Error guardando perfil en nube:", error);
-                    window.showToast(`¡Bienvenido, ${userNickname}! (Modo Local)`);
+                    console.error("Error guardando perfil:", error);
                 }
-            } else {
-                window.showToast(`¡Bienvenido, ${userNickname}! (Sin conexión)`);
             }
-
+            
+            showToast(`¡Bienvenido a la pista, ${userNickname}!`);
             closeNicknameModal();
 
-            // Si estaba a medias de enviar un comentario, lo enviamos
             if (pendingCommentNewsId) {
-                window.submitComment(pendingCommentNewsId);
+                submitComment(pendingCommentNewsId);
                 pendingCommentNewsId = null;
             }
         });
@@ -455,7 +455,7 @@
 
             filteredNews.forEach((news, index) => {
                 const card = document.createElement('div');
-                card.id = `news-card-${news.id}`; // Asignado ID único para borrado visual
+                card.id = `news-card-${news.id}`; // Agregamos ID para localizarla al borrar
                 card.className = `news-card-el news-card glass-panel rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden`;
                 
                 const glow = document.createElement('div');
@@ -506,7 +506,7 @@
                     card.appendChild(mediaContainer);
                 }
 
-                // BARRA INFERIOR
+                // BARRA INFERIOR (Likes, Comentarios, Link/Borrar)
                 const bottomBar = document.createElement('div');
                 bottomBar.className = 'flex flex-wrap justify-between items-center mt-2 pt-4 border-t border-white/5 gap-3';
 
@@ -514,17 +514,14 @@
                 leftActions.className = 'flex gap-2';
 
                 // LIKES
-                const currentUidForLike = currentUserUid || 'local-user';
-                const isLiked = news.likedBy && news.likedBy.includes(currentUidForLike);
+                const safeUid = currentUserUid || 'local-user';
+                const isLiked = news.likedBy && news.likedBy.includes(safeUid);
                 const likeCount = news.likedBy ? news.likedBy.length : 0;
                 
                 const likeBtn = document.createElement('button');
                 likeBtn.className = `flex items-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl transition-all border ${isLiked ? 'text-pink-400 bg-pink-500/10 border-pink-500/30 shadow-[0_0_15px_rgba(244,114,182,0.2)] heart-active' : 'text-slate-400 bg-slate-800/50 border-slate-700 hover:bg-slate-800 hover:text-pink-400 hover:border-pink-500/30'}`;
                 likeBtn.innerHTML = `<i data-lucide="heart" class="w-4 h-4 ${isLiked ? 'fill-current' : ''}"></i> <span>${likeCount > 0 ? likeCount : 'Espectacular'}</span>`;
-                likeBtn.onclick = () => {
-                    likeBtn.disabled = true; // Prevenir múltiples clics rápidos
-                    window.toggleLike(news.id, isLiked);
-                };
+                likeBtn.onclick = () => toggleLike(news.id, isLiked);
                 leftActions.appendChild(likeBtn);
 
                 // BOTÓN CHAT/COMENTARIOS
@@ -558,7 +555,7 @@
                     const delBtn = document.createElement('button');
                     delBtn.className = 'inline-flex items-center justify-center w-10 h-10 rounded-xl text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:text-red-300 transition-all';
                     delBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i>';
-                    delBtn.onclick = () => window.deleteNewsItem(news.id);
+                    delBtn.onclick = () => deleteNewsItem(news.id);
                     rightActions.appendChild(delBtn);
                 }
 
@@ -570,7 +567,6 @@
                 commentsSection.id = `comments-${news.id}`;
                 commentsSection.className = `comments-section mt-4 pt-4 border-t border-slate-700/50 flex flex-col gap-3 ${openComments.has(news.id) ? 'open' : ''}`;
                 
-                // Lista de comentarios
                 if (commentsArray.length > 0) {
                     const commentsList = document.createElement('div');
                     commentsList.className = 'flex flex-col gap-3 max-h-60 overflow-y-auto pr-2 custom-scroll';
@@ -580,7 +576,7 @@
                         cDiv.className = 'bg-slate-900/50 rounded-xl p-3 border border-white/5';
                         
                         let deleteHtml = '';
-                        if (isAdmin || c.uid === currentUserUid) {
+                        if (isAdmin || c.uid === (currentUserUid || safeUid)) {
                             const cObjStr = encodeURIComponent(JSON.stringify(c));
                             deleteHtml = `<button onclick="deleteComment('${news.id}', '${cObjStr}')" class="text-red-500/50 hover:text-red-400 transition-colors" title="Borrar"><i data-lucide="x-circle" class="w-4 h-4"></i></button>`;
                         }
@@ -600,7 +596,6 @@
                     commentsSection.appendChild(commentsList);
                 }
 
-                // Input para nuevo comentario
                 const inputDiv = document.createElement('div');
                 inputDiv.className = 'flex gap-2 mt-1';
                 inputDiv.innerHTML = `
@@ -686,7 +681,7 @@
                     }
                 ];
                 renderNews();
-                if(isAdmin) window.showToast("Entorno Local Activado", "error");
+                if(isAdmin) showToast("Entorno Local Activado", "error");
             }
         }
 
@@ -714,16 +709,16 @@
                 try {
                     await addDoc(publicNewsCollectionRef, newPost);
                     document.getElementById('news-form').reset();
-                    window.showToast("¡Actualización lanzada con éxito!");
+                    showToast("¡Actualización lanzada con éxito!");
                 } catch (error) {
-                    window.showToast("Fallo en la transmisión", "error");
+                    showToast("Fallo en la transmisión", "error");
                 }
             } else {
                 newPost.id = Date.now().toString();
                 allNews.unshift(newPost);
                 document.getElementById('news-form').reset();
                 renderNews();
-                window.showToast("¡Actualización lanzada! (Local)");
+                showToast("¡Actualización lanzada! (Local)");
             }
             
             btn.innerHTML = originalHTML;
@@ -731,54 +726,49 @@
             lucide.createIcons();
         });
 
-        // --- BORRAR Y LIKES (Corregido con Borrado Optimista) ---
+        // --- BORRAR (Instantáneo) Y LIKES ---
         window.deleteNewsItem = async function(docId) {
             if (!isAdmin) return;
             if (confirm("¿Abortar misión y borrar este anuncio permanentemente?")) {
                 
-                // Ocultar tarjeta inmediatamente (Borrado optimista)
-                const card = document.getElementById(`news-card-${docId}`);
-                if (card) {
-                    card.style.opacity = '0';
-                    card.style.transform = 'scale(0.9)';
-                    setTimeout(() => card.style.display = 'none', 300);
-                }
+                // Borrado optimista: Actualizamos la UI instantáneamente
+                allNews = allNews.filter(n => String(n.id) !== String(docId));
+                renderNews(); 
 
+                // Procedemos a borrar en Firebase por detrás
                 if (publicNewsCollectionRef && db) {
                     try {
                         const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                         await deleteDoc(postRef);
-                        window.showToast("Registro borrado del sistema");
+                        showToast("Registro borrado del sistema");
                     } catch (error) {
                         console.error(error);
-                        if(card) {
-                            card.style.display = 'flex';
-                            card.style.opacity = '1';
-                            card.style.transform = 'scale(1)';
-                        }
-                        window.showToast("Error crítico al eliminar", "error");
+                        showToast("Error crítico al eliminar en BD", "error");
                     }
                 } else {
-                    allNews = allNews.filter(n => String(n.id) !== String(docId));
-                    renderNews();
-                    window.showToast("Registro borrado (Modo Local)");
+                    showToast("Registro borrado (Modo Local)");
                 }
             }
         };
 
         window.toggleLike = async function(docId, currentlyLiked) {
-            const uid = currentUserUid || 'local-user';
+            if (isLiking) return; // Evita doble clic rápido
+            isLiking = true;
+
+            const safeUid = currentUserUid || 'local-user';
             
             if (publicNewsCollectionRef && db) {
                 const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                 try {
                     if (currentlyLiked) {
-                        await updateDoc(postRef, { likedBy: arrayRemove(uid) });
+                        await updateDoc(postRef, { likedBy: arrayRemove(safeUid) });
                     } else {
-                        await updateDoc(postRef, { likedBy: arrayUnion(uid) });
+                        await updateDoc(postRef, { likedBy: arrayUnion(safeUid) });
                     }
                 } catch (error) {
-                    window.showToast("Fallo de conexión", "error");
+                    showToast("Fallo de conexión", "error");
+                } finally {
+                    isLiking = false;
                 }
             } else {
                 // Modo Local / Demo
@@ -786,14 +776,13 @@
                 if (newsItem) {
                     if (!newsItem.likedBy) newsItem.likedBy = [];
                     if (currentlyLiked) {
-                        newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
+                        newsItem.likedBy = newsItem.likedBy.filter(id => id !== safeUid);
                     } else {
-                        if (!newsItem.likedBy.includes(uid)) { // Verificación extra local
-                            newsItem.likedBy.push(uid);
-                        }
+                        newsItem.likedBy.push(safeUid);
                     }
                     renderNews();
                 }
+                isLiking = false;
             }
         };
 
