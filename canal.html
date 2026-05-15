@@ -687,6 +687,7 @@
 
             const category = document.getElementById('news-category').value;
             const newPost = {
+                id: 'post-' + Date.now(),
                 category: category,
                 text: document.getElementById('news-text').value,
                 mediaUrl: document.getElementById('news-media').value.trim(),
@@ -697,17 +698,25 @@
             };
 
             try {
-                if (!db) throw new Error("La base de datos no está activa.");
+                if (!db) {
+                    // Si la BD no está provisionada, hacemos que funcione visualmente (modo local)
+                    allNews.unshift(newPost);
+                    renderNews();
+                    document.getElementById('news-form').reset();
+                    if (currentFilter !== 'ALL' && currentFilter !== category) setFilter('ALL');
+                    showToast("Modo local: Novedad creada (Falta activar guardado)", "info");
+                    return; // Salimos sin dar error para que funcione la parte visual
+                }
+
                 if (!auth.currentUser) throw new Error("Aún no te has conectado al servidor, espera un segundo.");
 
-                // Utilizamos addDoc que es el método oficial más seguro y directo para añadir a colecciones
                 const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
-                await addDoc(colRef, newPost);
+                const docRef = doc(colRef, newPost.id);
+                await setDoc(docRef, newPost);
                 
                 document.getElementById('news-form').reset();
                 showToast("¡Transmisión lanzada a la pista!");
                 
-                // Forzamos la vista a TODO por si estaba en otro filtro
                 if (currentFilter !== 'ALL' && currentFilter !== category) {
                     setFilter('ALL');
                 }
