@@ -715,24 +715,26 @@
             };
 
             try {
-                if (db && auth.currentUser) {
-                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
-                    // Al usar addDoc, la tecnología nativa de Firebase actualizará la pantalla al instante
-                    await addDoc(colRef, newPost);
-                    
-                    document.getElementById('news-form').reset();
-                    showToast("¡Transmisión lanzada a la pista!");
-                    
-                    // Si estamos filtrando otra categoría, cambiamos a "Explorar Todo" para poder verla
-                    if (currentFilter !== 'ALL' && currentFilter !== category) {
-                        setFilter('ALL');
-                    }
-                } else {
-                    throw new Error("No hay conexión con el servidor");
+                if (!db || !auth.currentUser) {
+                    throw new Error("Sin conexión segura con la base de datos.");
+                }
+
+                // Usamos setDoc con un ID automático (más fiable que addDoc en algunos casos)
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
+                const newDocRef = doc(colRef);
+                await setDoc(newDocRef, newPost);
+                
+                document.getElementById('news-form').reset();
+                showToast("¡Transmisión lanzada a la pista!");
+                
+                // Si estamos filtrando otra categoría, cambiamos a "Explorar Todo" para poder verla
+                if (currentFilter !== 'ALL' && currentFilter !== category) {
+                    setFilter('ALL');
                 }
             } catch (error) {
-                console.error("Error de base de datos:", error);
-                showToast("Error al guardar la transmisión.", "error");
+                console.error("Error al publicar:", error);
+                // Si falla, ahora mostrará el motivo exacto en el mensaje rojo
+                showToast("Error: " + (error.message || "Fallo de escritura"), "error");
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
@@ -740,35 +742,33 @@
             }
         });
 
-        // --- BORRAR NOTICIA (OPTIMISTA) ---
+        // --- BORRAR NOTICIA ---
         window.deleteNewsItem = function(docId) {
             if (!isAdmin) return;
             
             askConfirmDialog(async () => {
-                // ACTUALIZACIÓN VISUAL INMEDIATA
-                allNews = allNews.filter(n => String(n.id) !== String(docId));
-                renderNews(); 
-
-                // SINCRONIZACIÓN EN SEGUNDO PLANO
+                // Sincronización con Firebase (la vista se actualizará sola gracias a onSnapshot)
                 if (db && !docId.toString().startsWith('temp-')) {
                     try {
                         const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                         await deleteDoc(postRef);
+                        showToast("Transmisión eliminada");
                     } catch (error) {
                         console.error("Error de borrado:", error);
+                        showToast("Error al borrar", "error");
                     }
                 }
             });
         };
 
-        // --- LIKES (OPTIMISTA) ---
+        // --- LIKES ---
         window.toggleLike = async function(docId, currentlyLiked) {
             if (isLiking) return; 
             isLiking = true;
 
             const uid = currentUserUid || 'local-user';
-            
-            // ACTUALIZACIÓN VISUAL INMEDIATA
+
+            // 1. Actualización visual inmediata para no hacer esperar al usuario
             const newsItem = allNews.find(n => String(n.id) === String(docId));
             if (newsItem) {
                 if (!newsItem.likedBy) newsItem.likedBy = [];
@@ -780,7 +780,7 @@
                 renderNews();
             }
 
-            // SINCRONIZACIÓN EN SEGUNDO PLANO
+            // 2. Guardado en la nube
             if (db && !docId.toString().startsWith('temp-')) {
                 try {
                     const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
