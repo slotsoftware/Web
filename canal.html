@@ -486,7 +486,10 @@
                     await addDoc(colRef, postToSave);
                 } catch (error) {
                     console.error("Error guardando en la nube:", error);
+                    showToast("Guardado localmente (sin conexión).", "info");
                 }
+            } else {
+                 showToast("Guardado localmente (sin Firebase).", "info");
             }
         });
 
@@ -525,7 +528,14 @@
             try {
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
                 const firebaseConfig = JSON.parse(configStr);
-                if (!firebaseConfig.projectId) throw new Error("Sin Firebase");
+                
+                // Si estamos en el entorno de previsualización sin Firebase real
+                if (!firebaseConfig.projectId || Object.keys(firebaseConfig).length === 0) {
+                    console.warn("Sin configuración de Firebase. Funcionando en modo local.");
+                    document.getElementById('loading-state').style.display = 'none';
+                    renderNews();
+                    return; // Salir aquí para no intentar inicializar Firebase vacío
+                }
 
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
