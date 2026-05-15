@@ -162,7 +162,6 @@
                 <div>
                     <textarea id="news-text" rows="3" placeholder="Escribe el anuncio espectacular aquí..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all resize-none font-medium placeholder-slate-500" required></textarea>
                 </div>
-                <!-- IMPORTANTE: Cambiado type="url" a type="text" para evitar bloqueos del navegador -->
                 <div>
                     <input type="text" id="news-media" placeholder="URL de Imagen, Vídeo (.mp4) o YouTube (Opcional)" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-medium placeholder-slate-500">
                 </div>
@@ -207,7 +206,6 @@
         </div>
     </main>
 
-    <!-- Modal de Identificación (Nickname) -->
     <div id="nickname-modal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)] transform transition-all">
             <div class="flex justify-center mb-4">
@@ -229,7 +227,6 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmación de Borrado -->
     <div id="confirm-modal" class="fixed inset-0 z-[300] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.2)] transform transition-all text-center">
             <div class="flex justify-center mb-4">
@@ -246,13 +243,11 @@
         </div>
     </div>
 
-    <!-- Modal de Mensajes (Toasts) -->
     <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.5)] text-sm font-bold transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-3 border border-slate-700">
         <i id="toast-icon" data-lucide="info" class="w-5 h-5"></i>
         <span id="toast-msg">Mensaje</span>
     </div>
 
-    <!-- Firebase SDK (Modular) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -285,7 +280,6 @@
             enableAdmin();
         }
 
-        // --- TOASTS ---
         window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
@@ -308,7 +302,6 @@
             }, 3000);
         }
 
-        // --- MODAL DE CONFIRMACIÓN (Anti-Bloqueo) ---
         function askConfirmDialog(actionCallback) {
             pendingDeleteAction = actionCallback;
             document.getElementById('confirm-modal').classList.remove('hidden');
@@ -325,7 +318,6 @@
             document.getElementById('confirm-modal').classList.add('hidden');
         });
 
-        // --- FILTROS UI ---
         window.setFilter = function(category) {
             currentFilter = category;
             
@@ -355,7 +347,6 @@
             }
         }
 
-        // --- COMENTARIOS (OPTIMISTA) ---
         window.toggleComments = function(newsId) {
             const section = document.getElementById(`comments-${newsId}`);
             if (openComments.has(newsId)) {
@@ -388,7 +379,6 @@
                 timestamp: Date.now()
             };
 
-            // ACTUALIZACIÓN OPTIMISTA (Aparece de inmediato)
             const newsItem = allNews.find(n => String(n.id) === String(newsId));
             if (newsItem) {
                 if (!newsItem.comments) newsItem.comments = [];
@@ -396,7 +386,6 @@
                 renderNews();
             }
 
-            // SINCRONIZACIÓN EN SEGUNDO PLANO
             if (db) {
                 try {
                     const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
@@ -413,14 +402,12 @@
             askConfirmDialog(async () => {
                 const commentObj = JSON.parse(decodeURIComponent(commentObjStr));
                 
-                // ACTUALIZACIÓN OPTIMISTA
                 const newsItem = allNews.find(n => String(n.id) === String(newsId));
                 if (newsItem && newsItem.comments) {
                     newsItem.comments = newsItem.comments.filter(c => c.timestamp !== commentObj.timestamp);
                     renderNews();
                 }
 
-                // SINCRONIZACIÓN
                 if (db) {
                     try {
                         const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
@@ -462,8 +449,6 @@
             }
         });
 
-
-        // --- RENDERIZADO VISUAL ---
         function renderNews() {
             const container = document.getElementById('feed-container');
             const loadingState = document.getElementById('loading-state');
@@ -678,22 +663,19 @@
                                 renderNews();
                             },
                             (error) => {
-                                console.error("Error de red: ", error);
-                                document.getElementById('loading-state').innerHTML = `<p class="text-red-400 font-bold">Error de red.</p>`;
+                                document.getElementById('loading-state').innerHTML = `<p class="text-red-400 font-bold">Error de red al conectar con datos.</p>`;
                             }
                         );
                     }
                 });
 
             } catch (error) {
-                // Si no hay Firebase, lista vacía, PISTA DESPEJADA.
                 allNews = [];
                 renderNews();
-                if(isAdmin) showToast("Entorno Local Activado", "error");
+                if(isAdmin) showToast("Entorno Local Activado (Sin Base de Datos)", "error");
             }
         }
 
-        // --- PUBLICAR NOTICIA ---
         document.getElementById('news-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isAdmin) return;
@@ -715,26 +697,23 @@
             };
 
             try {
-                if (!db || !auth.currentUser) {
-                    throw new Error("Sin conexión segura con la base de datos.");
-                }
+                if (!db) throw new Error("La base de datos no está activa.");
+                if (!auth.currentUser) throw new Error("Aún no te has conectado al servidor, espera un segundo.");
 
-                // Usamos setDoc con un ID automático (más fiable que addDoc en algunos casos)
+                // Utilizamos addDoc que es el método oficial más seguro y directo para añadir a colecciones
                 const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
-                const newDocRef = doc(colRef);
-                await setDoc(newDocRef, newPost);
+                await addDoc(colRef, newPost);
                 
                 document.getElementById('news-form').reset();
                 showToast("¡Transmisión lanzada a la pista!");
                 
-                // Si estamos filtrando otra categoría, cambiamos a "Explorar Todo" para poder verla
+                // Forzamos la vista a TODO por si estaba en otro filtro
                 if (currentFilter !== 'ALL' && currentFilter !== category) {
                     setFilter('ALL');
                 }
             } catch (error) {
                 console.error("Error al publicar:", error);
-                // Si falla, ahora mostrará el motivo exacto en el mensaje rojo
-                showToast("Error: " + (error.message || "Fallo de escritura"), "error");
+                showToast("Error: " + error.message, "error");
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
@@ -742,13 +721,11 @@
             }
         });
 
-        // --- BORRAR NOTICIA ---
         window.deleteNewsItem = function(docId) {
             if (!isAdmin) return;
             
             askConfirmDialog(async () => {
-                // Sincronización con Firebase (la vista se actualizará sola gracias a onSnapshot)
-                if (db && !docId.toString().startsWith('temp-')) {
+                if (db) {
                     try {
                         const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                         await deleteDoc(postRef);
@@ -761,14 +738,12 @@
             });
         };
 
-        // --- LIKES ---
         window.toggleLike = async function(docId, currentlyLiked) {
             if (isLiking) return; 
             isLiking = true;
 
             const uid = currentUserUid || 'local-user';
-
-            // 1. Actualización visual inmediata para no hacer esperar al usuario
+            
             const newsItem = allNews.find(n => String(n.id) === String(docId));
             if (newsItem) {
                 if (!newsItem.likedBy) newsItem.likedBy = [];
@@ -780,8 +755,7 @@
                 renderNews();
             }
 
-            // 2. Guardado en la nube
-            if (db && !docId.toString().startsWith('temp-')) {
+            if (db) {
                 try {
                     const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
                     if (currentlyLiked) {
@@ -799,7 +773,6 @@
 
         initApp();
         lucide.createIcons();
-
     </script>
 </body>
 </html>
