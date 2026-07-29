@@ -1,17 +1,13 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <meta name="theme-color" content="#ffffff">
-    <title>SlotSoftware | Tecnología para Slot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000205">
+    <title>SlotSoftware | Comunity System</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
@@ -19,28 +15,26 @@
             theme: {
                 extend: {
                     colors: {
-                        'brand-white': 'var(--bg-brand)',
+                        'cyan-neon': '#00e5ff',
+                        'blue-neon': '#0066ff',
+                        'dark-abyss': '#000205',
                     },
                     fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                        mono: ['Share Tech Mono', 'monospace'],
                     },
                     animation: {
-                        'fade-in': 'fadeIn 1s ease-out forwards',
-                        'fade-in-up': 'fadeInUp 1s ease-out forwards',
-                        'wiggle': 'wiggle 2s linear infinite',
+                        'pulse-glow': 'pulseGlow 2s infinite alternate',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
                     },
                     keyframes: {
+                        pulseGlow: {
+                            '0%': { opacity: '0.6', textShadow: '0 0 5px #00e5ff' },
+                            '100%': { opacity: '1', textShadow: '0 0 15px #00e5ff, 0 0 25px #0066ff' },
+                        },
                         fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        wiggle: {
-                            '0%, 100%': { transform: 'rotate(-3deg)' },
-                            '50%': { transform: 'rotate(3deg)' },
                         }
                     }
                 }
@@ -49,583 +43,1283 @@
     </script>
     <style>
         :root {
-            --bg-brand: #FFFFFF;
+            --cyan: #00e5ff;
+            --blue-neon: #0066ff;
+            --dark-abyss: #000205;
         }
 
-        .animate-on-load { opacity: 0; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--dark-abyss); overflow: hidden;
+            font-family: 'Share Tech Mono', monospace;
+            color: #ffffff; user-select: none; touch-action: manipulation;
+        }
+
+        #bg-gradient {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+            background: radial-gradient(circle at 50% 50%, #010a14 0%, var(--dark-abyss) 75%, #000000 100%);
+        }
+
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
         
-        html { -webkit-text-size-adjust: 100%; }
-        
-        @media (prefers-reduced-motion: reduce) {
-            .animate-on-load {
-                animation: none !important;
-                opacity: 1 !important;
-                transform: none !important;
-            }
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.25) 51%);
+            background-size: 100% 4px; pointer-events: none; opacity: 0.3;
+        }
+
+        /* Título de fondo sobre la galaxia */
+        #bg-title {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(2.5rem, 8vw, 7rem);
+            color: rgba(255, 255, 255, 0.6); /* Color base más sólido y visible */
+            text-shadow: 0 0 40px rgba(0, 229, 255, 0.9), 0 0 80px rgba(0, 102, 255, 0.8), 0 0 120px rgba(0, 229, 255, 0.5); /* Resplandor masivo */
+            z-index: 3;
+            pointer-events: none;
+            text-align: center;
+            line-height: 1.1;
+            opacity: 0; /* Inicia oculto */
+            transition: opacity 4s ease-in-out 1s; /* Aparece muy lentamente tras 1 segundo */
+        }
+        #bg-title.visible {
+            opacity: 1;
+        }
+
+        #ui-layer {
+            position: relative; z-index: 10; width: 100%; height: 100%;
+            pointer-events: none; display: flex; flex-direction: column; justify-content: space-between;
+        }
+
+        /* Pantalla de inicio */
+        #start-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000;
+            background-color: #000000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 2s ease-in-out; padding: 20px; text-align: center;
         }
         
-        .animate-fade-in, .animate-fade-in-up { will-change: opacity, transform; }
-        .text-balance { text-wrap: balance; }
+        .btn-start {
+            font-family: 'Montserrat', sans-serif; font-weight: 300; letter-spacing: 0.4em;
+            padding: 16px 32px; background: rgba(0, 10, 25, 0.4); color: var(--cyan);
+            cursor: pointer; text-transform: uppercase; font-size: 0.85rem;
+            border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: 0 0 20px rgba(0, 102, 255, 0.15) inset;
+            transition: all 0.4s ease; pointer-events: auto; backdrop-filter: blur(5px);
+        }
+        .btn-start:hover, .btn-start:active { 
+            background: rgba(0, 102, 255, 0.2); border-color: var(--cyan);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.4) inset, 0 0 20px rgba(0, 102, 255, 0.6); text-shadow: 0 0 10px var(--cyan);
+        }
+
+        /* Nav Sup */
+        .top-nav {
+            position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px;
+            display: flex; justify-content: flex-end; align-items: flex-start;
+            pointer-events: auto; z-index: 20;
+        }
+        
+        /* Estilo Cinemático tipo Prometheus (Montserrat ajustada) */
+        .prometheus-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300; /* Un poco más gruesa (antes 100) */
+            letter-spacing: 0.65em; /* Separación extrema restaurada */
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.8), 0 0 30px rgba(0, 102, 255, 0.6); /* Brillo general aumentado */
+            margin-right: -0.65em; /* Compensa el margen de la última letra para centrar bien */
+        }
+
+        /* Menú Modal Constelaciones */
+        .menu-modal {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(0, 10, 25, 0.88) 0%, rgba(0, 5, 15, 0.78) 100%);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            padding: 20px; width: 320px; max-height: 75vh; overflow-y: auto;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; transform: scale(0.9);
+            border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: 0 0 30px rgba(0, 229, 255, 0.15) inset, 0 0 20px rgba(0, 102, 255, 0.3);
+            z-index: 30; border-radius: 2px;
+            transform-origin: center;
+        }
+        @media (min-width: 768px) { .menu-modal { padding: 25px; width: 360px; } }
+        .menu-modal::before, .menu-modal::after {
+            content: ''; position: absolute; width: 16px; height: 16px; border-color: var(--cyan); border-style: solid; opacity: 0.8; box-shadow: 0 0 8px var(--cyan);
+        }
+        .menu-modal::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+        .menu-modal::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+        
+        /* Animación aún más lenta (1.2s) y controlada */
+        .menu-modal.active { pointer-events: auto; animation: holoUnfold 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        
+        /* Contenido interno aparece más despacio, esperando a que se abra la caja */
+        .menu-modal.active > * { opacity: 0; animation: holoFadeIn 0.8s ease-out 0.5s forwards; }
+
+        /* KEYFRAMES: Despliegue Holográfico Menú Terminal (Sin desplazamiento/escala horizontal) */
+        @keyframes holoUnfold {
+            0% { transform: scale(1, 0.01); opacity: 0; filter: brightness(3); box-shadow: 0 0 50px #00e5ff inset; }
+            30% { transform: scale(1, 0.02); opacity: 1; filter: brightness(2); box-shadow: 0 0 30px #00e5ff inset; }
+            70% { transform: scale(1, 1.02); }
+            100% { transform: scale(1, 1); opacity: 1; filter: brightness(1); }
+        }
+
+        @keyframes holoFadeIn {
+            0% { opacity: 0; transform: translateY(-5px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* KEYFRAMES: Modales de Contenido Grande (Inclinación 3D tipo Pantalla Principal) */
+        @keyframes sciFiModal {
+            0% { opacity: 0; transform: perspective(800px) rotateX(20deg) scale(0.7, 0.01); box-shadow: 0 0 100px var(--cyan) inset; }
+            40% { opacity: 1; transform: perspective(800px) rotateX(10deg) scale(1, 0.02); box-shadow: 0 0 50px var(--cyan) inset; }
+            70% { transform: perspective(800px) rotateX(-2deg) scale(1, 1.02); }
+            100% { opacity: 1; transform: perspective(800px) rotateX(0deg) scale(1, 1); box-shadow: 0 0 40px rgba(0, 229, 255, 0.15) inset, 0 10px 40px rgba(0, 0, 0, 0.9); }
+        }
+
+        @keyframes sciFiModalClose {
+            0% { opacity: 1; transform: perspective(800px) rotateX(0deg) scale(1, 1); }
+            100% { opacity: 0; transform: perspective(800px) rotateX(10deg) scale(0.9, 0.01); box-shadow: 0 0 80px var(--cyan) inset; }
+        }
+
+        /* Animaciones generales más lentas para los paneles grandes */
+        .animate-open { animation: sciFiModal 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .animate-close { animation: sciFiModalClose 0.5s ease-in forwards; }
+
+        .menu-titulo {
+            font-family: 'Montserrat', sans-serif; font-weight: 300; border-bottom: 1px dashed rgba(0, 229, 255, 0.3);
+            padding-bottom: 10px; margin-bottom: 15px; font-size: 0.85rem; letter-spacing: 0.18em; color: #fff;
+            display: flex; justify-content: space-between; align-items: center; text-shadow: 0 0 10px var(--cyan); text-transform: uppercase;
+        }
+        .menu-enlace {
+            display: flex; align-items: center; padding: 12px 12px; cursor: pointer; transition: all 0.3s ease; font-size: 0.75rem; letter-spacing: 0.12em; margin-bottom: 6px; border-bottom: 1px solid transparent; color: rgba(255,255,255,0.85); background: rgba(0, 229, 255, 0.03); pointer-events: auto; min-height: 38px; border-radius: 2px;
+        }
+        .menu-enlace:hover, .menu-enlace:active {
+            color: var(--cyan); background: rgba(0, 229, 255, 0.15); border-bottom: 1px solid var(--cyan); padding-left: 18px; text-shadow: 0 0 8px var(--cyan);
+        }
+        .menu-enlace .prefix { color: var(--cyan); margin-right: 8px; font-size: 0.65rem; }
+        .btn-cerrar {
+            margin-top: 18px; padding: 10px; width: 100%; background: transparent; border: 1px solid rgba(0, 229, 255, 0.3); text-align: center; cursor: pointer; font-weight: 300; letter-spacing: 0.2em; transition: all 0.3s ease; color: var(--cyan); font-size: 0.7rem; pointer-events: auto; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-cerrar:hover, .btn-cerrar:active { background: rgba(0, 229, 255, 0.2); border-color: var(--cyan); }
+
+        /* HUD Data & Subtítulos */
+        .telemetry-data { position: absolute; bottom: 20px; left: 20px; font-size: 0.6rem; color: rgba(0, 229, 255, 0.5); pointer-events: none; letter-spacing: 0.15em; line-height: 1.8; }
+        #subtitle-container {
+            position: absolute; bottom: 70px; left: 5%; width: 90%; text-align: center; font-size: clamp(0.75rem, 2.5vw, 0.95rem); color: #fff; letter-spacing: 0.08em; opacity: 0; transition: opacity 0.5s ease; text-shadow: 0 0 10px var(--cyan), 0 0 20px var(--blue-neon); pointer-events: none; background: rgba(0, 2, 8, 0.6); padding: 8px 12px; border-radius: 4px; backdrop-filter: blur(4px);
+        }
+        @media (min-width: 768px) { #subtitle-container { bottom: 40px; left: 15%; width: 70%; padding: 10px; } }
+        .cursor-blink { animation: blink 1s step-end infinite; color: var(--cyan); }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* MODALES DE CONTENIDO ENRIQUECIDO (IMÁGENES Y TEXTOS) */
+        .glass-modal {
+            background: linear-gradient(135deg, rgba(0, 8, 20, 0.95) 0%, rgba(0, 4, 12, 0.92) 100%);
+            backdrop-filter: blur(16px); border: 1px solid rgba(0, 229, 255, 0.4);
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.15) inset, 0 10px 40px rgba(0, 0, 0, 0.9);
+            position: relative; max-height: 85vh;
+        }
+        .glass-modal::before, .glass-modal::after {
+            content: ''; position: absolute; width: 30px; height: 30px; border-color: var(--cyan); border-style: solid; opacity: 0.8; box-shadow: 0 0 15px var(--cyan);
+        }
+        .glass-modal::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+        .glass-modal::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+        
+        /* Estilos para las tarjetas de imágenes inyectadas */
+        .sci-fi-card {
+            background: rgba(0, 15, 30, 0.4); border: 1px solid rgba(0, 229, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+        .sci-fi-card:hover { border-color: rgba(0, 229, 255, 0.6); box-shadow: 0 0 15px rgba(0, 229, 255, 0.15) inset; transform: translateY(-2px); }
+        .sci-fi-img { filter: contrast(1.1) brightness(0.9); transition: all 0.5s ease; }
+        .sci-fi-card:hover .sci-fi-img { filter: contrast(1.2) brightness(1.1); transform: scale(1.05); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 229, 255, 0.6); }
+
+        input, textarea { background: rgba(0, 229, 255, 0.05) !important; border: 1px solid rgba(0, 229, 255, 0.2) !important; color: #fff !important; font-family: 'Share Tech Mono', monospace !important; }
+        input:focus, textarea:focus { border-color: var(--cyan) !important; box-shadow: 0 0 10px rgba(0, 229, 255, 0.3) inset !important; outline: none; }
 
         html[lang="es"] .lang-en { display: none !important; }
         html[lang="en"] .lang-es { display: none !important; }
     </style>
 </head>
-<body class="bg-brand-white text-gray-900 font-sans antialiased flex flex-col min-h-[100dvh] selection:bg-gray-900 selection:text-white transition-colors duration-300">
+<body>
 
-    <nav class="container mx-auto px-6 py-6 md:py-8 flex justify-between items-center animate-on-load animate-fade-in">
-        <a href="#" class="flex items-center transition-transform hover:scale-105">
-            <img src="logo1.png" alt="SlotSoftware Logo" class="h-32 md:h-40 w-auto" onerror="this.src='https://placehold.co/200x80?text=SlotSoftware+Logo'">
-        </a>
-        <div class="hidden lg:flex gap-8 text-sm font-medium text-gray-500">
-            <a href="#productos" class="hover:text-black transition-colors">
-                <span class="lang-es">Productos</span><span class="lang-en">Products</span>
-            </a>
-            <a href="#servicios" class="hover:text-black transition-colors">
-                <span class="lang-es">Servicios</span><span class="lang-en">Services</span>
-            </a>
-            <a href="#filosofia" class="hover:text-black transition-colors">
-                <span class="lang-es">Filosofía</span><span class="lang-en">Philosophy</span>
-            </a>
+    <div id="bg-gradient"></div>
+    <div class="scanlines"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div id="bg-title" class="prometheus-title">SLOT<br>SOFTWARE</div>
+
+    <div id="start-screen">
+        <h1 class="prometheus-title" style="font-size: clamp(2rem, 5vw, 4rem); margin-bottom: 50px; text-align: center; line-height: 1.1;">SLOT<br>SOFTWARE</h1>
+        <button class="btn-start animate-pulse-glow" onclick="iniciarSistema()">CONECTAR ENLACE DIGITAL</button>
+        <div style="font-size: 0.65rem; color: rgba(0,229,255,0.5); margin-top: 20px; letter-spacing: 0.2em;">
+            ENTORNO INTERACTIVO: EXPLORA LAS CONSTELACIONES PARA ACCEDER A LA BASE DE DATOS
         </div>
-        <div class="flex items-center gap-2 sm:gap-4">
-            <button onclick="toggleLanguage()" class="hidden sm:block text-xs font-bold tracking-widest hover:text-black text-gray-400 transition-colors">
-                <span class="lang-es">EN</span><span class="lang-en">ES</span>
-            </button>
-            <a href="#contacto" class="hidden md:inline-flex text-sm font-medium border border-gray-200 px-5 py-2.5 rounded-full hover:border-black hover:bg-black hover:text-white transition-all">
-                <span class="lang-es">Contacto</span><span class="lang-en">Contact</span>
-            </a>
-            
-            <!-- NUEVO BOTÓN: Enlace a tu aplicación de Noticias -->
-            <!-- Nota: Cambia 'enlace_a_tu_app_de_noticias.html' por la URL real donde subas la app que creamos -->
-            <a href="canal.html" target="_blank" class="text-sm font-bold bg-blue-600 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-full hover:bg-blue-700 hover:scale-105 transition-all shadow-[0_0_15px_rgba(37,99,235,0.4)] flex items-center gap-2">
-                <i data-lucide="bell-ring" class="w-4 h-4 animate-wiggle"></i>
-                <span class="lang-es">Canal Novedades</span><span class="lang-en">News Channel</span>
-            </a>
-        </div>
-    </nav>
+    </div>
 
-    <main class="flex-grow flex flex-col justify-center items-center text-center relative overflow-hidden w-full">
-        <div class="container mx-auto px-6 py-12 sm:py-20 md:py-32 landscape:py-10 max-w-5xl flex flex-col items-center justify-center">
-            
-            <div class="animate-on-load animate-fade-in-up mb-8" style="animation-delay: 0.1s;">
-                <img id="main-logo" src="logo1.png" alt="SlotSoftware Main Logo" class="w-[1200px] max-w-[90vw] h-auto block hover:scale-105 transition-transform duration-700" onerror="this.src='https://placehold.co/600x200?text=SlotSoftware+Main+Logo'">
-            </div>
-
-            <div class="animate-on-load animate-fade-in-up flex flex-col items-center" style="animation-delay: 0.2s;">
-                <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.1] mb-6 sm:mb-8 text-balance">
-                    <span class="lang-es">Software de Slot.<br /><span class="text-gray-400">Simulación Pura.</span></span>
-                    <span class="lang-en">Slot Software.<br /><span class="text-gray-400">Pure Simulation.</span></span>
-                </h1>
-                <p class="text-lg sm:text-xl md:text-2xl text-gray-500 mb-8 sm:mb-12 max-w-2xl font-light leading-relaxed text-balance">
-                    <span class="lang-es">En SlotSoftware revolucionamos el slot. Construimos herramientas digitales potentes para cronometraje por cámara, diseño 3D y telemetría avanzada. Ni más, ni menos.</span>
-                    <span class="lang-en">At SlotSoftware we revolutionize slot racing. We build powerful digital tools for camera timing, 3D design, and advanced telemetry. Nothing more, nothing less.</span>
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
-                    
-                    <!-- NUEVO BOTÓN PRINCIPAL: Atrapa al usuario hacia la App de Noticias -->
-                    <a href="canal.html" target="_blank" class="px-6 py-4 sm:px-8 bg-blue-600 text-white rounded-full font-bold text-center hover:bg-blue-700 active:scale-95 sm:hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center justify-center gap-2">
-                        <i data-lucide="smartphone" class="w-5 h-5"></i>
-                        <span class="lang-es">Únete a nuestro Canal de Novedades</span><span class="lang-en">Join our News Channel</span>
-                    </a>
-
-                    <a href="#productos" class="px-6 py-4 sm:px-8 bg-gray-50 text-black rounded-full font-medium text-center hover:bg-gray-100 active:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2 border border-gray-200">
-                        <span class="lang-es">Ver productos</span><span class="lang-en">View products</span>
-                        <i data-lucide="arrow-down" class="w-4 h-4"></i>
-                    </a>
-                </div>
-                <!-- Pequeño texto persuasivo debajo -->
-                <p class="mt-4 text-xs text-gray-400 font-medium tracking-wide">
-                    <i data-lucide="info" class="w-3 h-3 inline-block mb-0.5"></i>
-                    <span class="lang-es">Recibe actualizaciones, mejoras y nuevas versiones en tu móvil.</span>
-                    <span class="lang-en">Get updates, improvements and new versions on your phone.</span>
-                </p>
+    <div id="ui-layer">
+        
+        <div class="top-nav">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleLanguage(); playDigitalChime(true);" class="text-cyan-neon/60 hover:text-cyan-neon font-bold text-xs tracking-widest transition-colors pointer-events-auto bg-black/40 px-2 py-1 rounded">
+                    <span class="lang-es">[EN]</span><span class="lang-en">[ES]</span>
+                </button>
+                <button id="audio-toggle" class="pointer-events-auto bg-cyan-neon/10 border border-cyan-neon/30 text-cyan-neon px-3 py-1.5 text-[0.65rem] tracking-widest hover:bg-cyan-neon/20 transition-all rounded" onclick="toggleAudioMute()">AUDIO: ON</button>
             </div>
         </div>
-    </main>
 
-    <section id="productos" class="py-16 sm:py-24 bg-brand-white">
-        <div class="container mx-auto px-6 max-w-6xl">
-            <div class="mb-12 sm:mb-16">
-                <h2 class="text-xs sm:text-sm font-bold tracking-widest text-gray-400 uppercase mb-2 sm:mb-3">
-                    <span class="lang-es">Catálogo</span><span class="lang-en">Catalog</span>
-                </h2>
-                <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
-                    <span class="lang-es">Nuestros Productos.</span><span class="lang-en">Our Products.</span>
+        <div class="telemetry-data">
+            <div>SYS_LINK // <span id="telemetry-1">100.00</span>%</div>
+            <div>NET_NODE // PEERJS</div>
+            <div>STATUS // OPERACIONAL</div>
+        </div>
+
+        <!-- Terminal Menú (Flotante sobre Constelaciones) -->
+        <div id="panel-menu" class="menu-modal">
+            <h2 class="menu-titulo">
+                <span id="menu-title-text">MÓDULO</span>
+                <span style="font-size: 0.65rem; color: var(--cyan);">DATALINK</span>
+            </h2>
+            <div id="menu-enlaces"></div>
+            <div class="btn-cerrar" onclick="cerrarMenu()">
+                <span class="lang-es">CERRAR TRANSMISIÓN</span><span class="lang-en">CLOSE TRANSMISSION</span>
+            </div>
+        </div>
+
+        <div id="subtitle-container">
+            <span id="subtitle-text"></span><span class="cursor-blink">_</span>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONTENIDO ENRIQUECIDO (Aquí se inyectan las imágenes y textos originales) -->
+    <div id="info-modal" class="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md overflow-y-auto opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4 sm:p-8">
+        <!-- Quitamos scale-95 de tailwind, para que la animación custom lo maneje -->
+        <div class="glass-modal w-full max-w-6xl p-6 sm:p-10 relative flex flex-col" id="info-modal-content">
+            <div class="border-b border-cyan-neon/30 pb-4 mb-6 flex justify-between items-center sticky top-0 bg-[#00040c]/90 z-20 backdrop-blur-sm px-2">
+                <h3 id="info-title" class="text-xl md:text-3xl font-bold font-sans text-cyan-neon uppercase tracking-widest text-shadow-[0_0_10px_#00e5ff]">TÍTULO</h3>
+                <button onclick="closeModal('info-modal')" class="text-cyan-neon hover:text-white transition-colors bg-cyan-neon/10 p-2 rounded">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <!-- Contenedor scrolleable interno -->
+            <div id="info-body" class="text-gray-300 text-sm md:text-base leading-relaxed tracking-wide space-y-8 overflow-y-auto pr-2 pb-4 animate-fade-in flex-grow">
+                <!-- El HTML complejo (imágenes, textos) se inyectará aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Contacto Form -->
+    <div id="contact-modal" class="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md overflow-y-auto opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4">
+        <div class="glass-modal w-full max-w-xl p-8 relative" id="contact-modal-content">
+            <div class="border-b border-cyan-neon/30 pb-4 mb-6 flex justify-between items-center">
+                <h3 class="text-xl font-bold font-sans text-cyan-neon uppercase tracking-widest">
+                    <span class="lang-es">> TRANSMISIÓN DE DATOS</span><span class="lang-en">> DATA TRANSMISSION</span>
                 </h3>
+                <button onclick="closeModal('contact-modal')" class="text-cyan-neon hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
-                <!-- Tarjeta 1 con Padding Hack -->
-                <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" rel="noopener noreferrer" class="group flex flex-col gap-5 cursor-pointer block">
-                    <div class="relative w-full overflow-hidden rounded-3xl bg-gray-100" style="padding-bottom: 177.78%; height: 0;">
-                        <img src="app.jpg" alt="Krono Personal" loading="lazy" class="absolute top-0 left-0 w-full h-full object-cover block group-hover:scale-105 transition-transform duration-700 ease-out" onerror="this.src='https://placehold.co/400x700?text=Krono+Personal'">
-                    </div>
-                    <div>
-                        <h4 class="text-xl font-bold mb-1 group-hover:text-gray-600 transition-colors">KRONO PERSONAL V.4.0</h4>
-                        <p class="text-gray-500 text-sm">
-                            <span class="lang-es">Es el gestor de tiempos ideal para entrenamientos personales. Esta aplicación no necesita instalación, es compatible Android, IOS, Windows y Linux.</span><span class="lang-en">It is the ideal time manager for personal training. This application does not require installation and is compatible with Android, iOS, Windows, and Linux.</span>
-                        </p>
-                    </div>
-                </a>
-
-                <!-- Tarjeta 2 con Padding Hack -->
-                <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" rel="noopener noreferrer" class="group flex flex-col gap-5 cursor-pointer block">
-                    <div class="relative w-full overflow-hidden rounded-3xl bg-gray-100" style="padding-bottom: 177.78%; height: 0;">
-                        <img src="datos.jpg" alt="Krono Dual" loading="lazy" class="absolute top-0 left-0 w-full h-full object-cover block group-hover:scale-105 transition-transform duration-700 ease-out" onerror="this.src='https://placehold.co/400x700?text=Krono+Dual'">
-                    </div>
-                    <div>
-                        <h4 class="text-xl font-bold mb-1 group-hover:text-gray-600 transition-colors">KRONO DUAL V.4.0</h4>
-                        <p class="text-gray-500 text-sm">
-                            <span class="lang-es">Este es nuestro sistema diseñado para competiciones, los Detectores de cámara son para dos coches, máxima precisión. Esta aplicación no necesita instalación, es compatible Android, IOS, Windows y Linux.</span><span class="lang-en">This is our system designed for competitions, camera detectors are for two cars, maximum precision. This application requires no installation and is compatible with Android, iOS, Windows, and Linux.</span>
-                        </p>
-                    </div>
-                </a>
-
-                <!-- Tarjeta 3 con Padding Hack -->
-                <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" rel="noopener noreferrer" class="group flex flex-col gap-5 cursor-pointer block">
-                    <div class="relative w-full overflow-hidden rounded-3xl bg-gray-100" style="padding-bottom: 177.78%; height: 0;">
-                        <img src="core.jpg" alt="Tracks Telemetry" loading="lazy" class="absolute top-0 left-0 w-full h-full object-cover block group-hover:scale-105 transition-transform duration-700 ease-out" onerror="this.src='https://placehold.co/400x700?text=Tracks+Telemetry'">
-                    </div>
-                    <div>
-                        <h4 class="text-xl font-bold mb-1 group-hover:text-gray-600 transition-colors">TRACKS TELEMETRY</h4>
-                        <p class="text-gray-500 text-sm">
-                            <span class="lang-es">Estás a punto de llevar el análisis de tu pista a límites increíbles, desde el Diseño en 2D, analógico, Digital, Rally y Multicarril hasta 8 carriles, transformando tu Diseño en un motor potente en 3D, con controles de Motores, Neumáticos, Piñones, Coronas, Peso, Voltaje. Comunidad en la Web para compartir Circuitos, Visores de Coches Reales, Decoraciones de Circuitos y mucho más.</span><span class="lang-en">You are about to take your track analysis to incredible limits, from 2D Design, analog, Digital, Rally and Multi-lane up to 8 lanes, transforming your Design into a powerful 3D engine, with controls for Motors, Tires, Pinions, Crowns, Weight, Voltage. Web Community to share Circuits, Real Car Viewers, Circuit Decorations and much more.</span>
-                        </p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Nuevas imágenes 16:9 y Vídeo 3D Slot Game -->
-            <div class="mt-16 sm:mt-20 flex flex-col gap-10 md:gap-16 max-w-4xl mx-auto">
-                <!-- EXPLICACIÓN KRONO TV -->
-                <div class="flex flex-col gap-6 md:gap-10">
-                    <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" rel="noopener noreferrer" class="block w-full relative rounded-3xl overflow-hidden bg-gray-100 aspect-video shadow-[0_8px_30px_rgb(0,0,0,0.08)] group">
-                        <img src="k1.png" alt="Krono TV" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" onerror="this.src='https://placehold.co/1920x1080?text=Imagen+16:9'">
-                    </a>
-                    
-                    <div class="flex flex-col gap-4 text-center items-center px-4">
-                        <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
-                            <span class="lang-es">KRONO V.4.0: Fotodetector Profesional.</span>
-                            <span class="lang-en">KRONO V.4.0: Professional Photodetector.</span>
-                        </h3>
-                        <p class="text-gray-500 leading-relaxed text-base sm:text-lg">
-                            <span class="lang-es">KRONO V.4.0 es una innovadora aplicación de cronometraje y telemetría que transforma la cámara de tu dispositivo en un fotodetector profesional. Utiliza algoritmos de visión por IA para registrar automáticamente el paso de los vehículos, midiendo tiempos, deltas y velocidades con extrema precisión. Permite configurar modos de carrera por vueltas o tiempo, ofreciendo análisis avanzados de consistencia y asistencia auditiva con voz de ingeniero. Destaca por su espectacular "Modo TV", que sincroniza un panel de telemetría inmersivo y personalizable en una segunda pantalla vía nube. Incluye gestión de pilotos, historiales exportables a Excel, penalizaciones por salida nula y un ranking global integrado. Es la herramienta definitiva para competiciones de slot y radiocontrol, combinando tecnología de vanguardia con un diseño de alta competición.</span>
-                            <span class="lang-en">KRONO V.4.0 is an innovative timing and telemetry application that transforms your device's camera into a professional photodetector. It uses AI vision algorithms to automatically record passing vehicles, measuring times, deltas, and speeds with extreme precision. It allows setting up race modes by laps or time, offering advanced consistency analysis and audio assistance with an engineer's voice. It stands out for its spectacular "TV Mode," which synchronizes an immersive and customizable telemetry panel on a second screen via the cloud. It includes driver management, Excel-exportable history, false start penalties, and an integrated global ranking. It is the definitive tool for slot and radio-control competitions, combining cutting-edge technology with high-competition design.</span>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- EXPLICACIÓN KRONODUAL TV -->
-                <div class="flex flex-col gap-6 md:gap-10">
-                    <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" rel="noopener noreferrer" class="block w-full relative rounded-3xl overflow-hidden bg-gray-100 aspect-video shadow-[0_8px_30px_rgb(0,0,0,0.08)] group">
-                        <img src="k2.png" alt="KronoDual TV" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" onerror="this.src='https://placehold.co/1920x1080?text=Imagen+16:9'">
-                    </a>
-                    
-                    <div class="flex flex-col gap-4 text-center items-center px-4">
-                        <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
-                            <span class="lang-es">KronoDual V.4.0: Telemetría Definitiva.</span>
-                            <span class="lang-en">KronoDual V.4.0: Ultimate Telemetry.</span>
-                        </h3>
-                        <p class="text-gray-500 leading-relaxed text-base sm:text-lg">
-                            <span class="lang-es">KronoDual V.4.0 es el sistema de cronometraje y telemetría definitivo para tus carreras de slot y Scalextric. Utilizando la cámara de tu dispositivo y tecnología de visión artificial, detecta el paso de los coches a 30fps sin necesidad de hardware adicional. Disfruta de modos de juego para 1 o 2 jugadores, registrando tiempos por vuelta, velocidad media, consistencia y récords con precisión milimétrica. Conecta cualquier Smart TV o monitor secundario a través de la nube para mostrar un espectacular panel de telemetría en tiempo real. Mantén el control total de la carrera con avisos por voz, alertas de salidas nulas, gestión de banderas amarillas y un sistema anti-rebotes inteligente. Al finalizar cada duelo, un innovador comentarista impulsado por IA analizará tu rendimiento y podrás exportar todos los datos a formato CSV. Transforma tu pista casera en un circuito profesional de alta competición con una configuración rápida, intuitiva y completamente personalizable.</span>
-                            <span class="lang-en">KronoDual V.4.0 is the definitive timing and telemetry system for your slot and Scalextric races. Using your device's camera and computer vision technology, it detects passing cars at 30fps without the need for additional hardware. Enjoy game modes for 1 or 2 players, recording lap times, average speed, consistency, and records with pinpoint accuracy. Connect any Smart TV or secondary monitor via the cloud to display a spectacular real-time telemetry panel. Maintain total control of the race with voice prompts, false start alerts, yellow flag management, and an intelligent anti-bounce system. At the end of each duel, an innovative AI-powered commentator will analyze your performance, and you can export all data to CSV format. Transform your home track into a professional high-competition circuit with a quick, intuitive, and completely customizable setup.</span>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- EXPLICACIÓN DEL 3D SLOT GAME -->
-                <div class="flex flex-col gap-6 md:gap-10">
-                    <!-- Imagen del juego con enlace -->
-                    <a href="https://slotsoftware.github.io/Game3d/" target="_blank" rel="noopener noreferrer" class="block w-full relative rounded-3xl overflow-hidden bg-gray-100 aspect-video shadow-[0_8px_30px_rgb(0,0,0,0.08)] group">
-                        <img src="3dgame.png" alt="3D Slot Game" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" onerror="this.src='https://placehold.co/1920x1080?text=3D+Slot+Game'">
-                    </a>
-                    
-                    <!-- Contenido y explicación de la app -->
-                    <div class="flex flex-col gap-4 text-center items-center px-4">
-                        <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
-                            <span class="lang-es">3D SLOT GAME: Simulación Total.</span>
-                            <span class="lang-en">3D SLOT GAME: Total Simulation.</span>
-                        </h3>
-                        <p class="text-gray-500 leading-relaxed text-base sm:text-lg">
-                            <span class="lang-es">Conoce a fondo nuestra aplicación estrella. Basada en Three.js y PeerJS, convierte tus pistas en un entorno de conducción hiperrealista. Incluye <strong>físicas avanzadas de derrape</strong>, <strong>multijugador online P2P</strong> con chat de voz para retar a tus amigos, y telemetría completa.</span>
-                            <span class="lang-en">Take a deep dive into our flagship app. Based on Three.js and PeerJS, it converts your tracks into a hyper-realistic driving environment. It includes <strong>advanced drift physics</strong>, <strong>P2P online multiplayer</strong> with voice chat to challenge friends, and full telemetry.</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <section id="servicios" class="py-16 sm:py-24 bg-brand-white">
-        <div class="container mx-auto px-6">
-            <div class="mb-12 sm:mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8">
-                <div>
-                    <h2 class="text-xs sm:text-sm font-bold tracking-widest text-gray-400 uppercase mb-2 sm:mb-3">
-                        <span class="lang-es">Qué hacemos</span><span class="lang-en">What we do</span>
-                    </h2>
-                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
-                        <span class="lang-es">Tecnología de Competición.</span><span class="lang-en">Competition Technology.</span>
-                    </h3>
-                </div>
-                <p class="text-gray-500 max-w-md text-balance">
-                    <span class="lang-es">Nos especializamos en crear ecosistemas digitales para slot, fusionando conectividad, gráficos 3D y análisis de datos.</span>
-                    <span class="lang-en">We specialize in creating digital ecosystems for slot racing, merging connectivity, 3D graphics, and data analysis.</span>
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-                <div class="group p-8 rounded-3xl hover:bg-gray-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 border border-gray-100">
-                    <div class="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <i data-lucide="camera" class="w-5 h-5"></i>
-                    </div>
-                    <h4 class="text-xl font-bold mb-3">
-                        <span class="lang-es">Visión Artificial</span><span class="lang-en">Computer Vision</span>
-                    </h4>
-                    <p class="text-gray-500 leading-relaxed text-sm">
-                        <span class="lang-es">Sistemas de cronometraje sin hardware dedicado. Usamos tu cámara web y algoritmos de detección de movimiento para calcular tiempos por vuelta exactos.</span>
-                        <span class="lang-en">Timing systems without dedicated hardware. We use your webcam and motion detection algorithms to calculate exact lap times.</span>
-                    </p>
-                </div>
-
-                <div class="group p-8 rounded-3xl hover:bg-gray-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 border border-gray-100">
-                    <div class="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <i data-lucide="monitor-play" class="w-5 h-5"></i>
-                    </div>
-                    <h4 class="text-xl font-bold mb-3">
-                        <span class="lang-es">Simulación 3D</span><span class="lang-en">3D Simulation</span>
-                    </h4>
-                    <p class="text-gray-500 leading-relaxed text-sm">
-                        <span class="lang-es">Motores gráficos en navegador (Three.js) para recrear tus pistas. Físicas de gravedad, control de derrape y personalización de vehículos.</span>
-                        <span class="lang-en">Browser-based graphics engines (Three.js) to recreate your tracks. Gravity physics, drift control, and vehicle customization.</span>
-                    </p>
-                </div>
-
-                <div class="group p-8 rounded-3xl hover:bg-gray-50 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 border border-gray-100">
-                    <div class="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <i data-lucide="wifi" class="w-5 h-5"></i>
-                    </div>
-                    <h4 class="text-xl font-bold mb-3">
-                        <span class="lang-es">Multijugador P2P</span><span class="lang-en">P2P Multiplayer</span>
-                    </h4>
-                    <p class="text-gray-500 leading-relaxed text-sm">
-                        <span class="lang-es">Conexiones Peer-to-Peer directas. Compite en tiempo real con amigos de todo el mundo, comparte circuitos y comunícate por voz sin latencia.</span>
-                        <span class="lang-en">Direct Peer-to-Peer connections. Compete in real-time with friends worldwide, share circuits, and communicate via voice with zero latency.</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="filosofia" class="py-20 sm:py-32 bg-black text-white">
-        <div class="container mx-auto px-6 max-w-6xl">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-                <div>
-                    <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 sm:mb-8 text-balance leading-tight">
-                        <span class="lang-es">Pasión por el Slot.<br/><span class="text-gray-500">Tecnología al límite.</span></span>
-                        <span class="lang-en">Passion for Slot.<br/><span class="text-gray-500">Technology to the limit.</span></span>
-                    </h2>
-                </div>
-                <div class="flex flex-col gap-6 text-gray-400 text-base sm:text-lg lg:text-xl font-light leading-relaxed">
-                    <p>
-                        <span class="lang-es">En SlotSoftware no hacemos simples aplicaciones; creamos el ecosistema digital que el automodelismo de ranura merece. Entendemos que la velocidad y la precisión son lo único que importa en la pista.</span>
-                        <span class="lang-en">At SlotSoftware we don't just make apps; we create the digital ecosystem that slot car racing deserves. We understand that speed and precision are all that matter on the track.</span>
-                    </p>
-                    <p>
-                        <span class="lang-es">Optimizamos nuestras herramientas web para que disfrutes de físicas reales a 60FPS y detecciones de vuelta exactas usando solo la cámara de tu móvil o PC. Llevamos el hobby clásico a la era del juego en la nube y el multijugador global.</span>
-                        <span class="lang-en">We optimize our web tools so you can enjoy real physics at 60FPS and exact lap detections using only your phone or PC camera. We bring the classic hobby into the era of cloud gaming and global multiplayer.</span>
-                    </p>
-                    <div class="pt-6">
-                        <button onclick="openContactModal()" class="inline-flex items-center gap-2 px-8 py-4 bg-white text-black rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
-                            <span class="lang-es">Hablemos de tu idea</span><span class="lang-en">Let's talk about your idea</span>
-                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer id="contacto" class="py-12 border-t border-gray-100 bg-brand-white">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-8">
-                <a href="#" class="flex items-center transition-transform hover:scale-105">
-                    <img src="logo1.png" alt="SlotSoftware Logo" class="h-32 md:h-40 w-auto" onerror="this.src='https://placehold.co/200x80?text=SlotSoftware+Logo'">
-                </a>
+            <form action="https://formsubmit.co/slotcarhome@gmail.com" method="POST" class="flex flex-col gap-5 text-sm">
+                <input type="hidden" name="_subject" value="Transmisión desde Red SlotSoftware">
+                <input type="hidden" name="_captcha" value="false">
                 
-                <div class="flex flex-col md:flex-row gap-6 md:gap-12 text-center md:text-left">
-                    <div>
-                        <h5 class="text-sm font-bold uppercase tracking-wider text-gray-900 mb-2">
-                            <span class="lang-es">Escríbenos</span><span class="lang-en">Email us</span>
-                        </h5>
-                        <a href="mailto:slotcarhome@gmail.com" class="text-gray-500 hover:text-black transition-colors">slotcarhome@gmail.com</a>
-                    </div>
+                <div>
+                    <label class="block text-cyan-neon/70 mb-1"><span class="lang-es">IDENTIFICADOR (NOMBRE)</span><span class="lang-en">IDENTIFIER (NAME)</span></label>
+                    <input type="text" name="name" required class="w-full p-3 rounded-sm">
                 </div>
-            </div>
-            
-            <div class="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
-                <p>&copy; 2026 SlotSoftware. <span class="lang-es">Todos los derechos reservados.</span><span class="lang-en">All rights reserved.</span></p>
-                
-                <!-- Contador de Visitas Reales -->
-                <div class="flex items-center gap-3 px-4 py-1.5 bg-gray-50 rounded-full border border-gray-200" title="Visitas totales reales">
-                    <span class="relative flex h-2.5 w-2.5">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
-                    </span>
-                    <span id="visitor-count" class="font-mono font-medium text-gray-900 tracking-tight">...</span>
-                    <span class="text-xs text-gray-500 uppercase tracking-widest"><span class="lang-es">Visitas</span><span class="lang-en">Visits</span></span>
+                <div>
+                    <label class="block text-cyan-neon/70 mb-1"><span class="lang-es">RUTA DE RETORNO (EMAIL)</span><span class="lang-en">RETURN PATH (EMAIL)</span></label>
+                    <input type="email" name="email" required class="w-full p-3 rounded-sm">
                 </div>
-
-                <div class="flex gap-4">
-                    <button onclick="openPrivacyModal()" class="hover:text-gray-900 transition-colors"><span class="lang-es">Privacidad</span><span class="lang-en">Privacy</span></button>
-                    <button onclick="openTermsModal()" class="hover:text-gray-900 transition-colors"><span class="lang-es">Términos</span><span class="lang-en">Terms</span></button>
+                <div>
+                    <label class="block text-cyan-neon/70 mb-1"><span class="lang-es">PAQUETE DE DATOS (MENSAJE)</span><span class="lang-en">DATA PACKET (MESSAGE)</span></label>
+                    <textarea name="message" rows="4" required class="w-full p-3 rounded-sm resize-none"></textarea>
                 </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Contact Modal -->
-    <div id="contact-modal" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm overflow-y-auto opacity-0 pointer-events-none transition-all duration-500 ease-out flex items-center justify-center p-4 sm:p-6">
-        <div class="bg-brand-white w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-500 ease-out" id="contact-modal-content">
-            <div class="px-6 py-4 md:py-6 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="text-xl md:text-2xl font-bold tracking-tight">
-                    <span class="lang-es">Cuéntanos tu idea</span><span class="lang-en">Tell us your idea</span>
-                </h3>
-                <button onclick="closeContactModal()" class="w-10 h-10 md:w-12 md:h-12 bg-gray-50 rounded-full flex items-center justify-center hover:bg-gray-200 hover:rotate-90 transition-all duration-300 text-gray-900" aria-label="Cerrar">
-                    <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+                <button type="submit" class="border border-cyan-neon text-cyan-neon hover:bg-cyan-neon/20 hover:text-white transition-all py-3 mt-2 tracking-widest font-bold">
+                    <span class="lang-es">EJECUTAR ENVÍO</span><span class="lang-en">EXECUTE SEND</span>
                 </button>
-            </div>
-            <div class="p-6 sm:p-8 md:p-10">
-                <form action="https://formsubmit.co/slotcarhome@gmail.com" method="POST" class="flex flex-col gap-6">
-                    <input type="hidden" name="_subject" value="Nuevo contacto desde SlotSoftware Web">
-                    <input type="hidden" name="_captcha" value="false">
-                    <input type="hidden" name="_template" value="box">
-
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                            <span class="lang-es">Tu nombre</span><span class="lang-en">Your name</span>
-                        </label>
-                        <input type="text" id="name" name="name" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-gray-50 focus:bg-white text-gray-900">
-                    </div>
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                            <span class="lang-es">Correo electrónico</span><span class="lang-en">Email address</span>
-                        </label>
-                        <input type="email" id="email" name="email" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-gray-50 focus:bg-white text-gray-900">
-                    </div>
-                    <div>
-                        <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
-                            <span class="lang-es">¿Qué tienes en mente?</span><span class="lang-en">What's on your mind?</span>
-                        </label>
-                        <textarea id="message" name="message" rows="4" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-gray-50 focus:bg-white resize-none text-gray-900"></textarea>
-                    </div>
-                    <button type="submit" class="w-full py-4 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors mt-2">
-                        <span class="lang-es">Enviar mensaje</span><span class="lang-en">Send message</span>
-                    </button>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
 
-    <!-- Privacy Modal -->
-    <div id="privacy-modal" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm overflow-y-auto opacity-0 pointer-events-none transition-all duration-500 ease-out flex items-center justify-center p-4 sm:p-6">
-        <div class="bg-brand-white w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-500 ease-out flex flex-col max-h-[90vh]" id="privacy-modal-content">
-            <div class="px-6 py-4 md:py-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-brand-white z-10">
-                <h3 class="text-xl md:text-2xl font-bold tracking-tight">
-                    <span class="lang-es">Política de Privacidad</span><span class="lang-en">Privacy Policy</span>
-                </h3>
-                <button onclick="closePrivacyModal()" class="w-10 h-10 md:w-12 md:h-12 bg-gray-50 rounded-full flex items-center justify-center hover:bg-gray-200 hover:rotate-90 transition-all duration-300 text-gray-900" aria-label="Cerrar">
-                    <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
-                </button>
-            </div>
-            <div class="p-6 sm:p-8 md:p-10 overflow-y-auto text-gray-600 text-sm md:text-base space-y-6">
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">1. Recopilación de Datos</span><span class="lang-en">1. Data Collection</span></h4>
-                    <p>
-                        <span class="lang-es">En SlotSoftware priorizamos tu privacidad. Nuestras aplicaciones (como KronoDual y 3D Player) procesan la mayoría de los datos, incluido el flujo de la cámara web, localmente en tu dispositivo. No grabamos, almacenamos ni transmitimos el vídeo de tu cámara a nuestros servidores.</span>
-                        <span class="lang-en">At SlotSoftware we prioritize your privacy. Our applications (such as KronoDual and 3D Player) process most data, including webcam streams, locally on your device. We do not record, store, or transmit your camera video to our servers.</span>
-                    </p>
-                </div>
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">2. Servicios de Terceros</span><span class="lang-en">2. Third-Party Services</span></h4>
-                    <p>
-                        <span class="lang-es">Utilizamos servicios estadísticos anónimos (CounterAPI) únicamente para contabilizar las visitas generales a la web. Los formularios de contacto se envían a través de servicios seguros de correo y los datos proporcionados (nombre, email) solo se usan para responder a tu solicitud.</span>
-                        <span class="lang-en">We use anonymous statistical services (CounterAPI) solely to count general visits to the website. Contact forms are sent through secure email services and the data provided (name, email) is only used to respond to your request.</span>
-                    </p>
-                </div>
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">3. Conexiones P2P</span><span class="lang-en">3. P2P Connections</span></h4>
-                    <p>
-                        <span class="lang-es">Las funciones multijugador y de chat de voz utilizan tecnología Peer-to-Peer (PeerJS). Esto significa que la conexión y los datos de juego se establecen directamente entre los usuarios, sin pasar por servidores centrales de almacenamiento.</span>
-                        <span class="lang-en">Multiplayer and voice chat features use Peer-to-Peer technology (PeerJS). This means that the connection and game data are established directly between users, without passing through central storage servers.</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Terms Modal -->
-    <div id="terms-modal" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm overflow-y-auto opacity-0 pointer-events-none transition-all duration-500 ease-out flex items-center justify-center p-4 sm:p-6">
-        <div class="bg-brand-white w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl transform scale-95 transition-transform duration-500 ease-out flex flex-col max-h-[90vh]" id="terms-modal-content">
-            <div class="px-6 py-4 md:py-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-brand-white z-10">
-                <h3 class="text-xl md:text-2xl font-bold tracking-tight">
-                    <span class="lang-es">Términos y Condiciones</span><span class="lang-en">Terms and Conditions</span>
-                </h3>
-                <button onclick="closeTermsModal()" class="w-10 h-10 md:w-12 md:h-12 bg-gray-50 rounded-full flex items-center justify-center hover:bg-gray-200 hover:rotate-90 transition-all duration-300 text-gray-900" aria-label="Cerrar">
-                    <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
-                </button>
-            </div>
-            <div class="p-6 sm:p-8 md:p-10 overflow-y-auto text-gray-600 text-sm md:text-base space-y-6">
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">1. Uso del Software</span><span class="lang-en">1. Software Usage</span></h4>
-                    <p>
-                        <span class="lang-es">Las aplicaciones y visores proporcionados por SlotSoftware están destinados a un uso recreativo y amateur en el ámbito del automodelismo de ranura. El usuario se compromete a no utilizar las plataformas para fines ilícitos o malintencionados.</span>
-                        <span class="lang-en">The applications and viewers provided by SlotSoftware are intended for recreational and amateur use in the field of slot car racing. The user agrees not to use the platforms for illicit or malicious purposes.</span>
-                    </p>
-                </div>
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">2. Propiedad Intelectual</span><span class="lang-en">2. Intellectual Property</span></h4>
-                    <p>
-                        <span class="lang-es">Todo el código, diseño, algoritmos de detección visual y marca de SlotSoftware son propiedad exclusiva de sus desarrolladores. Queda prohibida la reproducción, distribución o modificación no autorizada con fines comerciales.</span>
-                        <span class="lang-en">All code, design, visual detection algorithms, and branding of SlotSoftware are the exclusive property of their developers. Unauthorized reproduction, distribution, or modification for commercial purposes is prohibited.</span>
-                    </p>
-                </div>
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-2"><span class="lang-es">3. Exención de Responsabilidad</span><span class="lang-en">3. Limitation of Liability</span></h4>
-                    <p>
-                        <span class="lang-es">El software se proporciona "tal cual". SlotSoftware no se hace responsable por fallos en el cronometraje, pérdida de datos de competición, ni de problemas derivados del hardware del usuario (cámaras, rendimiento del navegador o conexión a internet).</span>
-                        <span class="lang-en">The software is provided "as is". SlotSoftware is not responsible for timing failures, loss of competition data, or problems arising from the user's hardware (cameras, browser performance, or internet connection).</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- SCRIPT DEL SISTEMA INMERSIVO -->
     <script>
         lucide.createIcons();
 
         function toggleLanguage() {
             const html = document.documentElement;
             const currentLang = html.getAttribute('lang') || 'es';
-            const newLang = currentLang === 'es' ? 'en' : 'es';
-            
-            html.setAttribute('lang', newLang);
+            html.setAttribute('lang', currentLang === 'es' ? 'en' : 'es');
+            if (activeMenuIndex !== -1) {
+                const info = configuracionMenus[activeMenuIndex];
+                animarMenuEnlaces(info.links);
+            }
+            // Si el modal está abierto, recargar el contenido en el nuevo idioma
+            if(currentActiveInfoKey) {
+                showDynamicInfo(currentActiveInfoKey);
+            }
         }
+        function getCurrentLang() { return document.documentElement.getAttribute('lang') || 'es'; }
 
-        // Funciones para el Modal de Contacto
-        function openContactModal() {
-            const modal = document.getElementById('contact-modal');
-            const content = document.getElementById('contact-modal-content');
-            document.body.style.overflow = 'hidden';
-            
+        function openModal(id) {
+            playDigitalChime(true);
+            const modal = document.getElementById(id);
+            const content = document.getElementById(id + '-content');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100', 'pointer-events-auto');
             
-            setTimeout(() => {
-                content.classList.remove('scale-95');
-                content.classList.add('scale-100');
-            }, 10);
+            // Aplicar la animación espectacular
+            content.classList.remove('animate-close');
+            void content.offsetWidth; // Forzar el reflow para reiniciar la animación
+            content.classList.add('animate-open');
         }
-
-        function closeContactModal() {
-            const modal = document.getElementById('contact-modal');
-            const content = document.getElementById('contact-modal-content');
+        
+        function closeModal(id) {
+            playDigitalChime(false);
+            const modal = document.getElementById(id);
+            const content = document.getElementById(id + '-content');
             
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
+            // Activar animación espectacular de cierre
+            content.classList.remove('animate-open');
+            content.classList.add('animate-close');
             
             setTimeout(() => {
                 modal.classList.remove('opacity-100', 'pointer-events-auto');
                 modal.classList.add('opacity-0', 'pointer-events-none');
-                document.body.style.overflow = '';
             }, 300);
+            
+            if(id === 'info-modal') currentActiveInfoKey = null;
         }
 
-        // Modales de Privacidad y Términos
-        function openPrivacyModal() {
-            const modal = document.getElementById('privacy-modal');
-            const content = document.getElementById('privacy-modal-content');
-            document.body.style.overflow = 'hidden';
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            modal.classList.add('opacity-100', 'pointer-events-auto');
-            setTimeout(() => { content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
+        let currentActiveInfoKey = null;
+
+        // -- BASE DE DATOS ENRIQUECIDA (IMÁGENES Y TEXTOS ORIGINALES) --
+        const infoPanels = {
+            'catalogo_completo': {
+                title: { es: "BASE DE DATOS: CATÁLOGO", en: "DATABASE: CATALOG" },
+                body: { 
+                    es: `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="sci-fi-card p-4 flex flex-col rounded">
+                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
+                                <img src="app.jpg" alt="Krono Personal" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Krono+Personal'">
+                            </div>
+                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> KRONO PERSONAL V.4.0</h4>
+                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">Es el gestor de tiempos ideal para entrenamientos personales. Esta aplicación no necesita instalación, es compatible Android, IOS, Windows y Linux.</p>
+                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">ABRIR MÓDULO</a>
+                        </div>
+                        <div class="sci-fi-card p-4 flex flex-col rounded">
+                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
+                                <img src="datos.jpg" alt="Krono Dual" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Krono+Dual'">
+                            </div>
+                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> KRONO DUAL V.4.0</h4>
+                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">Este es nuestro sistema diseñado para competiciones, los Detectores de cámara son para dos coches, máxima precisión. Esta aplicación no necesita instalación, es compatible Android, IOS, Windows y Linux.</p>
+                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">ABRIR MÓDULO</a>
+                        </div>
+                        <div class="sci-fi-card p-4 flex flex-col rounded">
+                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
+                                <img src="core.jpg" alt="Tracks Telemetry" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Tracks+Telemetry'">
+                            </div>
+                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> TRACKS TELEMETRY</h4>
+                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">Lleva el análisis de tu pista a límites increíbles, desde Diseño en 2D hasta 8 carriles, transformando tu Diseño en un motor potente en 3D, con controles de Motores, Neumáticos, Piñones, Peso y Voltaje. Comunidad Web integrada.</p>
+                            <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">ABRIR MÓDULO</a>
+                        </div>
+                    </div>
+                    `, 
+                    en: `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="sci-fi-card p-4 flex flex-col rounded">
+                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
+                                <img src="app.jpg" alt="Krono Personal" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Krono+Personal'">
+                            </div>
+                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> KRONO PERSONAL V.4.0</h4>
+                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">It is the ideal time manager for personal training. This application does not require installation and is compatible with Android, iOS, Windows, and Linux.</p>
+                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">OPEN MODULE</a>
+                        </div>
+                        <div class="sci-fi-card p-4 flex flex-col rounded">
+                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
+                                <img src="datos.jpg" alt="Krono Dual" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Krono+Dual'">
+                            </div>
+                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> KRONO DUAL V.4.0</h4>
+                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">This is our system designed for competitions, camera detectors are for two cars, maximum precision. Requires no installation and is compatible with Android, iOS, Windows, and Linux.</p>
+                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">OPEN MODULE</a>
+                        </div>
+                        <div class="sci-fi-card p-4 flex flex-col rounded">
+                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
+                                <img src="core.jpg" alt="Tracks Telemetry" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Tracks+Telemetry'">
+                            </div>
+                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> TRACKS TELEMETRY</h4>
+                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">Take your track analysis to incredible limits, from 2D Design up to 8 lanes, transforming your Design into a powerful 3D engine, with controls for Motors, Tires, Pinions, Weight, Voltage. Integrated Web Community.</p>
+                            <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">OPEN MODULE</a>
+                        </div>
+                    </div>
+                    ` 
+                }
+            },
+            'simulacion_avanzada': {
+                title: { es: "SISTEMAS AVANZADOS", en: "ADVANCED SYSTEMS" },
+                body: { 
+                    es: `
+                    <div class="flex flex-col gap-12">
+                        <!-- Krono TV -->
+                        <div class="sci-fi-card p-4 lg:p-6 flex flex-col lg:flex-row gap-6 items-center">
+                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="w-full lg:w-1/2 relative overflow-hidden rounded border border-cyan-neon/30 aspect-video block">
+                                <img src="k1.png" alt="Krono TV" class="absolute inset-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/1920x1080/000205/00e5ff?text=KRONO+TV'">
+                            </a>
+                            <div class="w-full lg:w-1/2">
+                                <h4 class="text-2xl font-bold font-sans text-white mb-3">> KRONO V.4.0: Fotodetector Profesional.</h4>
+                                <p class="text-cyan-neon/80 text-sm leading-relaxed mb-4">KRONO V.4.0 es una innovadora aplicación de cronometraje y telemetría que transforma la cámara de tu dispositivo en un fotodetector profesional. Utiliza algoritmos de visión por IA para registrar automáticamente el paso de los vehículos, midiendo tiempos, deltas y velocidades con extrema precisión. Permite configurar modos de carrera por vueltas o tiempo, ofreciendo análisis avanzados de consistencia y asistencia auditiva con voz de ingeniero. Destaca por su espectacular "Modo TV", que sincroniza un panel de telemetría inmersivo en una segunda pantalla vía nube.</p>
+                            </div>
+                        </div>
+
+                        <!-- Krono Dual TV -->
+                        <div class="sci-fi-card p-4 lg:p-6 flex flex-col lg:flex-row-reverse gap-6 items-center border-blue-neon/40">
+                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="w-full lg:w-1/2 relative overflow-hidden rounded border border-blue-neon/40 aspect-video block">
+                                <img src="k2.png" alt="Krono Dual TV" class="absolute inset-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/1920x1080/000205/0066ff?text=KRONO+DUAL+TV'">
+                            </a>
+                            <div class="w-full lg:w-1/2">
+                                <h4 class="text-2xl font-bold font-sans text-white mb-3">> KronoDual V.4.0: Telemetría Definitiva.</h4>
+                                <p class="text-blue-200/80 text-sm leading-relaxed mb-4">El sistema definitivo para carreras. Detecta el paso a 30fps sin hardware adicional. Modos 1 o 2 jugadores, registrando consistencia y récords con precisión milimétrica. Conecta cualquier Smart TV para mostrar un panel en tiempo real. Control total con avisos por voz, banderas amarillas y anti-rebotes inteligente. Comentarista IA analiza tu rendimiento al finalizar. Transforma tu pista casera en un circuito profesional.</p>
+                            </div>
+                        </div>
+
+                        <!-- 3D Game -->
+                        <div class="sci-fi-card p-4 lg:p-6 flex flex-col lg:flex-row gap-6 items-center shadow-[0_0_20px_rgba(0,102,255,0.2)]">
+                            <a href="https://slotsoftware.github.io/Game3d/" target="_blank" class="w-full lg:w-1/2 relative overflow-hidden rounded border border-white/20 aspect-video block">
+                                <img src="3dgame.png" alt="3D Game" class="absolute inset-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/1920x1080/000205/ffffff?text=3D+SLOT+GAME'">
+                            </a>
+                            <div class="w-full lg:w-1/2">
+                                <h4 class="text-2xl font-bold font-sans text-white mb-3">> 3D SLOT GAME: Simulación Total.</h4>
+                                <p class="text-gray-300 text-sm leading-relaxed mb-4">Conoce a fondo nuestra aplicación estrella. Basada en Three.js y PeerJS, convierte tus pistas en un entorno de conducción hiperrealista. Incluye <strong class="text-cyan-neon">físicas avanzadas de derrape</strong>, <strong class="text-cyan-neon">multijugador online P2P</strong> con chat de voz para retar a tus amigos, y telemetría completa.</p>
+                            </div>
+                        </div>
+                    </div>
+                    `, 
+                    en: `
+                    <div class="flex flex-col gap-12">
+                        <div class="sci-fi-card p-4 lg:p-6 flex flex-col lg:flex-row gap-6 items-center">
+                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="w-full lg:w-1/2 relative overflow-hidden rounded border border-cyan-neon/30 aspect-video block">
+                                <img src="k1.png" alt="Krono TV" class="absolute inset-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/1920x1080/000205/00e5ff?text=KRONO+TV'">
+                            </a>
+                            <div class="w-full lg:w-1/2">
+                                <h4 class="text-2xl font-bold font-sans text-white mb-3">> KRONO V.4.0: Professional Photodetector.</h4>
+                                <p class="text-cyan-neon/80 text-sm leading-relaxed mb-4">Transforms your device's camera into a professional photodetector. It uses AI vision algorithms to automatically record passing vehicles, measuring times, deltas, and speeds with extreme precision. It features a spectacular "TV Mode," which synchronizes an immersive telemetry panel on a second screen via the cloud.</p>
+                            </div>
+                        </div>
+                        <div class="sci-fi-card p-4 lg:p-6 flex flex-col lg:flex-row-reverse gap-6 items-center border-blue-neon/40">
+                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="w-full lg:w-1/2 relative overflow-hidden rounded border border-blue-neon/40 aspect-video block">
+                                <img src="k2.png" alt="Krono Dual TV" class="absolute inset-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/1920x1080/000205/0066ff?text=KRONO+DUAL+TV'">
+                            </a>
+                            <div class="w-full lg:w-1/2">
+                                <h4 class="text-2xl font-bold font-sans text-white mb-3">> KronoDual V.4.0: Ultimate Telemetry.</h4>
+                                <p class="text-blue-200/80 text-sm leading-relaxed mb-4">The definitive timing and telemetry system. Detects passing cars at 30fps without additional hardware. Enjoy game modes for 1 or 2 players, recording consistency and records with pinpoint accuracy. Connect any Smart TV via the cloud to display a real-time panel. Total control with voice prompts, yellow flags, and smart anti-bounce.</p>
+                            </div>
+                        </div>
+                        <div class="sci-fi-card p-4 lg:p-6 flex flex-col lg:flex-row gap-6 items-center shadow-[0_0_20px_rgba(0,102,255,0.2)]">
+                            <a href="https://slotsoftware.github.io/Game3d/" target="_blank" class="w-full lg:w-1/2 relative overflow-hidden rounded border border-white/20 aspect-video block">
+                                <img src="3dgame.png" alt="3D Game" class="absolute inset-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/1920x1080/000205/ffffff?text=3D+SLOT+GAME'">
+                            </a>
+                            <div class="w-full lg:w-1/2">
+                                <h4 class="text-2xl font-bold font-sans text-white mb-3">> 3D SLOT GAME: Total Simulation.</h4>
+                                <p class="text-gray-300 text-sm leading-relaxed mb-4">Take a deep dive into our flagship app. Based on Three.js and PeerJS, it converts your tracks into a hyper-realistic driving environment. It includes <strong class="text-cyan-neon">advanced drift physics</strong>, <strong class="text-cyan-neon">P2P online multiplayer</strong> with voice chat to challenge friends, and full telemetry.</p>
+                            </div>
+                        </div>
+                    </div>
+                    ` 
+                }
+            },
+            'arquitectura': {
+                title: { es: "TECNOLOGÍA DE COMPETICIÓN", en: "COMPETITION TECHNOLOGY" },
+                body: { 
+                    es: `
+                    <div class="flex flex-col md:flex-row gap-8 justify-center">
+                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-cyan-neon text-center">
+                            <i data-lucide="camera" class="w-10 h-10 mx-auto text-cyan-neon mb-4"></i>
+                            <h4 class="text-lg font-bold font-sans text-white mb-3">> VISIÓN ARTIFICIAL</h4>
+                            <p class="text-gray-400 text-sm">Sistemas de cronometraje sin hardware dedicado. Usamos tu cámara web y algoritmos de detección de movimiento para calcular tiempos por vuelta exactos.</p>
+                        </div>
+                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-blue-neon text-center">
+                            <i data-lucide="monitor-play" class="w-10 h-10 mx-auto text-blue-neon mb-4"></i>
+                            <h4 class="text-lg font-bold font-sans text-white mb-3">> SIMULACIÓN 3D</h4>
+                            <p class="text-gray-400 text-sm">Motores gráficos en navegador (Three.js) para recrear tus pistas. Físicas de gravedad, control de derrape y personalización de vehículos.</p>
+                        </div>
+                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-purple-500 text-center">
+                            <i data-lucide="wifi" class="w-10 h-10 mx-auto text-purple-500 mb-4"></i>
+                            <h4 class="text-lg font-bold font-sans text-white mb-3">> MULTIJUGADOR P2P</h4>
+                            <p class="text-gray-400 text-sm">Conexiones Peer-to-Peer directas. Compite en tiempo real con amigos de todo el mundo, comparte circuitos y comunícate por voz sin latencia.</p>
+                        </div>
+                    </div>
+                    `, 
+                    en: `
+                    <div class="flex flex-col md:flex-row gap-8 justify-center">
+                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-cyan-neon text-center">
+                            <i data-lucide="camera" class="w-10 h-10 mx-auto text-cyan-neon mb-4"></i>
+                            <h4 class="text-lg font-bold font-sans text-white mb-3">> COMPUTER VISION</h4>
+                            <p class="text-gray-400 text-sm">Timing systems without dedicated hardware. We use your webcam and motion detection algorithms to calculate exact lap times.</p>
+                        </div>
+                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-blue-neon text-center">
+                            <i data-lucide="monitor-play" class="w-10 h-10 mx-auto text-blue-neon mb-4"></i>
+                            <h4 class="text-lg font-bold font-sans text-white mb-3">> 3D SIMULATION</h4>
+                            <p class="text-gray-400 text-sm">Browser-based graphics engines (Three.js) to recreate your tracks. Gravity physics, drift control, and vehicle customization.</p>
+                        </div>
+                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-purple-500 text-center">
+                            <i data-lucide="wifi" class="w-10 h-10 mx-auto text-purple-500 mb-4"></i>
+                            <h4 class="text-lg font-bold font-sans text-white mb-3">> P2P MULTIPLAYER</h4>
+                            <p class="text-gray-400 text-sm">Direct Peer-to-Peer connections. Compete in real-time with friends worldwide, share circuits, and communicate via voice with zero latency.</p>
+                        </div>
+                    </div>
+                    ` 
+                }
+            },
+            'filosofia': {
+                title: { es: "PASIÓN POR EL SLOT", en: "PASSION FOR SLOT" },
+                body: { 
+                    es: `
+                    <div class="p-4 md:p-8 text-center max-w-4xl mx-auto">
+                        <h2 class="text-3xl md:text-5xl font-bold tracking-tight mb-8 font-sans text-white">Software de Slot.<br/><span class="text-cyan-neon">Simulación Pura.</span></h2>
+                        <p class="text-gray-300 text-lg mb-6 leading-relaxed">En SlotSoftware no hacemos simples aplicaciones; creamos el ecosistema digital que el automodelismo de ranura merece. Entendemos que la velocidad y la precisión son lo único que importa en la pista.</p>
+                        <p class="text-gray-400 text-base leading-relaxed">Optimizamos nuestras herramientas web para que disfrutes de físicas reales a 60FPS y detecciones de vuelta exactas usando solo la cámara de tu móvil o PC. Llevamos el hobby clásico a la era del juego en la nube y el multijugador global.</p>
+                    </div>
+                    `, 
+                    en: `
+                    <div class="p-4 md:p-8 text-center max-w-4xl mx-auto">
+                        <h2 class="text-3xl md:text-5xl font-bold tracking-tight mb-8 font-sans text-white">Slot Software.<br/><span class="text-cyan-neon">Pure Simulation.</span></h2>
+                        <p class="text-gray-300 text-lg mb-6 leading-relaxed">At SlotSoftware we don't just make apps; we create the digital ecosystem that slot car racing deserves. We understand that speed and precision are all that matter on the track.</p>
+                        <p class="text-gray-400 text-base leading-relaxed">We optimize our web tools so you can enjoy real physics at 60FPS and exact lap detections using only your phone or PC camera. We bring the classic hobby into the era of cloud gaming and global multiplayer.</p>
+                    </div>
+                    ` 
+                }
+            },
+            'privacidad_terminos': {
+                title: { es: "POLÍTICAS DEL SISTEMA", en: "SYSTEM POLICIES" },
+                body: { 
+                    es: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                        <div class="sci-fi-card p-6">
+                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-4 border-b border-cyan-neon/20 pb-2">PRIVACIDAD</h4>
+                            <p class="text-white mb-2"><strong>1. Recopilación de Datos</strong></p>
+                            <p class="text-gray-400 text-sm mb-4">Nuestras aplicaciones procesan el flujo de la cámara localmente. No grabamos ni transmitimos el vídeo a servidores.</p>
+                            <p class="text-white mb-2"><strong>2. Conexiones P2P</strong></p>
+                            <p class="text-gray-400 text-sm">El multijugador utiliza Peer-to-Peer. La conexión se establece directamente entre usuarios.</p>
+                        </div>
+                        <div class="sci-fi-card p-6">
+                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-4 border-b border-cyan-neon/20 pb-2">TÉRMINOS</h4>
+                            <p class="text-white mb-2"><strong>1. Propiedad Intelectual</strong></p>
+                            <p class="text-gray-400 text-sm mb-4">El código, diseño y algoritmos son propiedad de SlotSoftware. Prohibida su distribución comercial.</p>
+                            <p class="text-white mb-2"><strong>2. Exención de Responsabilidad</strong></p>
+                            <p class="text-gray-400 text-sm">Software suministrado "tal cual". No nos hacemos responsables por fallos derivados del hardware del usuario.</p>
+                        </div>
+                    </div>
+                    `, 
+                    en: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                        <div class="sci-fi-card p-6">
+                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-4 border-b border-cyan-neon/20 pb-2">PRIVACY</h4>
+                            <p class="text-white mb-2"><strong>1. Data Collection</strong></p>
+                            <p class="text-gray-400 text-sm mb-4">Our apps process the camera stream locally. We do not record or transmit video to servers.</p>
+                            <p class="text-white mb-2"><strong>2. P2P Connections</strong></p>
+                            <p class="text-gray-400 text-sm">Multiplayer uses Peer-to-Peer. Connections are established directly between users.</p>
+                        </div>
+                        <div class="sci-fi-card p-6">
+                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-4 border-b border-cyan-neon/20 pb-2">TERMS</h4>
+                            <p class="text-white mb-2"><strong>1. Intellectual Property</strong></p>
+                            <p class="text-gray-400 text-sm mb-4">Code, design, and algorithms are property of SlotSoftware. Commercial distribution prohibited.</p>
+                            <p class="text-white mb-2"><strong>2. Limitation of Liability</strong></p>
+                            <p class="text-gray-400 text-sm">Software provided "as is". Not responsible for failures arising from user hardware.</p>
+                        </div>
+                    </div>
+                    ` 
+                }
+            }
+        };
+
+        function showDynamicInfo(key) {
+            currentActiveInfoKey = key;
+            const data = infoPanels[key];
+            if (!data) return;
+            const lang = getCurrentLang();
+            document.getElementById('info-title').innerText = data.title[lang];
+            
+            const bodyContainer = document.getElementById('info-body');
+            // Reset animation
+            bodyContainer.classList.remove('animate-fade-in');
+            void bodyContainer.offsetWidth; // trigger reflow
+            bodyContainer.classList.add('animate-fade-in');
+            
+            bodyContainer.innerHTML = data.body[lang];
+            
+            openModal('info-modal');
+            lucide.createIcons(); // Reactivate any icons injected
         }
 
-        function closePrivacyModal() {
-            const modal = document.getElementById('privacy-modal');
-            const content = document.getElementById('privacy-modal-content');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.remove('opacity-100', 'pointer-events-auto');
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                document.body.style.overflow = '';
-            }, 300);
-        }
+        const configuracionMenus = [
+            { 
+                id: "CATALOGO", nombre: { es: "MÓDULO CATÁLOGO", en: "CATALOG MODULE" },
+                voz: { es: "Accediendo al catálogo de módulos. Listando aplicaciones.", en: "Accessing module catalog. Listing applications." },
+                links: [
+                    { textEs: "VER CATÁLOGO COMPLETO (APP/DATOS)", textEn: "VIEW FULL CATALOG (APP/DATA)", action: () => showDynamicInfo('catalogo_completo') },
+                    { textEs: "ACCESO DIRECTO: KRONO PER", textEn: "DIRECT LINK: KRONO PER", action: () => window.open("https://slotsoftware.github.io/KronoPerTV/", "_blank") },
+                    { textEs: "ACCESO DIRECTO: KRONO DUAL", textEn: "DIRECT LINK: KRONO DUAL", action: () => window.open("https://slotsoftware.github.io/KronoDual-TV/", "_blank") },
+                ] 
+            },
+            { 
+                id: "SIMULACION", nombre: { es: "MÓDULO SIMULACIÓN", en: "SIMULATION MODULE" },
+                voz: { es: "Entorno visual hiperrealista. Preparando telemetría.", en: "Hyper-realistic visual environment. Preparing telemetry." },
+                links: [
+                    { textEs: "VER DETALLES DE SIMULACIÓN", textEn: "VIEW SIMULATION DETAILS", action: () => showDynamicInfo('simulacion_avanzada') },
+                    { textEs: "ACCESO DIRECTO: 3D SLOT GAME", textEn: "DIRECT LINK: 3D SLOT GAME", action: () => window.open("https://slotsoftware.github.io/Game3d/", "_blank") },
+                    { textEs: "CANAL NOVEDADES RED", textEn: "NETWORK NEWS CHANNEL", action: () => window.open("canal.html", "_blank") }
+                ] 
+            },
+            { 
+                id: "ARQUITECTURA", nombre: { es: "MÓDULO ARQUITECTURA", en: "ARCHITECTURE MODULE" },
+                voz: { es: "Sistemas operativos de IA y motor gráfico 3D en línea.", en: "Operating systems of AI and 3D graphics engine online." },
+                links: [
+                    { textEs: "TECNOLOGÍA DE COMPETICIÓN", textEn: "COMPETITION TECHNOLOGY", action: () => showDynamicInfo('arquitectura') }
+                ] 
+            },
+            { 
+                id: "DIRECTIVAS", nombre: { es: "MÓDULO DIRECTIVAS", en: "DIRECTIVES MODULE" },
+                voz: { es: "Leyendo manifiesto base. Pasión por la simulación pura.", en: "Reading base manifesto. Passion for pure simulation." },
+                links: [
+                    { textEs: "NUESTRA FILOSOFÍA", textEn: "OUR PHILOSOPHY", action: () => showDynamicInfo('filosofia') }
+                ] 
+            },
+            { 
+                id: "COMUNICACION", nombre: { es: "MÓDULO COMUNICACIÓN", en: "COMMUNICATION MODULE" },
+                voz: { es: "Canal de transmisión abierto. Protocolos de seguridad listos.", en: "Transmission channel open. Security protocols ready." },
+                links: [
+                    { textEs: "INICIAR TRANSMISIÓN (CONTACTO)", textEn: "INITIATE TRANSMISSION (CONTACT)", action: () => openModal('contact-modal') },
+                    { textEs: "POLÍTICAS Y TÉRMINOS", textEn: "POLICIES & TERMS", action: () => showDynamicInfo('privacidad_terminos') }
+                ] 
+            }
+        ];
 
-        function openTermsModal() {
-            const modal = document.getElementById('terms-modal');
-            const content = document.getElementById('terms-modal-content');
-            document.body.style.overflow = 'hidden';
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            modal.classList.add('opacity-100', 'pointer-events-auto');
-            setTimeout(() => { content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
-        }
+        const zodiacs = [
+            [{x:0, y:0}, {x:35, y:-20}, {x:70, y:12}], // Catalogo
+            [{x:0, y:0}, {x:-30, y:-35}, {x:-60, y:-30}, {x:-12, y:30}, {x:20, y:50}], // Simulacion
+            [{x:0, y:0}, {x:-18, y:-45}, {x:25, y:-55}, {x:35, y:-18}, {x:30, y:30}], // Arquitectura
+            [{x:0, y:0}, {x:-35, y:-12}, {x:-18, y:30}, {x:30, y:18}], // Directivas
+            [{x:0, y:0}, {x:-30, y:-45}, {x:12, y:-70}, {x:48, y:-52}, {x:40, y:-12}, {x:70, y:18}] // Comunicacion
+        ];
+        const nombresZodiaco = {
+            es: ["CATÁLOGO", "SIMULACIÓN", "ARQUITECTURA", "DIRECTIVAS", "COMUNICACIÓN"],
+            en: ["CATALOG", "SIMULATION", "ARCHITECTURE", "DIRECTIVES", "COMMUNICATION"]
+        };
+        // Nueva variable con las descripciones cortas de cada módulo
+        const descripcionesZodiaco = {
+            es: ["APLICACIONES Y GESTORES", "ENTORNOS 3D Y TELEMETRÍA", "MOTORES GRÁFICOS E IA", "FILOSOFÍA DEL ECOSISTEMA", "CONTACTO Y POLÍTICAS"],
+            en: ["APPLICATIONS & MANAGERS", "3D ENVIRONMENTS & TELEMETRY", "GRAPHICS ENGINES & AI", "ECOSYSTEM PHILOSOPHY", "CONTACT & POLICIES"]
+        };
 
-        function closeTermsModal() {
-            const modal = document.getElementById('terms-modal');
-            const content = document.getElementById('terms-modal-content');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.remove('opacity-100', 'pointer-events-auto');
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                document.body.style.overflow = '';
-            }, 300);
-        }
+        // -- AUDIO Y SÍNTESIS DE VOZ --
+        const URL_MUSICA_GITHUB = "./1.mp3";
+        let audioCtx, masterGain, musicMuted = false, bgAudioElement = null;
 
-        // Lógica del Contador de Visitas REAL
-        async function initCounter() {
-            const counterEl = document.getElementById('visitor-count');
-            if (!counterEl) return;
-
-            // Utilizamos CounterAPI, una base de datos gratuita para llevar el conteo real
-            // El sufijo '/up' hace que automáticamente sume 1 visita en el servidor cada vez que alguien entra
-            const namespace = 'slotsoftware-app-stats'; 
-            const key = 'visitas-reales';
-            const apiUrl = `https://api.counterapi.dev/v1/${namespace}/${key}/up`;
-
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error('Error en la red');
-                const data = await response.json();
-                
-                // Añadimos el offset de 1876 visitas perdidas al contador real
-                const totalVisits = data.count + 1876;
-                
-                // Animación rápida desde 0 hasta el número real
-                let currentDisplay = 0;
-                const step = Math.ceil(totalVisits / 20); // Velocidad de la animación
-                
-                const updateDisplay = setInterval(() => {
-                    currentDisplay += step;
-                    if (currentDisplay >= totalVisits) {
-                        currentDisplay = totalVisits;
-                        clearInterval(updateDisplay);
-                    }
-                    // Muestra el número con puntos (ej: 1.204)
-                    counterEl.innerText = new Intl.NumberFormat('es-ES').format(currentDisplay);
-                }, 40);
-
-            } catch (error) {
-                console.error('Error al conectar con el servidor de visitas:', error);
-                counterEl.innerText = "-"; // Fallback discreto si el usuario tiene bloqueadores de anuncios o falla el internet
+        function prepararAudio() {
+            if (!bgAudioElement) {
+                bgAudioElement = new Audio();
+                bgAudioElement.src = URL_MUSICA_GITHUB;
+                bgAudioElement.loop = true;
+                bgAudioElement.volume = 0.5;
             }
         }
 
-        // Arrancar el contador
-        initCounter();
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                masterGain = audioCtx.createGain(); masterGain.gain.value = 0.6;
+                masterGain.connect(audioCtx.destination);
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            prepararAudio();
+            if (!musicMuted) bgAudioElement.play().catch(e => console.log("Musica no encontrada localmente", e));
+        }
+
+        function toggleAudioMute() {
+            musicMuted = !musicMuted;
+            const btn = document.getElementById('audio-toggle');
+            prepararAudio();
+            if (musicMuted) {
+                bgAudioElement.pause(); btn.innerText = "AUDIO: OFF"; btn.style.opacity = "0.5";
+            } else {
+                bgAudioElement.play().catch(e => {}); btn.innerText = "AUDIO: ON"; btn.style.opacity = "1";
+            }
+        }
+
+        function playDigitalChime(isOpen) {
+            if(!audioCtx) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = 'sine'; osc.frequency.setValueAtTime(isOpen ? 1800 : 1200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(isOpen ? 2400 : 800, audioCtx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+            osc.connect(gain); gain.connect(masterGain);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+        }
+
+        let typeTimeoutSub;
+        function reproducirVozCinematica(textoObj) {
+            clearTimeout(typeTimeoutSub);
+            window.speechSynthesis.cancel();
+            
+            const lang = getCurrentLang();
+            const texto = textoObj[lang];
+            const subtitleContainer = document.getElementById('subtitle-container');
+            const subtitleText = document.getElementById('subtitle-text');
+            
+            subtitleContainer.style.opacity = 1; subtitleText.innerHTML = "";
+            
+            let msg = new SpeechSynthesisUtterance(texto);
+            msg.lang = lang === 'en' ? 'en-US' : 'es-ES';
+            msg.pitch = 0.8; msg.rate = 1.1; 
+            
+            let i = 0;
+            function teclear() {
+                if (i < texto.length) {
+                    subtitleText.innerHTML += texto.charAt(i); i++;
+                    typeTimeoutSub = setTimeout(teclear, 30); 
+                } else {
+                    typeTimeoutSub = setTimeout(() => { subtitleContainer.style.opacity = 0; }, 4000);
+                }
+            }
+            teclear();
+            window.speechSynthesis.speak(msg);
+        }
+
+        // -- CANVAS Y CONSTELACIONES --
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h;
+        let nodes = [], menuNodes = [], backgroundStars = [], distantSuns = [], shootingStars = [], galaxyParticles = [];
+        let galaxyCenter = {x: 0, y: 0}, galaxyRadius = 0;
+        let pointer = { x: -1000, y: -1000, screenX: -1000, screenY: -1000 };
+        let globalTime = 0, camera = { x: 0, y: 0, zoom: 1, angle: 0 }, targetCamera = { x: 0, y: 0, zoom: 1, angle: 0 };
+        let isDragging = false, draggedNode = null, dragStartPos = { x: 0, y: 0 }, activeMenuIndex = -1;
+        let typingIntervals = [];
+
+        function screenToWorld(sx, sy) {
+            let dx = sx - w / 2, dy = sy - h / 2;
+            let cos = Math.cos(-camera.angle), sin = Math.sin(-camera.angle);
+            let rx = dx * cos - dy * sin, ry = dx * sin + dy * cos;
+            return { x: camera.x + rx / camera.zoom, y: camera.y + ry / camera.zoom };
+        }
+
+        function worldToScreen(wx, wy) {
+            let dx = (wx - camera.x) * camera.zoom, dy = (wy - camera.y) * camera.zoom;
+            let cos = Math.cos(camera.angle), sin = Math.sin(camera.angle);
+            let sx = w / 2 + dx * cos - dy * sin, sy = h / 2 + dx * sin + dy * cos;
+            return { x: sx, y: sy };
+        }
+
+        function resize() {
+            w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight;
+            iniciarUniversoProfundo();
+            if (activeMenuIndex === -1) { camera.x = targetCamera.x = w / 2; camera.y = targetCamera.y = h / 2; } 
+            else { posicionarMenuSobreNodo(activeMenuIndex); }
+        }
+
+        function iniciarUniversoProfundo() {
+            nodes = []; menuNodes = []; backgroundStars = []; distantSuns = []; shootingStars = []; galaxyParticles = [];
+            if (activeMenuIndex === -1) { camera.x = targetCamera.x = w / 2; camera.y = targetCamera.y = h / 2; camera.zoom = targetCamera.zoom = 1; camera.angle = targetCamera.angle = 0; }
+            
+            // --- INICIALIZACIÓN DE LA VÍA LÁCTEA ---
+            galaxyCenter = { x: w / 2, y: h / 2 };
+            galaxyRadius = Math.max(w, h) * 0.65; // Ligeramente más grande para llenar la pantalla
+            const gCount = w < 768 ? 1800 : 5000; // Ajuste de partículas por rendimiento
+            let coreR = galaxyRadius * 0.15;
+            
+            // Generar partículas distribuidas por zonas anatómicas de una galaxia real
+            for (let i = 0; i < gCount; i++) {
+                let r, angle, color, size, alpha;
+                let speedMult = 1;
+                
+                // 35% - Bulbo y Barra central (Estrellas viejas, densas, amarillas/blancas)
+                if (i < gCount * 0.35) {
+                    let u = Math.random(), v = Math.random();
+                    // Distribución gaussiana para el núcleo
+                    r = coreR * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v) * 0.5; 
+                    r = Math.abs(r);
+                    angle = Math.random() * Math.PI * 2;
+                    
+                    // Simular la barra central elíptica estirando el eje X
+                    let x = Math.cos(angle) * r * 2.2;
+                    let y = Math.sin(angle) * r * 0.7;
+                    r = Math.hypot(x, y);
+                    angle = Math.atan2(y, x);
+                    
+                    let coreColors = ['#ffffff', '#fff3e0', '#ffe0b2', '#ffcc80']; // Tonos cálidos
+                    color = coreColors[Math.floor(Math.random() * coreColors.length)];
+                    size = Math.random() * 2.0 + 0.5;
+                    alpha = Math.random() * 0.8 + 0.2;
+                    speedMult = 1.2; // El núcleo rota de forma más sólida
+                } 
+                // 20% - Disco Ambiental (Estrellas de fondo esparcidas por la galaxia)
+                else if (i < gCount * 0.55) {
+                    r = Math.random() * galaxyRadius;
+                    r = r * Math.random(); // Mayor densidad hacia el centro
+                    angle = Math.random() * Math.PI * 2;
+                    
+                    color = Math.random() > 0.5 ? '#00e5ff' : '#0066ff';
+                    size = Math.random() * 1.0 + 0.2;
+                    alpha = Math.random() * 0.3 + 0.1; // Más tenues
+                    speedMult = 0.5;
+                } 
+                // 45% - Brazos Espirales (Estrellas jóvenes, brillantes, azules y formaciones rosas)
+                else {
+                    let numArms = 2; // La Vía Láctea tiene 2 brazos principales (Scutum-Centaurus y Perseus)
+                    let arm = i % numArms;
+                    let armOffset = (Math.PI * 2 / numArms) * arm;
+                    
+                    // Distribución a lo largo del brazo (dando más peso cerca del centro)
+                    let d = Math.pow(Math.random(), 1.5); 
+                    r = coreR + d * (galaxyRadius - coreR);
+                    
+                    // Ecuación matemática de espiral logarítmica: theta = (1/b) * ln(r/a)
+                    let winding = 0.35; // Qué tan enrollada está la espiral
+                    let theta = Math.log(r / coreR) / winding;
+                    let baseAngle = theta + armOffset;
+                    
+                    // Añadir dispersión (nubes de polvo y estrellas sueltas)
+                    let scatterPhase = Math.random() * Math.PI * 2;
+                    let scatterAmp = (galaxyRadius * 0.08) + (r * 0.12); // Más dispersión lejos del centro
+                    
+                    let bx = Math.cos(baseAngle) * r;
+                    let by = Math.sin(baseAngle) * r;
+                    
+                    // Aplicar dispersión pseudo-gaussiana
+                    let gauss = (Math.random() + Math.random() + Math.random() - 1.5);
+                    bx += Math.cos(scatterPhase) * scatterAmp * gauss;
+                    by += Math.sin(scatterPhase) * scatterAmp * gauss;
+                    
+                    r = Math.hypot(bx, by);
+                    angle = Math.atan2(by, bx);
+                    
+                    let armColors = ['#ffffff', '#00e5ff', '#84ffff', '#0066ff', '#ff4081'];
+                    // 3% de probabilidad de ser una región de formación estelar rica en hidrógeno (H-II, color rosa/magenta)
+                    if(Math.random() < 0.03) color = '#ff4081'; 
+                    else color = armColors[Math.floor(Math.random() * 4)];
+                    
+                    size = Math.random() * 1.8 + 0.3;
+                    alpha = Math.random() * 0.9 + 0.1;
+                }
+
+                galaxyParticles.push({
+                    r: r,
+                    angle: angle,
+                    // Rotación diferencial: más rápida en el centro, disminuye hacia los bordes
+                    speed: 0.0006 * speedMult * (coreR / Math.max(r, coreR * 0.3)), 
+                    size: size,
+                    alpha: alpha,
+                    color: color
+                });
+            }
+
+            for (let i = 0; i < (w < 768 ? 150 : 350); i++) {
+                backgroundStars.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 0.8 + 0.1, alpha: Math.random() * 0.7 + 0.1, pulseSpeed: Math.random() * 0.02 + 0.005 });
+            }
+
+            const numSuns = w < 768 ? 2 : 4;
+            for (let i = 0; i < numSuns; i++) {
+                distantSuns.push({
+                    x: (i + 0.5) * (w / numSuns) + (Math.random() - 0.5) * 80, y: Math.random() * h,
+                    radius: (Math.random() * 6 + 12) * (w < 768 ? 0.8 : 1.0),
+                    colorInner: i % 2 === 0 ? 'rgba(0, 240, 255, ' : 'rgba(120, 215, 255, ',
+                    colorOuter: i % 2 === 0 ? 'rgba(0, 102, 255, ' : 'rgba(150, 0, 255, ',
+                    pulse: Math.random() * Math.PI, raysAngle: Math.random() * Math.PI, flareSpeed: Math.random() * 0.003 + 0.002
+                });
+            }
+
+            const areaFactor = w < 768 ? 3200 : 2500;
+            for (let i = 0; i < Math.floor((w * h) / areaFactor); i++) {
+                nodes.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25, r: Math.random() * 1.0 + 0.3, isNexus: false, alpha: Math.random() * 0.7 + 0.2, pulseRate: Math.random() * 0.04 + 0.01 });
+            }
+
+            let marginsX = w < 768 ? w * 0.25 : w * 0.20;
+            let marginsY = w < 768 ? h * 0.25 : h * 0.30;
+
+            const nexusPositions = [
+                { x: marginsX, y: marginsY }, { x: w - marginsX, y: marginsY }, 
+                { x: w - marginsX * 0.8, y: h / 2 }, // <-- Constelación movida a la derecha
+                { x: marginsX, y: h - marginsY }, { x: w - marginsX, y: h - marginsY }
+            ];
+
+            nexusPositions.forEach((pos, idx) => {
+                let nNode = { x: pos.x, y: pos.y, baseX: pos.x, baseY: pos.y, vx: 0, vy: 0, r: 0, isNexus: true, menuIdx: idx, pulse: Math.random() * Math.PI };
+                nodes.push(nNode); menuNodes.push(nNode);
+            });
+        }
+
+        function drawDetailedSun(ctx, sun) {
+            sun.pulse += 0.02; sun.raysAngle += sun.flareSpeed;
+            let r = sun.radius * (1 + Math.sin(sun.pulse) * 0.08);
+            let gradHalo = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, r * 5);
+            gradHalo.addColorStop(0, sun.colorInner + '0.22)'); gradHalo.addColorStop(0.3, sun.colorOuter + '0.08)'); gradHalo.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.beginPath(); ctx.arc(sun.x, sun.y, r * 5, 0, Math.PI * 2); ctx.fillStyle = gradHalo; ctx.fill();
+
+            ctx.save(); ctx.translate(sun.x, sun.y); ctx.rotate(sun.raysAngle);
+            for (let i = 0; i < 4; i++) {
+                let rayL = (i % 2 === 0) ? r * 6.5 : r * 3.8;
+                let rayGrad = ctx.createLinearGradient(-rayL, 0, rayL, 0);
+                rayGrad.addColorStop(0, 'rgba(0,0,0,0)'); rayGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.8)'); rayGrad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.beginPath(); ctx.moveTo(-rayL, 0); ctx.lineTo(rayL, 0); ctx.strokeStyle = rayGrad; ctx.lineWidth = i % 2 === 0 ? 1.2 : 0.8; ctx.stroke(); ctx.rotate(Math.PI / 4);
+            }
+            ctx.restore();
+
+            let gradCore = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, r);
+            gradCore.addColorStop(0, '#ffffff'); gradCore.addColorStop(0.65, sun.colorInner + '0.8)'); gradCore.addColorStop(1, 'transparent');
+            ctx.beginPath(); ctx.arc(sun.x, sun.y, r, 0, Math.PI * 2); ctx.fillStyle = gradCore; ctx.fill();
+        }
+
+        function drawNexusLightPoint(ctx, x, y, isHovered, isDragged, pulse) {
+            ctx.save();
+            let isMobile = w < 768;
+            let radius = (isHovered || isDragged ? 4.0 : 2.5) * (isMobile ? 1.2 : 1.0);
+            let glowRadius = (isHovered || isDragged ? 25 : 15) * (isMobile ? 1.2 : 1.0);
+            let pulseScale = Math.max(0.1, 1 + Math.sin(pulse) * 0.2);
+            let outerRadius = Math.max(0.1, glowRadius * pulseScale);
+            
+            let radGlow = ctx.createRadialGradient(x, y, 0, x, y, outerRadius);
+            radGlow.addColorStop(0, isDragged ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 229, 255, 0.95)');
+            radGlow.addColorStop(0.25, isDragged ? 'rgba(0, 255, 255, 0.5)' : 'rgba(0, 102, 255, 0.35)');
+            radGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+            ctx.beginPath(); ctx.arc(x, y, outerRadius, 0, Math.PI * 2); ctx.fillStyle = radGlow; ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fillStyle = "#ffffff"; ctx.shadowBlur = 12; ctx.shadowColor = "#00e5ff"; ctx.fill();
+            ctx.restore();
+        }
+
+        function drawConstellations(ctx) {
+            ctx.save();
+            let scaleFactor = w < 768 ? 1.4 : 1.8;
+            const lang = getCurrentLang();
+            let hitRadius = w < 768 ? 55 : 45; // Radio de detección para el hover
+
+            menuNodes.forEach(n => {
+                let isHovered = Math.hypot(n.x - pointer.x, n.y - pointer.y) < hitRadius;
+                let isMoving = (isDragging && draggedNode === n);
+                let isSelected = (activeMenuIndex === n.menuIdx);
+                let isHighlighted = isMoving || isSelected || isHovered; // Se ilumina también al pasar el ratón
+                let alpha = isHighlighted ? 1 : 0.3; 
+                
+                const z = zodiacs[n.menuIdx];
+                ctx.strokeStyle = `rgba(0, 229, 255, ${alpha})`; ctx.lineWidth = isHighlighted ? 1.5 : 0.8; ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                
+                ctx.beginPath();
+                for(let i = 0; i < z.length; i++) {
+                    let px = n.x + z[i].x * scaleFactor, py = n.y + z[i].y * scaleFactor;
+                    ctx.moveTo(px + 2, py); ctx.arc(px, py, isHighlighted ? 2.5 : 1.5, 0, Math.PI*2);
+                    if(i > 0) { ctx.moveTo(n.x + z[i-1].x * scaleFactor, n.y + z[i-1].y * scaleFactor); ctx.lineTo(px, py); }
+                }
+                ctx.stroke(); ctx.fill();
+                
+                // Textos flotantes de la constelación (Siempre visibles, más brillantes al hacer hover)
+                
+                // Título principal (Cian Neón)
+                ctx.font = isHighlighted ? "bold 15px 'Share Tech Mono'" : "13px 'Share Tech Mono'"; 
+                ctx.fillStyle = isHighlighted ? "rgba(0, 229, 255, 1)" : "rgba(0, 229, 255, 0.65)"; 
+                ctx.shadowBlur = isHighlighted ? 10 : 3; 
+                ctx.shadowColor = "#00e5ff";
+                ctx.fillText(nombresZodiaco[lang][n.menuIdx], n.x + 25, n.y - 14);
+                
+                // Descripción corta (Blanco translúcido, fuente más pequeña)
+                ctx.font = isHighlighted ? "12px 'Share Tech Mono'" : "11px 'Share Tech Mono'"; 
+                ctx.fillStyle = isHighlighted ? "rgba(255, 255, 255, 0.95)" : "rgba(255, 255, 255, 0.5)"; 
+                ctx.shadowBlur = isHighlighted ? 4 : 0;
+                ctx.fillText(descripcionesZodiaco[lang][n.menuIdx], n.x + 25, n.y + 6);
+            });
+            ctx.restore();
+        }
+
+        function dibujar() {
+            // Movimiento rápido y sincronizado (X, Y, Zoom y Rotación)
+            camera.x += (targetCamera.x - camera.x) * 0.1; 
+            camera.y += (targetCamera.y - camera.y) * 0.1;
+            camera.zoom += (targetCamera.zoom - camera.zoom) * 0.1; 
+            camera.angle += (targetCamera.angle - camera.angle) * 0.1;
+
+            // ESTABILIZADOR: Previene el temblor final de la cámara redondeando su posición al alcanzar el objetivo visualmente
+            if (Math.abs(targetCamera.x - camera.x) < 0.1) camera.x = targetCamera.x;
+            if (Math.abs(targetCamera.y - camera.y) < 0.1) camera.y = targetCamera.y;
+            if (Math.abs(targetCamera.zoom - camera.zoom) < 0.001) camera.zoom = targetCamera.zoom;
+            if (Math.abs(targetCamera.angle - camera.angle) < 0.001) camera.angle = targetCamera.angle;
+
+            ctx.clearRect(0, 0, w, h);
+            globalTime += 1;
+
+            if (Math.random() < 0.015) {
+                let startX = Math.random() * (w * 1.5) - w * 0.25, startY = Math.random() * (h * 0.5) - h * 0.2;
+                let angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2, speed = Math.random() * 8 + 12;
+                shootingStars.push({ x: startX, y: startY, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, length: Math.random() * 80 + 100, alpha: 1.0, decay: Math.random() * 0.015 + 0.01 });
+            }
+
+            ctx.save(); ctx.translate(w / 2, h / 2); ctx.scale(camera.zoom, camera.zoom); ctx.rotate(camera.angle); ctx.translate(-camera.x, -camera.y);
+
+            distantSuns.forEach(sun => drawDetailedSun(ctx, sun));
+            backgroundStars.forEach(star => {
+                star.alpha += Math.sin(globalTime * star.pulseSpeed) * 0.01;
+                if (star.alpha < 0.1) star.alpha = 0.1; if (star.alpha > 0.8) star.alpha = 0.8;
+                ctx.beginPath(); ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(180, 230, 255, ${star.alpha})`; ctx.fill();
+            });
+
+            // --- RENDERIZADO DE LA VÍA LÁCTEA (Perspectiva 3D) ---
+            ctx.save();
+            // 1. Mover al centro
+            ctx.translate(galaxyCenter.x, galaxyCenter.y);
+            // 2. Rotar la galaxia entera para que se vea en diagonal (más espectacular)
+            ctx.rotate(0.4); 
+            // 3. Aplastar el eje Y para simular la inclinación 3D del disco galáctico
+            ctx.scale(1, 0.40); 
+            
+            ctx.globalCompositeOperation = 'lighter';
+            
+            // Halo galáctico y resplandor del bulbo central
+            let haloR = galaxyRadius * 0.45;
+            let coreGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, haloR);
+            coreGrad.addColorStop(0, 'rgba(255, 240, 220, 0.35)'); // Blanco cálido brillante en el mismísimo centro
+            coreGrad.addColorStop(0.2, 'rgba(255, 180, 100, 0.15)'); // Halo dorado/naranja
+            coreGrad.addColorStop(0.5, 'rgba(0, 150, 255, 0.05)'); // Transición al azul interestelar
+            coreGrad.addColorStop(1, 'transparent'); // Oscuridad del espacio
+            
+            ctx.fillStyle = coreGrad;
+            ctx.beginPath();
+            ctx.arc(0, 0, haloR, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Dibujar todas las partículas estelares
+            galaxyParticles.forEach(p => {
+                p.angle += p.speed; 
+                let x = Math.cos(p.angle) * p.r; 
+                let y = Math.sin(p.angle) * p.r; 
+                
+                // Desvanecer suavemente las estrellas que están muy lejos del centro
+                let distFade = Math.max(0, 1 - (p.r / (galaxyRadius * 1.1))); 
+                ctx.globalAlpha = p.alpha * distFade;
+                ctx.fillStyle = p.color;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.restore();
+            // -----------------------------------------
+
+            for (let i = shootingStars.length - 1; i >= 0; i--) {
+                let ss = shootingStars[i];
+                ss.x += ss.vx; ss.y += ss.vy; ss.alpha -= ss.decay;
+                if (ss.alpha <= 0) { shootingStars.splice(i, 1); continue; }
+                let tailX = ss.x - (ss.vx / 10) * ss.length, tailY = ss.y - (ss.vy / 10) * ss.length;
+                let gradSS = ctx.createLinearGradient(ss.x, ss.y, tailX, tailY);
+                gradSS.addColorStop(0, `rgba(255, 255, 255, ${ss.alpha})`); gradSS.addColorStop(0.3, `rgba(0, 229, 255, ${ss.alpha * 0.7})`); gradSS.addColorStop(1, 'transparent');
+                ctx.beginPath(); ctx.moveTo(ss.x, ss.y); ctx.lineTo(tailX, tailY); ctx.strokeStyle = gradSS; ctx.lineWidth = 2.0; ctx.stroke();
+            }
+
+            drawConstellations(ctx);
+            ctx.globalCompositeOperation = 'lighter';
+            const connectionDistance = w < 768 ? 65 : 85; 
+
+            for (let i = 0; i < nodes.length; i++) {
+                let n1 = nodes[i];
+                if(!n1.isNexus) {
+                    n1.x += n1.vx; n1.y += n1.vy;
+                    if(n1.x < 0) n1.x = w; if(n1.x > w) n1.x = 0;
+                    if(n1.y < 0) n1.y = h; if(n1.y > h) n1.y = 0;
+                    n1.alpha = 0.4 + Math.sin(globalTime * n1.pulseRate) * 0.4;
+                } else {
+                    n1.pulse += 0.03;
+                    if (draggedNode !== n1) {
+                        let dx = pointer.x - n1.x, dy = pointer.y - n1.y, dist = Math.hypot(dx, dy);
+                        if (dist < 120 && dist > 0.001 && !isDragging) {
+                            let force = (120 - dist) / 120; n1.vx -= (dx / dist) * force * 0.8; n1.vy -= (dy / dist) * force * 0.8;
+                        }
+                        n1.vx += (n1.baseX - n1.x) * 0.03; n1.vy += (n1.baseY - n1.y) * 0.03;
+                        n1.vx *= 0.85; n1.vy *= 0.85; n1.x += n1.vx; n1.y += n1.vy;
+                    }
+                }
+
+                if (n1.isNexus) {
+                    let hitRadius = w < 768 ? 55 : 45;
+                    drawNexusLightPoint(ctx, n1.x, n1.y, Math.hypot(n1.x - pointer.x, n1.y - pointer.y) < hitRadius, draggedNode === n1, n1.pulse);
+                } else {
+                    ctx.beginPath(); ctx.arc(n1.x, n1.y, n1.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(0, 150, 255, ${n1.alpha})`; ctx.fill();
+                }
+
+                for (let j = i + 1; j < nodes.length; j++) {
+                    let n2 = nodes[j];
+                    if (Math.abs(n1.x - n2.x) > connectionDistance || Math.abs(n1.y - n2.y) > connectionDistance) continue;
+                    let dist = Math.hypot(n1.x - n2.x, n1.y - n2.y);
+                    if (dist < connectionDistance) { 
+                        ctx.beginPath(); ctx.moveTo(n1.x, n1.y); ctx.lineTo(n2.x, n2.y);
+                        let op = (1 - dist/connectionDistance); 
+                        ctx.strokeStyle = (n1.isNexus || n2.isNexus) ? `rgba(0, 229, 255, ${op * 0.9})` : `rgba(0, 102, 255, ${op * 0.35})`; 
+                        ctx.lineWidth = (n1.isNexus || n2.isNexus) ? 0.8 : 0.4; ctx.stroke();
+                    }
+                }
+            }
+            ctx.restore();
+
+            if (activeMenuIndex !== -1) posicionarMenuSobreNodo(activeMenuIndex);
+            ctx.globalCompositeOperation = 'source-over';
+            requestAnimationFrame(dibujar);
+        }
+
+        window.addEventListener('resize', resize); resize();
+
+        function updatePointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            pointer.screenX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            pointer.screenY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+            let worldP = screenToWorld(pointer.screenX, pointer.screenY);
+            pointer.x = worldP.x; pointer.y = worldP.y;
+        }
+
+        function handlePointerStart(e) {
+            // Ignorar clics si hay un modal (pantalla de info o contacto) abierto
+            if (document.getElementById('info-modal').classList.contains('opacity-100') ||
+                document.getElementById('contact-modal').classList.contains('opacity-100')) {
+                return;
+            }
+            updatePointerPos(e); dragStartPos = { x: pointer.x, y: pointer.y };
+            let hitRadius = w < 768 ? 60 : 50;
+            menuNodes.forEach(n => { if (Math.hypot(n.x - pointer.x, n.y - pointer.y) < hitRadius) { isDragging = true; draggedNode = n; } });
+        }
+
+        function handlePointerMove(e) {
+            if (document.getElementById('info-modal').classList.contains('opacity-100') ||
+                document.getElementById('contact-modal').classList.contains('opacity-100')) {
+                return;
+            }
+            updatePointerPos(e);
+            if (isDragging && draggedNode) {
+                draggedNode.baseX = pointer.x; draggedNode.baseY = pointer.y; draggedNode.x = pointer.x; draggedNode.y = pointer.y; canvas.style.cursor = 'grabbing';
+            } else {
+                let hover = false, hitRadius = w < 768 ? 55 : 45;
+                menuNodes.forEach(n => { if (Math.hypot(n.x - pointer.x, n.y - pointer.y) < hitRadius) hover = true; });
+                canvas.style.cursor = hover ? 'grab' : 'crosshair';
+            }
+        }
+
+        function handlePointerEnd() {
+            if (isDragging && draggedNode) {
+                if (Math.hypot(pointer.x - dragStartPos.x, pointer.y - dragStartPos.y) < 12) abrirMenu(draggedNode.menuIdx);
+                isDragging = false; draggedNode = null; canvas.style.cursor = 'grab';
+            }
+        }
+
+        canvas.addEventListener('mousedown', handlePointerStart); canvas.addEventListener('mousemove', handlePointerMove); canvas.addEventListener('mouseup', handlePointerEnd);
+        canvas.addEventListener('mouseleave', () => { pointer.x = -1000; pointer.y = -1000; isDragging = false; draggedNode = null; });
+        canvas.addEventListener('touchstart', (e) => { handlePointerStart(e); }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => { handlePointerMove(e); }, { passive: false });
+        canvas.addEventListener('touchend', handlePointerEnd);
+
+        // -- LOGICA DEL MENU TERMINAL --
+        const panelMenu = document.getElementById('panel-menu');
+        const tituloMenuText = document.getElementById('menu-title-text');
+
+        function iniciarSistema() {
+            initAudio();
+            document.getElementById('start-screen').style.opacity = '0';
+            setTimeout(() => { 
+                document.getElementById('start-screen').style.display = 'none'; 
+                document.getElementById('bg-title').classList.add('visible'); // Hace aparecer el título de la galaxia
+                reproducirVozCinematica({es: "Enlace digital establecido. Explore las constelaciones.", en: "Digital link established. Explore the constellations."});
+            }, 2000);
+            setInterval(() => { document.getElementById('telemetry-1').innerText = (99.90 + Math.random() * 0.09).toFixed(3); }, 800);
+            dibujar();
+        }
+
+        function posicionarMenuSobreNodo(index) {
+            const node = menuNodes[index];
+            if (!node) return;
+            let screenP = worldToScreen(node.x, node.y);
+            const menuWidth = panelMenu.offsetWidth || 320, menuHeight = panelMenu.offsetHeight || 300;
+            
+            let left, top = screenP.y - menuHeight / 2;
+            
+            // Decidir a qué lado se abre el menú permanentemente según la posición original del nodo
+            if (node.baseX > w / 2) {
+                // Si el nodo está en la mitad derecha, se abre hacia la izquierda
+                left = screenP.x - menuWidth - 35;
+                panelMenu.style.transformOrigin = "right center"; // La animación nace desde la derecha (pegado al nodo)
+            } else {
+                // Si está en la mitad izquierda, se abre hacia la derecha
+                left = screenP.x + 35;
+                panelMenu.style.transformOrigin = "left center"; // La animación nace desde la izquierda (pegado al nodo)
+            }
+            
+            // Mantener dentro de los bordes verticales y horizontales de seguridad
+            if (left < 15) left = 15;
+            if (left + menuWidth > w - 15) left = w - menuWidth - 15;
+            if (top < 20) top = 20; 
+            if (top + menuHeight > h - 20) top = h - menuHeight - 20;
+            
+            // ESTABILIZADOR DEL DOM: Math.round evita que el navegador calcule fracciones de píxel.
+            panelMenu.style.left = `${Math.round(left)}px`; 
+            panelMenu.style.top = `${Math.round(top)}px`;
+        }
+
+        function animarMenuEnlaces(enlacesConfig) {
+            const contenedor = document.getElementById('menu-enlaces');
+            contenedor.innerHTML = '';
+            typingIntervals.forEach(clearTimeout); typingIntervals = [];
+            const lang = getCurrentLang();
+
+            enlacesConfig.forEach((link, idx) => {
+                let div = document.createElement('div');
+                div.className = 'menu-enlace';
+                div.onclick = link.action;
+                
+                let prefix = document.createElement('span'); prefix.className = 'prefix'; prefix.innerText = '>';
+                div.appendChild(prefix);
+                
+                let textSpan = document.createElement('span'); div.appendChild(textSpan);
+                contenedor.appendChild(div);
+
+                let textToType = lang === 'es' ? link.textEs : link.textEn;
+                let startDelay = idx * 150, i = 0;
+                function teclearEnlace() {
+                    if (i < textToType.length) { textSpan.innerHTML += textToType.charAt(i); i++; typingIntervals.push(setTimeout(teclearEnlace, 20)); }
+                }
+                typingIntervals.push(setTimeout(teclearEnlace, startDelay));
+            });
+        }
+
+        function abrirMenu(index) {
+            playDigitalChime(true); activeMenuIndex = index;
+            const info = configuracionMenus[index]; const node = menuNodes[index];
+            
+            // Zoom, paneo y rotación suaves hacia el cuadro de la constelación
+            if (node) {
+                targetCamera.x = node.x;
+                targetCamera.y = node.y;
+                targetCamera.zoom = w < 768 ? 1.2 : 1.4;
+                targetCamera.angle = (index % 2 === 0 ? 1 : -1) * 0.12; // Rotación cinemática
+            }
+            
+            tituloMenuText.innerText = info.nombre[getCurrentLang()];
+            animarMenuEnlaces(info.links);
+            posicionarMenuSobreNodo(index); panelMenu.classList.add('active');
+            reproducirVozCinematica(info.voz);
+        }
+
+        function cerrarMenu() {
+            playDigitalChime(false); activeMenuIndex = -1; panelMenu.classList.remove('active');
+            
+            // Retorno fluido al centro de la galaxia
+            targetCamera.x = w / 2; 
+            targetCamera.y = h / 2; 
+            targetCamera.zoom = 1; 
+            targetCamera.angle = 0;
+            
+            typingIntervals.forEach(clearTimeout); typingIntervals = [];
+            window.speechSynthesis.cancel(); clearTimeout(typeTimeoutSub);
+            document.getElementById('subtitle-container').style.opacity = 0;
+        }
+
     </script>
 </body>
 </html>
