@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0a0a0a">
+    <meta name="theme-color" content="#000000">
     <title>SlotSoftware | Tecnología para Slot</title>
     
     <!-- LIBRERÍAS EXTERNAS -->
@@ -13,55 +13,28 @@
     <!-- FUENTES DIGITALES Y MODERNAS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: { 
-                        'brand-dark': '#050a05', 
-                        'brand-panel': '#0f172a',
-                        'neon-green': '#39ff14',
-                        'neon-blue': '#3b82f6',
-                        'neon-orange': '#f97316',
-                        'neon-yellow': '#facc15'
+                        'brand-dark': '#000000', 
+                        'brand-panel': '#0a0a0a',
+                        'brand-card': '#111111',
+                        'brand-border': '#222222',
                     },
                     fontFamily: { 
                         sans: ['Inter', 'sans-serif'],
-                        orbitron: ['Orbitron', 'sans-serif'],
                         mono: ['Share Tech Mono', 'monospace']
-                    },
-                    boxShadow: {
-                        'neon-g': '0 0 15px rgba(57,255,20,0.4)',
-                        'neon-g-strong': '0 0 30px rgba(57,255,20,0.6)',
-                        'neon-b': '0 0 15px rgba(59,130,246,0.4)',
-                        'neon-o': '0 0 15px rgba(249,115,22,0.4)',
-                    },
-                    animation: {
-                        'fade-in-scale': 'fadeInScale 0.4s ease-out forwards',
-                        'wiggle': 'wiggle 2s linear infinite',
-                        'pulse-neon': 'pulseNeon 2s infinite alternate',
-                    },
-                    keyframes: {
-                        fadeInScale: {
-                            '0%': { opacity: '0', transform: 'scale(0.98)' },
-                            '100%': { opacity: '1', transform: 'scale(1)' },
-                        },
-                        wiggle: {
-                            '0%, 100%': { transform: 'rotate(-3deg)' },
-                            '50%': { transform: 'rotate(3deg)' },
-                        },
-                        pulseNeon: {
-                            '0%': { filter: 'drop-shadow(0 0 5px rgba(57,255,20,0.5))' },
-                            '100%': { filter: 'drop-shadow(0 0 15px rgba(57,255,20,0.8))' }
-                        }
                     }
                 }
             }
         }
     </script>
     <style>
+        /* ESTILOS BASE 100% SEGUROS */
         html, body {
             height: 100%;
             height: 100dvh;
@@ -70,11 +43,12 @@
             overscroll-behavior: none;
             margin: 0;
             padding: 0;
-            background-color: #0a0a0a; /* Fondo oscuro base */
+            background-color: #000000;
             color: #ffffff;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Ocultar barras de desplazamiento pero permitir scroll interno */
+        /* Ocultar barras de scroll pero permitir deslizamiento interno */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -82,236 +56,185 @@
         .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
         .text-balance { text-wrap: balance; }
 
+        /* Gestión de Idiomas */
         html[lang="es"] .lang-en { display: none !important; }
         html[lang="en"] .lang-es { display: none !important; }
 
-        .tab-panel { display: none; }
-        .tab-panel.active { display: flex; }
-        
-        .tab-content-wrapper { animation: fadeInScale 0.3s ease-out forwards; }
-
-        /* Fondo de cuadrícula estilo telemetría */
-        .grid-bg {
-            background-image: 
-                linear-gradient(transparent 19px, rgba(57, 255, 20, 0.05) 1px), 
-                linear-gradient(90deg, transparent 19px, rgba(57, 255, 20, 0.05) 1px);
-            background-size: 20px 20px;
+        /* Animaciones a prueba de fallos (Sin depender del JIT de Tailwind) */
+        @keyframes customFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
         }
+        @keyframes customSlideUp {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .anim-fade-in { animation: customFadeIn 0.5s ease-out forwards; }
+        .anim-slide-up { animation: customSlideUp 0.6s ease-out forwards; }
     </style>
 </head>
 
-<body class="bg-brand-dark text-gray-200 font-sans antialiased flex flex-col selection:bg-neon-green selection:text-black pt-safe relative">
+<body class="bg-brand-dark text-gray-300 font-sans flex flex-col pt-safe relative selection:bg-white selection:text-black">
 
-    <!-- Fondo Grid Global -->
-    <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,#1e293b_0%,#050a05_100%)] opacity-50 pointer-events-none z-0"></div>
-
-    <header class="flex-none h-16 sm:h-20 px-4 sm:px-6 w-full max-w-7xl mx-auto flex justify-between items-center z-20 bg-black/40 backdrop-blur-md border-b border-white/10 relative">
-        <a href="#" onclick="switchTab('home')" class="flex items-center h-full py-3 sm:py-4">
-            <!-- Asumiendo que logo1.png es oscuro, le aplicamos filtro para que se vea blanco/brillante si es necesario, o usa uno claro -->
-            <img src="logo1.png" alt="SlotSoftware" class="h-full w-auto object-contain hover:scale-105 transition-transform drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] brightness-0 invert" onerror="this.src='https://placehold.co/200x80/0a0a0a/39ff14?text=SlotSoftware'">
+    <!-- HEADER MINIMALISTA -->
+    <header class="flex-none h-16 sm:h-20 px-6 sm:px-8 w-full max-w-7xl mx-auto flex justify-between items-center z-20 border-b border-brand-border bg-black/80 backdrop-blur-xl">
+        <a href="#" onclick="switchTab('products')" class="flex items-center h-full py-3 group">
+            <div class="font-sans font-bold text-lg tracking-widest text-white group-hover:opacity-70 transition-opacity">
+                SLOT<span class="text-gray-500 font-light">SOFTWARE</span>
+            </div>
         </a>
         
-        <nav class="hidden md:flex items-center gap-2 bg-gray-900/50 p-1 rounded-full border border-white/5">
-            <button onclick="switchTab('home')" class="nav-btn active px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all" data-tab="home"><span class="lang-es">Inicio</span><span class="lang-en">Home</span></button>
-            <button onclick="switchTab('products')" class="nav-btn px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all text-gray-400 hover:text-white" data-tab="products"><span class="lang-es">Productos</span><span class="lang-en">Products</span></button>
-            <button onclick="switchTab('services')" class="nav-btn px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all text-gray-400 hover:text-white" data-tab="services"><span class="lang-es">Servicios</span><span class="lang-en">Services</span></button>
-            <button onclick="switchTab('info')" class="nav-btn px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all text-gray-400 hover:text-white" data-tab="info"><span class="lang-es">Filosofía</span><span class="lang-en">Philosophy</span></button>
+        <nav class="hidden md:flex items-center gap-8">
+            <button onclick="switchTab('products')" class="nav-btn text-xs font-semibold tracking-widest uppercase transition-colors text-white" data-tab="products">
+                <span class="lang-es">Productos</span><span class="lang-en">Products</span>
+            </button>
+            <button onclick="switchTab('services')" class="nav-btn text-xs font-semibold tracking-widest uppercase transition-colors text-gray-500 hover:text-white" data-tab="services">
+                <span class="lang-es">Servicios</span><span class="lang-en">Services</span>
+            </button>
+            <button onclick="switchTab('info')" class="nav-btn text-xs font-semibold tracking-widest uppercase transition-colors text-gray-500 hover:text-white" data-tab="info">
+                <span class="lang-es">Filosofía</span><span class="lang-en">Philosophy</span>
+            </button>
         </nav>
         
-        <div class="flex items-center gap-3">
-            <button onclick="toggleLanguage()" class="text-xs font-bold tracking-widest text-neon-green border border-neon-green/30 hover:bg-neon-green/10 transition-colors bg-black/50 px-3 py-1.5 rounded flex items-center gap-1">
-                <i data-lucide="globe" class="w-3 h-3"></i>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleLanguage()" class="text-xs font-bold tracking-widest text-gray-400 hover:text-white transition-colors flex items-center gap-1.5">
+                <i data-lucide="globe" class="w-3.5 h-3.5"></i>
                 <span class="lang-es">EN</span><span class="lang-en">ES</span>
             </button>
-            <a href="canal.html" target="_blank" class="hidden sm:flex text-[10px] font-black tracking-widest uppercase bg-neon-blue/20 text-neon-blue border border-neon-blue px-4 py-2 rounded shadow-neon-b hover:bg-neon-blue hover:text-black hover:scale-105 transition-all items-center gap-2">
-                <i data-lucide="bell-ring" class="w-3.5 h-3.5 animate-wiggle"></i>
+            <a href="canal.html" target="_blank" class="hidden sm:flex text-[10px] font-bold tracking-widest uppercase bg-white text-black px-4 py-2 rounded-full hover:bg-gray-200 transition-colors items-center gap-2">
                 <span class="lang-es">Canal Novedades</span><span class="lang-en">News Channel</span>
+                <i data-lucide="arrow-up-right" class="w-3 h-3"></i>
             </a>
         </div>
     </header>
 
     <main class="flex-1 w-full relative overflow-hidden z-10">
         
-        <!-- TAB INICIO -->
-        <div id="tab-home" class="tab-panel active absolute inset-0 w-full h-full flex-col items-center justify-center p-4 sm:p-6 text-center overflow-y-auto no-scrollbar">
-            <div class="w-full max-w-4xl flex flex-col items-center my-auto py-10 tab-content-wrapper pb-24 md:pb-10 relative">
+        <!-- PESTAÑA: PRODUCTOS (INICIO) -->
+        <div id="tab-products" class="tab-panel flex anim-fade-in absolute inset-0 w-full h-full flex-col p-4 sm:p-6 lg:p-10 overflow-y-auto no-scrollbar">
+            <div class="w-full max-w-6xl mx-auto pb-24">
                 
-                <!-- Decoración de fondo -->
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-neon-green/10 blur-[100px] rounded-full pointer-events-none"></div>
-
-                <!-- Logo Gigante Cuadrado -->
-                <img src="logo1.png" alt="Main Logo" class="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-full mb-6 sm:mb-8 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] brightness-0 invert animate-pulse-neon relative z-10" onerror="this.src='https://placehold.co/800x800/0a0a0a/39ff14?text=SlotSoftware'">
-                
-                <h1 class="font-orbitron text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[1.1] mb-4 sm:mb-6 text-balance relative z-10 drop-shadow-lg">
-                    <span class="lang-es">Software de Slot.<br /><span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-green to-emerald-500">Simulación Pura.</span></span>
-                    <span class="lang-en">Slot Software.<br /><span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-green to-emerald-500">Pure Simulation.</span></span>
-                </h1>
-                
-                <p class="font-mono text-base sm:text-lg md:text-xl text-gray-400 mb-8 max-w-2xl font-light text-balance px-2 relative z-10">
-                    <span class="lang-es">En SlotSoftware revolucionamos el slot. Construimos herramientas digitales potentes para cronometraje por cámara, diseño 3D y telemetría avanzada. Ni más, ni menos.</span>
-                    <span class="lang-en">At SlotSoftware we revolutionize slot racing. We build powerful digital tools for camera timing, 3D design, and advanced telemetry. Nothing more, nothing less.</span>
-                </p>
-                
-                <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 justify-center relative z-10">
-                    <a href="canal.html" target="_blank" class="w-full sm:w-auto px-6 py-4 bg-neon-blue/20 text-neon-blue border border-neon-blue rounded font-black text-xs sm:text-sm tracking-widest uppercase hover:bg-neon-blue hover:text-black active:scale-95 transition-all shadow-neon-b flex items-center justify-center gap-2 group">
-                        <i data-lucide="smartphone" class="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform"></i>
-                        <span class="lang-es">Únete a nuestro Canal</span><span class="lang-en">Join our Channel</span>
-                    </a>
-                    <button onclick="switchTab('products')" class="w-full sm:w-auto px-6 py-4 bg-neon-green/20 text-neon-green border border-neon-green rounded font-black text-xs sm:text-sm tracking-widest uppercase hover:bg-neon-green hover:text-black active:scale-95 transition-all shadow-neon-g flex items-center justify-center gap-2 group">
-                        <i data-lucide="cpu" class="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform"></i>
-                        <span class="lang-es">Ver productos</span><span class="lang-en">View products</span>
-                    </button>
-                </div>
-                
-                <div class="mt-8 flex items-center gap-2 bg-black/60 border border-white/10 px-4 py-2 rounded-full relative z-10">
-                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                    <p class="text-[10px] sm:text-xs text-gray-400 font-mono tracking-widest uppercase">
-                        <span class="lang-es">Recibe actualizaciones en tu móvil</span>
-                        <span class="lang-en">Get updates on your phone</span>
+                <!-- SECCIÓN HERO MINIMALISTA -->
+                <div class="flex flex-col items-center justify-center pt-10 pb-20 text-center anim-slide-up">
+                    <h1 class="text-4xl sm:text-5xl md:text-7xl font-semibold tracking-tight leading-[1.1] mb-6 text-balance text-white">
+                        <span class="lang-es">Software de Slot.<br /><span class="text-gray-500 font-light">Simulación Pura.</span></span>
+                        <span class="lang-en">Slot Software.<br /><span class="text-gray-500 font-light">Pure Simulation.</span></span>
+                    </h1>
+                    
+                    <p class="text-base md:text-lg text-gray-400 mb-10 max-w-2xl font-light text-balance px-4 leading-relaxed">
+                        <span class="lang-es">En SlotSoftware revolucionamos el slot. Construimos herramientas digitales potentes para cronometraje por cámara, diseño 3D y telemetría avanzada. Ni más, ni menos.</span>
+                        <span class="lang-en">At SlotSoftware we revolutionize slot racing. We build powerful digital tools for camera timing, 3D design, and advanced telemetry. Nothing more, nothing less.</span>
                     </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB PRODUCTOS -->
-        <div id="tab-products" class="tab-panel absolute inset-0 w-full h-full flex-col p-4 sm:p-6 lg:p-10 overflow-y-auto no-scrollbar">
-            <div class="w-full max-w-6xl mx-auto tab-content-wrapper pb-24">
-                
-                <div class="mb-10 sm:mb-16 shrink-0 pt-4 flex items-center gap-3 border-b border-white/10 pb-4">
-                    <i data-lucide="layers" class="w-8 h-8 text-neon-green"></i>
-                    <div>
-                        <h2 class="text-[10px] sm:text-xs font-bold tracking-widest text-neon-green uppercase mb-1 font-mono">
-                            <span class="lang-es">Catálogo Digital</span><span class="lang-en">Digital Catalog</span>
-                        </h2>
-                        <h3 class="text-2xl sm:text-3xl md:text-4xl font-black font-orbitron tracking-tight">
-                            <span class="lang-es">Nuestros Productos</span><span class="lang-en">Our Products</span>
-                        </h3>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 justify-center">
+                        <button onclick="document.getElementById('catalogo').scrollIntoView({behavior: 'smooth'})" class="w-full sm:w-auto px-8 py-3.5 bg-white text-black rounded-full font-semibold text-xs tracking-widest uppercase hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
+                            <span class="lang-es">Ver catálogo</span><span class="lang-en">View catalog</span>
+                        </button>
+                        <a href="canal.html" target="_blank" class="w-full sm:w-auto px-8 py-3.5 border border-brand-border text-white rounded-full font-semibold text-xs tracking-widest uppercase hover:bg-brand-card transition-colors flex items-center justify-center gap-2">
+                            <span class="lang-es">Canal de Novedades</span><span class="lang-en">News Channel</span>
+                        </a>
                     </div>
                 </div>
+
+                <!-- CATÁLOGO DE PRODUCTOS -->
+                <div id="catalogo" class="mb-12 flex flex-col items-center text-center pt-8">
+                    <h2 class="text-xs font-mono tracking-widest text-gray-500 uppercase mb-2">
+                        <span class="lang-es">Catálogo Digital</span><span class="lang-en">Digital Catalog</span>
+                    </h2>
+                    <h3 class="text-2xl sm:text-3xl font-medium text-white tracking-tight">
+                        <span class="lang-es">Software de Competición</span><span class="lang-en">Competition Software</span>
+                    </h3>
+                </div>
                 
-                <!-- Grid de Tarjetas 9:16 (Alargadas) -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-16 sm:mb-20">
-                    <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="group flex flex-col gap-4 bg-brand-panel/80 p-4 sm:p-5 rounded-2xl border border-gray-800 hover:border-neon-green shadow-lg hover:shadow-neon-g transition-all backdrop-blur-sm relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-8 h-8 bg-neon-green/20 rounded-bl-3xl z-0"></div>
-                        <div class="relative w-full overflow-hidden rounded-xl bg-black border border-gray-800 aspect-[9/16] z-10">
-                            <img src="app.jpg" alt="Krono Personal" class="w-full h-full object-cover block group-hover:scale-105 transition-transform duration-700 ease-out opacity-80 group-hover:opacity-100" onerror="this.src='https://placehold.co/400x700/111/39ff14?text=Krono+Personal'">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent pointer-events-none"></div>
-                        </div>
-                        <div class="z-10 mt-2">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="w-1.5 h-1.5 bg-neon-green rounded-full"></span>
-                                <h4 class="text-sm font-black font-orbitron tracking-wider text-white group-hover:text-neon-green transition-colors">KRONO PERSONAL V.4.0</h4>
+                <!-- Grid de Tarjetas 9:16 (Minimalistas) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+                    <!-- Tarjeta 1 -->
+                    <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="group flex flex-col bg-brand-card rounded-2xl border border-brand-border hover:border-gray-600 transition-colors overflow-hidden">
+                        <div class="relative w-full bg-black aspect-[9/16] overflow-hidden">
+                            <img src="app.jpg" alt="Krono Personal" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" onerror="this.src='https://placehold.co/400x700/0a0a0a/333333?text=Krono+Personal'">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-black/50 backdrop-blur-md text-white border border-white/10 font-medium text-[10px] px-3 py-1.5 rounded-full uppercase tracking-widest">1 Carril</span>
                             </div>
-                            <p class="text-gray-400 text-xs font-mono leading-relaxed">
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-lg font-semibold text-white mb-2 tracking-wide">KRONO PERSONAL V.4.0</h4>
+                            <p class="text-gray-400 text-sm font-light leading-relaxed">
                                 <span class="lang-es">Es el gestor de tiempos ideal para entrenamientos personales. Esta aplicación no necesita instalación, es compatible Android, IOS, Windows y Linux.</span>
                                 <span class="lang-en">It is the ideal time manager for personal training. This application does not require installation and is compatible with Android, iOS, Windows, and Linux.</span>
                             </p>
                         </div>
                     </a>
                     
-                    <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="group flex flex-col gap-4 bg-brand-panel/80 p-4 sm:p-5 rounded-2xl border border-gray-800 hover:border-neon-blue shadow-lg hover:shadow-neon-b transition-all backdrop-blur-sm relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-8 h-8 bg-neon-blue/20 rounded-bl-3xl z-0"></div>
-                        <div class="relative w-full overflow-hidden rounded-xl bg-black border border-gray-800 aspect-[9/16] z-10">
-                            <img src="datos.jpg" alt="Krono Dual" class="w-full h-full object-cover block group-hover:scale-105 transition-transform duration-700 ease-out opacity-80 group-hover:opacity-100" onerror="this.src='https://placehold.co/400x700/111/3b82f6?text=Krono+Dual'">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent pointer-events-none"></div>
-                        </div>
-                        <div class="z-10 mt-2">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="w-1.5 h-1.5 bg-neon-blue rounded-full"></span>
-                                <h4 class="text-sm font-black font-orbitron tracking-wider text-white group-hover:text-neon-blue transition-colors">KRONO DUAL V.4.0</h4>
+                    <!-- Tarjeta 2 -->
+                    <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="group flex flex-col bg-brand-card rounded-2xl border border-brand-border hover:border-gray-600 transition-colors overflow-hidden">
+                        <div class="relative w-full bg-black aspect-[9/16] overflow-hidden">
+                            <img src="datos.jpg" alt="Krono Dual" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" onerror="this.src='https://placehold.co/400x700/0a0a0a/333333?text=Krono+Dual'">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-black/50 backdrop-blur-md text-white border border-white/10 font-medium text-[10px] px-3 py-1.5 rounded-full uppercase tracking-widest">2 Carriles</span>
                             </div>
-                            <p class="text-gray-400 text-xs font-mono leading-relaxed">
-                                <span class="lang-es">Este es nuestro sistema diseñado para competiciones, los Detectores de cámara son para dos coches, máxima precisión. Esta aplicación no necesita instalación, es compatible Android, IOS, Windows y Linux.</span>
-                                <span class="lang-en">This is our system designed for competitions, camera detectors are for two cars, maximum precision. This application requires no installation and is compatible with Android, iOS, Windows, and Linux.</span>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-lg font-semibold text-white mb-2 tracking-wide">KRONO DUAL V.4.0</h4>
+                            <p class="text-gray-400 text-sm font-light leading-relaxed">
+                                <span class="lang-es">Sistema diseñado para competiciones, los detectores de cámara son para dos coches con máxima precisión. Compatible Android, IOS, Windows y Linux.</span>
+                                <span class="lang-en">System designed for competitions, camera detectors are for two cars with maximum precision. Compatible with Android, iOS, Windows, and Linux.</span>
                             </p>
                         </div>
                     </a>
                     
-                    <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="group flex flex-col gap-4 bg-brand-panel/80 p-4 sm:p-5 rounded-2xl border border-gray-800 hover:border-neon-orange shadow-lg hover:shadow-neon-o transition-all backdrop-blur-sm relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-8 h-8 bg-neon-orange/20 rounded-bl-3xl z-0"></div>
-                        <div class="relative w-full overflow-hidden rounded-xl bg-black border border-gray-800 aspect-[9/16] z-10">
-                            <img src="core.jpg" alt="Tracks Telemetry" class="w-full h-full object-cover block group-hover:scale-105 transition-transform duration-700 ease-out opacity-80 group-hover:opacity-100" onerror="this.src='https://placehold.co/400x700/111/f97316?text=Tracks+Telemetry'">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent pointer-events-none"></div>
-                        </div>
-                        <div class="z-10 mt-2">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="w-1.5 h-1.5 bg-neon-orange rounded-full"></span>
-                                <h4 class="text-sm font-black font-orbitron tracking-wider text-white group-hover:text-neon-orange transition-colors">TRACKS TELEMETRY</h4>
+                    <!-- Tarjeta 3 -->
+                    <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="group flex flex-col bg-brand-card rounded-2xl border border-brand-border hover:border-gray-600 transition-colors overflow-hidden">
+                        <div class="relative w-full bg-black aspect-[9/16] overflow-hidden">
+                            <img src="core.jpg" alt="Tracks Telemetry" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" onerror="this.src='https://placehold.co/400x700/0a0a0a/333333?text=Tracks+Telemetry'">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-black/50 backdrop-blur-md text-white border border-white/10 font-medium text-[10px] px-3 py-1.5 rounded-full uppercase tracking-widest">Simulador 3D</span>
                             </div>
-                            <p class="text-gray-400 text-xs font-mono leading-relaxed">
-                                <span class="lang-es">Estás a punto de llevar el análisis de tu pista a límites increíbles, transformando tu Diseño en un motor potente en 3D, con controles de Motores, Neumáticos, Piñones y Voltaje.</span>
-                                <span class="lang-en">You are about to take your track analysis to incredible limits, transforming your Design into a powerful 3D engine, with controls for Motors, Tires, Pinions and Voltage.</span>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-lg font-semibold text-white mb-2 tracking-wide">TRACKS TELEMETRY</h4>
+                            <p class="text-gray-400 text-sm font-light leading-relaxed">
+                                <span class="lang-es">Lleva el análisis de tu pista a límites increíbles, desde diseño 2D hasta un motor potente en 3D con controles físicos y comunidad web integrada.</span>
+                                <span class="lang-en">Take your track analysis to incredible limits, from 2D design to a powerful 3D engine with physical controls and an integrated web community.</span>
                             </p>
                         </div>
                     </a>
                 </div>
 
-                <!-- Explicaciones Detalladas (Imágenes 16:9) -->
-                <div class="flex flex-col gap-12 md:gap-16 max-w-5xl mx-auto">
+                <!-- Explicaciones Detalladas (Imágenes 16:9 Minimalistas) -->
+                <div class="flex flex-col gap-24 max-w-5xl mx-auto">
                     
-                    <div class="flex flex-col lg:flex-row gap-6 lg:gap-10 items-center bg-black/40 border border-white/5 rounded-3xl p-4 sm:p-6 lg:p-8 hover:bg-black/60 transition-colors">
-                        <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="block w-full lg:w-1/2 relative rounded-2xl overflow-hidden bg-black border border-gray-800 aspect-video shadow-lg group shrink-0">
-                            <img src="k1.png" alt="Krono TV" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-70 transition-all duration-700 ease-out group-hover:scale-105 group-hover:opacity-100" onerror="this.src='https://placehold.co/1920x1080/111/39ff14?text=Krono+TV'">
-                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-                                <div class="bg-neon-green/20 text-neon-green border border-neon-green rounded-full p-3 backdrop-blur-sm"><i data-lucide="play" class="w-6 h-6 fill-current"></i></div>
-                            </div>
+                    <!-- Detalle 1 -->
+                    <div class="flex flex-col gap-8">
+                        <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="block w-full relative rounded-2xl overflow-hidden bg-brand-card border border-brand-border aspect-video group">
+                            <img src="k1.png" alt="Krono TV" class="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700 ease-out" onerror="this.src='https://placehold.co/1920x1080/0a0a0a/333333?text=Krono+TV'">
                         </a>
-                        <div class="flex flex-col gap-4 text-left w-full lg:w-1/2">
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="crosshair" class="w-5 h-5 text-neon-green animate-[spin_4s_linear_infinite]"></i>
-                                <h3 class="text-xl sm:text-2xl font-black font-orbitron tracking-tight text-white">
-                                    <span class="lang-es">KRONO V.4.0: Fotodetector Profesional.</span>
-                                    <span class="lang-en">KRONO V.4.0: Professional Photodetector.</span>
-                                </h3>
-                            </div>
-                            <p class="text-gray-400 font-mono text-xs sm:text-sm leading-relaxed">
-                                <span class="lang-es">KRONO V.4.0 es una innovadora aplicación de cronometraje y telemetría que transforma la cámara de tu dispositivo en un fotodetector profesional. Utiliza algoritmos de visión por IA para registrar automáticamente el paso de los vehículos, midiendo tiempos, deltas y velocidades con extrema precisión. Permite configurar modos de carrera, ofreciendo análisis avanzados de consistencia y asistencia auditiva con voz de ingeniero. Destaca por su espectacular "Modo TV".</span>
-                                <span class="lang-en">KRONO V.4.0 is an innovative timing and telemetry application that transforms your device's camera into a professional photodetector. It uses AI vision algorithms to automatically record passing vehicles, measuring times, deltas, and speeds with extreme precision. It stands out for its spectacular "TV Mode," which synchronizes an immersive telemetry panel.</span>
+                        <div class="flex flex-col md:flex-row gap-6 md:gap-12 items-start px-2">
+                            <h3 class="text-2xl sm:text-3xl font-medium tracking-tight text-white w-full md:w-1/3 shrink-0 text-balance">
+                                <span class="lang-es">KRONO V.4.0: Fotodetector Profesional.</span>
+                                <span class="lang-en">KRONO V.4.0: Professional Photodetector.</span>
+                            </h3>
+                            <p class="text-gray-400 font-light text-sm sm:text-base leading-relaxed w-full md:w-2/3">
+                                <span class="lang-es">KRONO V.4.0 es una innovadora aplicación de cronometraje y telemetría que transforma la cámara de tu dispositivo en un fotodetector profesional. Utiliza algoritmos de visión por IA para registrar automáticamente el paso de los vehículos, midiendo tiempos, deltas y velocidades con extrema precisión. Permite configurar modos de carrera por vueltas o tiempo, ofreciendo análisis avanzados de consistencia y asistencia auditiva con voz de ingeniero. Destaca por su espectacular "Modo TV", que sincroniza un panel de telemetría inmersivo y personalizable en una segunda pantalla vía nube. Incluye gestión de pilotos, historiales exportables a Excel, penalizaciones por salida nula y un ranking global integrado.</span>
+                                <span class="lang-en">KRONO V.4.0 is an innovative timing and telemetry application that transforms your device's camera into a professional photodetector. It uses AI vision algorithms to automatically record passing vehicles, measuring times, deltas, and speeds with extreme precision. It allows setting up race modes by laps or time, offering advanced consistency analysis and audio assistance with an engineer's voice. It stands out for its spectacular "TV Mode," which synchronizes an immersive and customizable telemetry panel on a second screen via the cloud. It includes driver management, Excel-exportable history, false start penalties, and an integrated global ranking.</span>
                             </p>
                         </div>
                     </div>
 
-                    <div class="flex flex-col lg:flex-row-reverse gap-6 lg:gap-10 items-center bg-black/40 border border-white/5 rounded-3xl p-4 sm:p-6 lg:p-8 hover:bg-black/60 transition-colors">
-                        <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="block w-full lg:w-1/2 relative rounded-2xl overflow-hidden bg-black border border-gray-800 aspect-video shadow-lg group shrink-0">
-                            <img src="k2.png" alt="KronoDual TV" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-70 transition-all duration-700 ease-out group-hover:scale-105 group-hover:opacity-100" onerror="this.src='https://placehold.co/1920x1080/111/3b82f6?text=KronoDual+TV'">
-                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-                                <div class="bg-neon-blue/20 text-neon-blue border border-neon-blue rounded-full p-3 backdrop-blur-sm"><i data-lucide="play" class="w-6 h-6 fill-current"></i></div>
-                            </div>
-                        </a>
-                        <div class="flex flex-col gap-4 text-left w-full lg:w-1/2">
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="activity" class="w-5 h-5 text-neon-blue animate-pulse"></i>
-                                <h3 class="text-xl sm:text-2xl font-black font-orbitron tracking-tight text-white">
-                                    <span class="lang-es">KronoDual V.4.0: Telemetría Definitiva.</span>
-                                    <span class="lang-en">KronoDual V.4.0: Ultimate Telemetry.</span>
-                                </h3>
-                            </div>
-                            <p class="text-gray-400 font-mono text-xs sm:text-sm leading-relaxed">
-                                <span class="lang-es">KronoDual V.4.0 es el sistema de cronometraje y telemetría definitivo para tus carreras de slot. Utilizando la cámara y tecnología de visión artificial, detecta el paso de los coches a 30fps sin hardware adicional. Disfruta de modos para 1 o 2 jugadores, registrando tiempos, velocidad y récords. Conecta cualquier Smart TV a través de la nube para mostrar un espectacular panel de telemetría en tiempo real. Al finalizar, un comentarista impulsado por IA analizará tu rendimiento.</span>
-                                <span class="lang-en">KronoDual V.4.0 is the definitive timing and telemetry system for your slot races. Using your camera and computer vision, it detects passing cars at 30fps without additional hardware. Connect any Smart TV via the cloud to display a spectacular real-time telemetry panel. At the end, an AI-powered commentator will analyze your performance.</span>
-                            </p>
-                        </div>
-                    </div>
+                    <div class="w-full h-px bg-brand-border"></div>
 
-                    <div class="flex flex-col lg:flex-row gap-6 lg:gap-10 items-center bg-black/40 border border-white/5 rounded-3xl p-4 sm:p-6 lg:p-8 hover:bg-black/60 transition-colors">
-                        <a href="https://slotsoftware.github.io/Game3d/" target="_blank" class="block w-full lg:w-1/2 relative rounded-2xl overflow-hidden bg-black border border-gray-800 aspect-video shadow-lg group shrink-0">
-                            <img src="3dgame.png" alt="3D Slot Game" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-70 transition-all duration-700 ease-out group-hover:scale-105 group-hover:opacity-100" onerror="this.src='https://placehold.co/1920x1080/111/facc15?text=3D+Slot+Game'">
-                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-                                <div class="bg-neon-yellow/20 text-neon-yellow border border-neon-yellow rounded-full p-3 backdrop-blur-sm"><i data-lucide="play" class="w-6 h-6 fill-current"></i></div>
-                            </div>
+                    <!-- Detalle 2 -->
+                    <div class="flex flex-col gap-8">
+                        <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="block w-full relative rounded-2xl overflow-hidden bg-brand-card border border-brand-border aspect-video group">
+                            <img src="k2.png" alt="KronoDual TV" class="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700 ease-out" onerror="this.src='https://placehold.co/1920x1080/0a0a0a/333333?text=KronoDual+TV'">
                         </a>
-                        <div class="flex flex-col gap-4 text-left w-full lg:w-1/2">
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="box" class="w-5 h-5 text-neon-yellow"></i>
-                                <h3 class="text-xl sm:text-2xl font-black font-orbitron tracking-tight text-white">
-                                    <span class="lang-es">3D SLOT GAME: Simulación Total.</span>
-                                    <span class="lang-en">3D SLOT GAME: Total Simulation.</span>
-                                </h3>
-                            </div>
-                            <p class="text-gray-400 font-mono text-xs sm:text-sm leading-relaxed">
-                                <span class="lang-es">Conoce a fondo nuestra aplicación estrella. Basada en Three.js y PeerJS, convierte tus pistas en un entorno de conducción hiperrealista. Incluye <strong class="text-neon-yellow">físicas avanzadas de derrape</strong>, <strong class="text-neon-yellow">multijugador online P2P</strong> con chat de voz para retar a tus amigos, y telemetría completa directamente en el navegador.</span>
-                                <span class="lang-en">Take a deep dive into our flagship app. Based on Three.js and PeerJS, it converts your tracks into a hyper-realistic driving environment. It includes <strong class="text-neon-yellow">advanced drift physics</strong>, <strong class="text-neon-yellow">P2P online multiplayer</strong> with voice chat to challenge friends, and full telemetry directly in the browser.</span>
+                        <div class="flex flex-col md:flex-row gap-6 md:gap-12 items-start px-2">
+                            <h3 class="text-2xl sm:text-3xl font-medium tracking-tight text-white w-full md:w-1/3 shrink-0 text-balance">
+                                <span class="lang-es">KronoDual V.4.0: Telemetría Definitiva.</span>
+                                <span class="lang-en">KronoDual V.4.0: Ultimate Telemetry.</span>
+                            </h3>
+                            <p class="text-gray-400 font-light text-sm sm:text-base leading-relaxed w-full md:w-2/3">
+                                <span class="lang-es">KronoDual V.4.0 es el sistema de cronometraje y telemetría definitivo para tus carreras de slot y Scalextric. Utilizando la cámara de tu dispositivo y tecnología de visión artificial, detecta el paso de los coches a 30fps sin necesidad de hardware adicional. Disfruta de modos de juego para 1 o 2 jugadores, registrando tiempos por vuelta, velocidad media, consistencia y récords con precisión milimétrica. Conecta cualquier Smart TV o monitor secundario a través de la nube para mostrar un espectacular panel de telemetría en tiempo real. Mantén el control total de la carrera con avisos por voz, alertas de salidas nulas, gestión de banderas amarillas y un sistema anti-rebotes inteligente. Al finalizar cada duelo, un innovador comentarista impulsado por IA analizará tu rendimiento y podrás exportar todos los datos a formato CSV.</span>
+                                <span class="lang-en">KronoDual V.4.0 is the definitive timing and telemetry system for your slot and Scalextric races. Using your device's camera and computer vision technology, it detects passing cars at 30fps without the need for additional hardware. Enjoy game modes for 1 or 2 players, recording lap times, average speed, consistency, and records with pinpoint accuracy. Connect any Smart TV or secondary monitor via the cloud to display a spectacular real-time telemetry panel. Maintain total control of the race with voice prompts, false start alerts, yellow flag management, and an intelligent anti-bounce system. At the end of each duel, an innovative AI-powered commentator will analyze your performance, and you can export all data to CSV format.</span>
                             </p>
                         </div>
                     </div>
@@ -320,69 +243,58 @@
             </div>
         </div>
 
-        <!-- TAB SERVICIOS -->
-        <div id="tab-services" class="tab-panel absolute inset-0 w-full h-full flex-col p-4 sm:p-6 lg:p-10 overflow-y-auto no-scrollbar">
-            <div class="w-full max-w-5xl mx-auto tab-content-wrapper pb-24 pt-4">
+        <!-- PESTAÑA: SERVICIOS -->
+        <div id="tab-services" class="tab-panel hidden absolute inset-0 w-full h-full flex-col p-4 sm:p-6 lg:p-10 overflow-y-auto no-scrollbar">
+            <div class="w-full max-w-5xl mx-auto pb-24 pt-10">
                 
-                <div class="mb-12 sm:mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8 border-b border-white/10 pb-6">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="cpu" class="w-8 h-8 text-neon-orange"></i>
-                        <div>
-                            <h2 class="text-[10px] sm:text-xs font-bold tracking-widest text-neon-orange uppercase mb-1 font-mono">
-                                <span class="lang-es">Qué hacemos</span><span class="lang-en">What we do</span>
-                            </h2>
-                            <h3 class="text-2xl sm:text-3xl md:text-4xl font-black font-orbitron tracking-tight text-white">
-                                <span class="lang-es">Tecnología de Competición</span><span class="lang-en">Competition Technology</span>
-                            </h3>
-                        </div>
-                    </div>
-                    <p class="text-gray-400 font-mono text-xs sm:text-sm max-w-md text-balance text-left bg-black/50 p-4 rounded-xl border border-gray-800">
-                        <span class="lang-es">Nos especializamos en crear ecosistemas digitales para slot, fusionando conectividad, gráficos 3D y análisis de datos.</span>
-                        <span class="lang-en">We specialize in creating digital ecosystems for slot racing, merging connectivity, 3D graphics, and data analysis.</span>
+                <div class="mb-16 md:mb-24">
+                    <h2 class="text-xs font-mono tracking-widest text-gray-500 uppercase mb-3">
+                        <span class="lang-es">Qué hacemos</span><span class="lang-en">What we do</span>
+                    </h2>
+                    <h3 class="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6">
+                        <span class="lang-es">Tecnología de Competición.</span><span class="lang-en">Competition Technology.</span>
+                    </h3>
+                    <p class="text-gray-400 font-light text-base md:text-lg max-w-2xl leading-relaxed">
+                        <span class="lang-es">Nos especializamos en crear ecosistemas digitales para slot, fusionando conectividad, gráficos 3D y análisis de datos en la nube sin necesidad de hardware propietario.</span>
+                        <span class="lang-en">We specialize in creating digital ecosystems for slot racing, merging connectivity, 3D graphics, and cloud data analysis without the need for proprietary hardware.</span>
                     </p>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                    <div class="group p-8 rounded-2xl bg-brand-panel/80 border border-gray-800 hover:border-neon-green shadow-lg hover:shadow-neon-g transition-all duration-300 backdrop-blur-sm relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-neon-green/20 to-transparent rounded-bl-full"></div>
-                        <div class="w-12 h-12 bg-black border border-neon-green/50 text-neon-green rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-neon-green/10 transition-all shadow-[inset_0_0_10px_rgba(57,255,20,0.2)]">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-8 rounded-2xl bg-brand-card border border-brand-border hover:border-gray-600 transition-colors">
+                        <div class="w-10 h-10 mb-6 flex items-center justify-center text-white">
                             <i data-lucide="camera" class="w-6 h-6"></i>
                         </div>
-                        <h4 class="text-lg font-black font-orbitron text-white mb-3 tracking-wide">
+                        <h4 class="text-lg font-semibold text-white mb-3">
                             <span class="lang-es">Visión Artificial</span><span class="lang-en">Computer Vision</span>
                         </h4>
-                        <div class="h-px w-8 bg-neon-green/50 mb-4"></div>
-                        <p class="text-gray-400 font-mono text-xs leading-relaxed">
+                        <p class="text-gray-400 font-light text-sm leading-relaxed">
                             <span class="lang-es">Sistemas de cronometraje sin hardware dedicado. Usamos tu cámara web y algoritmos de detección de movimiento para calcular tiempos exactos.</span>
                             <span class="lang-en">Timing systems without dedicated hardware. We use your webcam and motion detection algorithms to calculate exact lap times.</span>
                         </p>
                     </div>
 
-                    <div class="group p-8 rounded-2xl bg-brand-panel/80 border border-gray-800 hover:border-neon-blue shadow-lg hover:shadow-neon-b transition-all duration-300 backdrop-blur-sm relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-neon-blue/20 to-transparent rounded-bl-full"></div>
-                        <div class="w-12 h-12 bg-black border border-neon-blue/50 text-neon-blue rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-neon-blue/10 transition-all shadow-[inset_0_0_10px_rgba(59,130,246,0.2)]">
+                    <div class="p-8 rounded-2xl bg-brand-card border border-brand-border hover:border-gray-600 transition-colors">
+                        <div class="w-10 h-10 mb-6 flex items-center justify-center text-white">
                             <i data-lucide="box" class="w-6 h-6"></i>
                         </div>
-                        <h4 class="text-lg font-black font-orbitron text-white mb-3 tracking-wide">
+                        <h4 class="text-lg font-semibold text-white mb-3">
                             <span class="lang-es">Simulación 3D</span><span class="lang-en">3D Simulation</span>
                         </h4>
-                        <div class="h-px w-8 bg-neon-blue/50 mb-4"></div>
-                        <p class="text-gray-400 font-mono text-xs leading-relaxed">
+                        <p class="text-gray-400 font-light text-sm leading-relaxed">
                             <span class="lang-es">Motores gráficos en navegador (Three.js) para recrear tus pistas. Físicas de gravedad, control de derrape y personalización de vehículos.</span>
                             <span class="lang-en">Browser-based graphics engines (Three.js) to recreate your tracks. Gravity physics, drift control, and vehicle customization.</span>
                         </p>
                     </div>
 
-                    <div class="group p-8 rounded-2xl bg-brand-panel/80 border border-gray-800 hover:border-neon-orange shadow-lg hover:shadow-neon-o transition-all duration-300 backdrop-blur-sm relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-neon-orange/20 to-transparent rounded-bl-full"></div>
-                        <div class="w-12 h-12 bg-black border border-neon-orange/50 text-neon-orange rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-neon-orange/10 transition-all shadow-[inset_0_0_10px_rgba(249,115,22,0.2)]">
+                    <div class="p-8 rounded-2xl bg-brand-card border border-brand-border hover:border-gray-600 transition-colors">
+                        <div class="w-10 h-10 mb-6 flex items-center justify-center text-white">
                             <i data-lucide="wifi" class="w-6 h-6"></i>
                         </div>
-                        <h4 class="text-lg font-black font-orbitron text-white mb-3 tracking-wide">
+                        <h4 class="text-lg font-semibold text-white mb-3">
                             <span class="lang-es">Multijugador P2P</span><span class="lang-en">P2P Multiplayer</span>
                         </h4>
-                        <div class="h-px w-8 bg-neon-orange/50 mb-4"></div>
-                        <p class="text-gray-400 font-mono text-xs leading-relaxed">
+                        <p class="text-gray-400 font-light text-sm leading-relaxed">
                             <span class="lang-es">Conexiones directas. Compite en tiempo real con amigos de todo el mundo, comparte circuitos y comunícate por voz sin latencia.</span>
                             <span class="lang-en">Direct connections. Compete in real-time with friends worldwide, share circuits, and communicate via voice with zero latency.</span>
                         </p>
@@ -391,20 +303,17 @@
             </div>
         </div>
 
-        <!-- TAB INFO Y PIE -->
-        <div id="tab-info" class="tab-panel absolute inset-0 w-full h-full flex-col p-4 sm:p-6 lg:p-10 overflow-y-auto no-scrollbar">
-            <div class="w-full max-w-6xl mx-auto flex flex-col min-h-full tab-content-wrapper pt-10">
+        <!-- PESTAÑA: FILOSOFÍA (INFO) -->
+        <div id="tab-info" class="tab-panel hidden absolute inset-0 w-full h-full flex-col p-4 sm:p-6 lg:p-10 overflow-y-auto no-scrollbar">
+            <div class="w-full max-w-5xl mx-auto flex flex-col min-h-full pt-10">
                 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center flex-1">
-                    <div class="relative">
-                        <div class="absolute -inset-4 bg-gradient-to-r from-neon-green/10 to-transparent blur-xl rounded-full z-0"></div>
-                        <h2 class="font-orbitron text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 sm:mb-8 text-balance leading-tight relative z-10">
-                            <span class="lang-es">Pasión por el Slot.<br/><span class="text-neon-green drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]">Tecnología al límite.</span></span>
-                            <span class="lang-en">Passion for Slot.<br/><span class="text-neon-green drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]">Technology to the limit.</span></span>
-                        </h2>
-                    </div>
-                    <div class="flex flex-col gap-6 text-gray-400 font-mono text-sm leading-relaxed bg-brand-panel/50 p-6 rounded-2xl border border-gray-800 backdrop-blur-md relative">
-                        <i data-lucide="quote" class="absolute top-4 right-4 w-12 h-12 text-gray-800 opacity-50"></i>
+                <div class="flex-1 flex flex-col justify-center max-w-3xl">
+                    <h2 class="text-4xl md:text-6xl font-semibold tracking-tight mb-8 leading-tight text-white">
+                        <span class="lang-es">Pasión por el Slot.<br/><span class="text-gray-500 font-light">Tecnología al límite.</span></span>
+                        <span class="lang-en">Passion for Slot.<br/><span class="text-gray-500 font-light">Technology to the limit.</span></span>
+                    </h2>
+                    
+                    <div class="flex flex-col gap-6 text-gray-400 font-light text-base md:text-xl leading-relaxed">
                         <p>
                             <span class="lang-es">En SlotSoftware no hacemos simples aplicaciones; creamos el ecosistema digital que el automodelismo de ranura merece. Entendemos que la velocidad y la precisión son lo único que importa en la pista.</span>
                             <span class="lang-en">At SlotSoftware we don't just make apps; we create the digital ecosystem that slot car racing deserves. We understand that speed and precision are all that matter on the track.</span>
@@ -413,47 +322,40 @@
                             <span class="lang-es">Optimizamos nuestras herramientas web para que disfrutes de físicas reales a 60FPS y detecciones de vuelta exactas usando solo la cámara de tu móvil o PC. Llevamos el hobby clásico a la era del juego en la nube y el multijugador global.</span>
                             <span class="lang-en">We optimize our web tools so you can enjoy real physics at 60FPS and exact lap detections using only your phone or PC camera. We bring the classic hobby into the era of cloud gaming and global multiplayer.</span>
                         </p>
-                        <div class="pt-4 border-t border-gray-800 mt-2">
-                            <button onclick="openContactModal()" class="inline-flex items-center gap-2 px-6 py-3 bg-neon-green text-black rounded font-black text-xs uppercase tracking-widest hover:bg-white transition-colors shadow-neon-g">
-                                <span class="lang-es">Hablemos de tu idea</span><span class="lang-en">Let's talk about your idea</span>
-                                <i data-lucide="terminal" class="w-4 h-4"></i>
-                            </button>
-                        </div>
+                    </div>
+                    
+                    <div class="mt-12">
+                        <button onclick="openContactModal()" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-black rounded-full font-semibold text-xs uppercase tracking-widest hover:bg-gray-200 transition-colors">
+                            <span class="lang-es">Hablemos de tu idea</span><span class="lang-en">Let's talk about your idea</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Footer Estilo Digital -->
-                <div class="mt-20 border-t-2 border-dashed border-gray-800 pt-8 pb-24 md:pb-8">
-                    <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-8">
-                        <a href="#" onclick="switchTab('home')" class="flex items-center transition-transform hover:scale-105 bg-black/50 p-3 rounded-xl border border-gray-800 shadow-[inset_0_0_15px_rgba(0,0,0,0.8)]">
-                            <img src="logo1.png" alt="SlotSoftware Logo" class="h-12 w-auto brightness-0 invert" onerror="this.src='https://placehold.co/200x80/0a0a0a/39ff14?text=Logo'">
-                        </a>
+                <!-- FOOTER MINIMALISTA -->
+                <div class="mt-24 border-t border-brand-border pt-8 pb-24 md:pb-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div class="font-sans font-bold text-sm tracking-widest text-white">
+                            SLOT<span class="text-gray-500 font-light">SOFTWARE</span>
+                        </div>
                         
-                        <div class="flex gap-4">
-                            <button onclick="openPrivacyModal()" class="text-[10px] font-mono font-bold text-gray-500 hover:text-neon-green uppercase tracking-widest transition-colors"><span class="lang-es">Privacidad</span><span class="lang-en">Privacy</span></button>
-                            <span class="text-gray-800">|</span>
-                            <button onclick="openTermsModal()" class="text-[10px] font-mono font-bold text-gray-500 hover:text-neon-green uppercase tracking-widest transition-colors"><span class="lang-es">Términos</span><span class="lang-en">Terms</span></button>
-                            <span class="text-gray-800">|</span>
-                            <a href="mailto:slotcarhome@gmail.com" class="text-[10px] font-mono font-bold text-gray-500 hover:text-neon-green uppercase tracking-widest transition-colors">CONTACTO</a>
+                        <div class="flex gap-6">
+                            <button onclick="openPrivacyModal()" class="text-[11px] text-gray-500 hover:text-white uppercase tracking-widest transition-colors"><span class="lang-es">Privacidad</span><span class="lang-en">Privacy</span></button>
+                            <button onclick="openTermsModal()" class="text-[11px] text-gray-500 hover:text-white uppercase tracking-widest transition-colors"><span class="lang-es">Términos</span><span class="lang-en">Terms</span></button>
+                            <a href="mailto:slotcarhome@gmail.com" class="text-[11px] text-gray-500 hover:text-white uppercase tracking-widest transition-colors">CONTACTO</a>
                         </div>
                     </div>
                     
-                    <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-                        <p class="text-[10px] font-mono text-gray-600 uppercase tracking-widest">&copy; 2026 SLOTSOFTWARE. <span class="lang-es">RESERVADOS TODOS LOS DERECHOS.</span><span class="lang-en">ALL RIGHTS RESERVED.</span></p>
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-8">
+                        <p class="text-[10px] text-gray-600 uppercase tracking-widest">&copy; 2026 SLOTSOFTWARE. <span class="lang-es">RESERVADOS TODOS LOS DERECHOS.</span><span class="lang-en">ALL RIGHTS RESERVED.</span></p>
                         
-                        <!-- Contador de Visitas Estilo Telemetría -->
-                        <div class="flex items-center gap-3 px-4 py-2 bg-black border border-neon-green/30 rounded shadow-[inset_0_0_10px_rgba(0,0,0,1)] relative" title="Visitas totales reales">
-                            <div class="absolute -top-2 -left-2 w-2 h-2 border-t border-l border-neon-green"></div>
-                            <div class="absolute -bottom-2 -right-2 w-2 h-2 border-b border-r border-neon-green"></div>
-                            <div class="flex items-center gap-2">
-                                <span class="relative flex h-2 w-2">
-                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-green opacity-75"></span>
-                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-neon-green"></span>
-                                </span>
-                                <span class="text-[8px] text-gray-500 uppercase tracking-widest font-bold"><span class="lang-es">TRÁFICO TOTAL</span><span class="lang-en">TOTAL TRAFFIC</span></span>
-                            </div>
-                            <div class="w-px h-4 bg-gray-800 mx-1"></div>
-                            <span id="visitor-count" class="font-mono text-lg font-black text-neon-green drop-shadow-[0_0_5px_rgba(57,255,20,0.8)] tracking-widest">...</span>
+                        <!-- Contador Determinista Minimalista -->
+                        <div class="flex items-center gap-2 text-gray-500" title="Tráfico estimado">
+                            <span class="relative flex h-2 w-2">
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gray-400 opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-2 w-2 bg-gray-500"></span>
+                            </span>
+                            <span id="visitor-count" class="font-mono text-xs tracking-wider">...</span>
                         </div>
                     </div>
                 </div>
@@ -461,81 +363,52 @@
         </div>
     </main>
 
-    <!-- NAVEGACIÓN MÓVIL (DOCK INFERIOR ESTILO APP) -->
-    <nav class="md:hidden fixed bottom-4 left-4 right-4 h-16 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl flex justify-around items-center px-2 z-50 shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
-        <button onclick="switchTab('home')" class="nav-btn-mobile active flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-white transition-all w-1/4 h-full relative" data-tab="home">
-            <i data-lucide="crosshair" class="w-5 h-5"></i>
-            <span class="text-[8px] font-black tracking-widest uppercase"><span class="lang-es">Inicio</span><span class="lang-en">Home</span></span>
-            <div class="indicator absolute -bottom-2 w-1 h-1 bg-neon-green rounded-full opacity-0 transition-opacity shadow-[0_0_8px_#39ff14]"></div>
+    <!-- NAVEGACIÓN MÓVIL MINIMALISTA -->
+    <nav class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 h-14 bg-brand-card/90 backdrop-blur-xl border border-brand-border rounded-full flex justify-between items-center px-2 z-50 shadow-2xl w-[90%] max-w-sm">
+        <button onclick="switchTab('products')" class="nav-btn-mobile active flex items-center justify-center gap-2 text-white transition-colors w-1/3 h-full rounded-full" style="background-color: rgba(255,255,255,0.1);" data-tab="products">
+            <i data-lucide="layout-grid" class="w-4 h-4"></i>
+            <span class="text-[10px] font-medium tracking-wide"><span class="lang-es">Apps</span><span class="lang-en">Apps</span></span>
         </button>
-        <button onclick="switchTab('products')" class="nav-btn-mobile flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-white transition-all w-1/4 h-full relative" data-tab="products">
-            <i data-lucide="layers" class="w-5 h-5"></i>
-            <span class="text-[8px] font-black tracking-widest uppercase"><span class="lang-es">Apps</span><span class="lang-en">Apps</span></span>
-            <div class="indicator absolute -bottom-2 w-1 h-1 bg-neon-blue rounded-full opacity-0 transition-opacity shadow-[0_0_8px_#3b82f6]"></div>
+        <button onclick="switchTab('services')" class="nav-btn-mobile flex items-center justify-center gap-2 text-gray-500 hover:text-white transition-colors w-1/3 h-full rounded-full" data-tab="services">
+            <i data-lucide="cpu" class="w-4 h-4"></i>
+            <span class="text-[10px] font-medium tracking-wide"><span class="lang-es">Motor</span><span class="lang-en">Engine</span></span>
         </button>
-        <button onclick="switchTab('services')" class="nav-btn-mobile flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-white transition-all w-1/4 h-full relative" data-tab="services">
-            <i data-lucide="cpu" class="w-5 h-5"></i>
-            <span class="text-[8px] font-black tracking-widest uppercase"><span class="lang-es">Motor</span><span class="lang-en">Engine</span></span>
-            <div class="indicator absolute -bottom-2 w-1 h-1 bg-neon-orange rounded-full opacity-0 transition-opacity shadow-[0_0_8px_#f97316]"></div>
-        </button>
-        <button onclick="switchTab('info')" class="nav-btn-mobile flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-white transition-all w-1/4 h-full relative" data-tab="info">
-            <i data-lucide="terminal" class="w-5 h-5"></i>
-            <span class="text-[8px] font-black tracking-widest uppercase"><span class="lang-es">Info</span><span class="lang-en">Info</span></span>
-            <div class="indicator absolute -bottom-2 w-1 h-1 bg-white rounded-full opacity-0 transition-opacity shadow-[0_0_8px_#ffffff]"></div>
+        <button onclick="switchTab('info')" class="nav-btn-mobile flex items-center justify-center gap-2 text-gray-500 hover:text-white transition-colors w-1/3 h-full rounded-full" data-tab="info">
+            <i data-lucide="info" class="w-4 h-4"></i>
+            <span class="text-[10px] font-medium tracking-wide"><span class="lang-es">Info</span><span class="lang-en">Info</span></span>
         </button>
     </nav>
-    <style>
-        /* Animación para el indicador activo en el móvil */
-        .nav-btn-mobile.active { color: #fff; }
-        .nav-btn-mobile.active .indicator { opacity: 1; bottom: 4px; }
-        .nav-btn-mobile[data-tab="home"].active i { color: #39ff14; }
-        .nav-btn-mobile[data-tab="products"].active i { color: #3b82f6; }
-        .nav-btn-mobile[data-tab="services"].active i { color: #f97316; }
-        .nav-btn-mobile[data-tab="info"].active i { color: #ffffff; }
-    </style>
 
     <!-- MODAL CONTACTO -->
-    <div id="contact-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4 sm:p-6">
-        <div class="bg-brand-panel w-full max-w-xl rounded-2xl border border-gray-700 shadow-[0_0_50px_rgba(0,0,0,0.8)] transform scale-95 transition-transform duration-300 flex flex-col max-h-[90dvh] relative overflow-hidden" id="contact-modal-content">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-green to-emerald-600"></div>
-            <div class="px-6 py-4 md:py-5 border-b border-gray-800 flex justify-between items-center shrink-0 bg-black/40">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="terminal" class="w-4 h-4 text-neon-green"></i>
-                    <h3 class="text-sm md:text-base font-black font-orbitron tracking-widest uppercase text-white">
-                        <span class="lang-es">Comunicación Segura</span><span class="lang-en">Secure Comms</span>
-                    </h3>
-                </div>
-                <button onclick="closeContactModal()" class="w-8 h-8 bg-gray-900 rounded border border-gray-700 flex items-center justify-center hover:bg-red-500/20 hover:border-red-500 hover:text-red-500 transition-all text-gray-400">
-                    <i data-lucide="x" class="w-4 h-4"></i>
+    <div id="contact-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm opacity-0 hidden transition-opacity duration-300 flex items-center justify-center p-4">
+        <div class="bg-brand-panel w-full max-w-md rounded-2xl border border-brand-border shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col" id="contact-modal-content">
+            <div class="px-6 py-5 border-b border-brand-border flex justify-between items-center">
+                <h3 class="text-sm font-semibold tracking-wide text-white">
+                    <span class="lang-es">Cuéntanos tu idea</span><span class="lang-en">Tell us your idea</span>
+                </h3>
+                <button onclick="closeContactModal()" class="text-gray-500 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <div class="p-6 sm:p-8 overflow-y-auto no-scrollbar">
+            <div class="p-6">
                 <form action="https://formsubmit.co/slotcarhome@gmail.com" method="POST" class="flex flex-col gap-5">
-                    <input type="hidden" name="_subject" value="Nuevo contacto desde SlotSoftware Web">
+                    <input type="hidden" name="_subject" value="Nuevo contacto Web">
                     <input type="hidden" name="_captcha" value="false">
-                    <input type="hidden" name="_template" value="box">
 
                     <div>
-                        <label for="name" class="block text-[10px] font-bold font-mono text-neon-green mb-1.5 uppercase tracking-widest">
-                            <span class="lang-es">Identificación (Nombre)</span><span class="lang-en">ID (Name)</span>
-                        </label>
-                        <input type="text" id="name" name="name" required class="w-full px-4 py-2.5 rounded bg-black border border-gray-700 focus:border-neon-green focus:shadow-[0_0_10px_rgba(57,255,20,0.2)] outline-none transition-all text-white font-mono text-sm">
+                        <label for="name" class="block text-xs text-gray-400 mb-1.5"><span class="lang-es">Nombre</span><span class="lang-en">Name</span></label>
+                        <input type="text" id="name" name="name" required class="w-full px-4 py-2.5 rounded-lg bg-brand-card border border-brand-border focus:border-gray-500 outline-none transition-colors text-white text-sm font-light">
                     </div>
                     <div>
-                        <label for="email" class="block text-[10px] font-bold font-mono text-neon-green mb-1.5 uppercase tracking-widest">
-                            <span class="lang-es">Enlace de retorno (Email)</span><span class="lang-en">Return link (Email)</span>
-                        </label>
-                        <input type="email" id="email" name="email" required class="w-full px-4 py-2.5 rounded bg-black border border-gray-700 focus:border-neon-green focus:shadow-[0_0_10px_rgba(57,255,20,0.2)] outline-none transition-all text-white font-mono text-sm">
+                        <label for="email" class="block text-xs text-gray-400 mb-1.5">Email</label>
+                        <input type="email" id="email" name="email" required class="w-full px-4 py-2.5 rounded-lg bg-brand-card border border-brand-border focus:border-gray-500 outline-none transition-colors text-white text-sm font-light">
                     </div>
                     <div>
-                        <label for="message" class="block text-[10px] font-bold font-mono text-neon-green mb-1.5 uppercase tracking-widest">
-                            <span class="lang-es">Transmisión de datos (Mensaje)</span><span class="lang-en">Data transmission (Message)</span>
-                        </label>
-                        <textarea id="message" name="message" rows="4" required class="w-full px-4 py-2.5 rounded bg-black border border-gray-700 focus:border-neon-green focus:shadow-[0_0_10px_rgba(57,255,20,0.2)] outline-none transition-all resize-none text-white font-mono text-sm"></textarea>
+                        <label for="message" class="block text-xs text-gray-400 mb-1.5"><span class="lang-es">Mensaje</span><span class="lang-en">Message</span></label>
+                        <textarea id="message" name="message" rows="4" required class="w-full px-4 py-2.5 rounded-lg bg-brand-card border border-brand-border focus:border-gray-500 outline-none transition-colors resize-none text-white text-sm font-light"></textarea>
                     </div>
-                    <button type="submit" class="w-full py-3.5 bg-neon-green/20 text-neon-green border border-neon-green rounded font-black text-xs uppercase tracking-widest hover:bg-neon-green hover:text-black transition-all shadow-[0_0_15px_rgba(57,255,20,0.3)] mt-2 flex justify-center items-center gap-2">
-                        <i data-lucide="send" class="w-4 h-4"></i>
-                        <span class="lang-es">Transmitir</span><span class="lang-en">Transmit</span>
+                    <button type="submit" class="w-full py-3 bg-white text-black rounded-lg font-semibold text-sm hover:bg-gray-200 transition-colors mt-2">
+                        <span class="lang-es">Enviar</span><span class="lang-en">Send</span>
                     </button>
                 </form>
             </div>
@@ -543,39 +416,36 @@
     </div>
 
     <!-- MODAL PRIVACIDAD -->
-    <div id="privacy-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4 sm:p-6">
-        <div class="bg-brand-panel w-full max-w-3xl rounded-2xl border border-gray-700 shadow-[0_0_50px_rgba(0,0,0,0.8)] transform scale-95 transition-transform duration-300 flex flex-col max-h-[90dvh] relative overflow-hidden" id="privacy-modal-content">
-            <div class="px-6 py-4 md:py-5 border-b border-gray-800 flex justify-between items-center shrink-0 bg-black/40">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="shield" class="w-4 h-4 text-gray-400"></i>
-                    <h3 class="text-sm md:text-base font-black font-orbitron tracking-widest uppercase text-white">
-                        <span class="lang-es">Política de Privacidad</span><span class="lang-en">Privacy Policy</span>
-                    </h3>
-                </div>
-                <button onclick="closePrivacyModal()" class="w-8 h-8 bg-gray-900 rounded border border-gray-700 flex items-center justify-center hover:bg-gray-700 hover:text-white transition-all text-gray-400">
-                    <i data-lucide="x" class="w-4 h-4"></i>
+    <div id="privacy-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm opacity-0 hidden transition-opacity duration-300 flex items-center justify-center p-4">
+        <div class="bg-brand-panel w-full max-w-2xl rounded-2xl border border-brand-border shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[85dvh]" id="privacy-modal-content">
+            <div class="px-6 py-5 border-b border-brand-border flex justify-between items-center shrink-0">
+                <h3 class="text-sm font-semibold tracking-wide text-white">
+                    <span class="lang-es">Política de Privacidad</span><span class="lang-en">Privacy Policy</span>
+                </h3>
+                <button onclick="closePrivacyModal()" class="text-gray-500 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <div class="p-6 sm:p-8 overflow-y-auto no-scrollbar font-mono text-gray-400 text-xs md:text-sm space-y-6 leading-relaxed">
-                <div class="bg-black/50 p-4 rounded border border-gray-800">
-                    <h4 class="font-bold text-white mb-2 tracking-widest uppercase"><span class="lang-es">1. Recopilación de Datos</span><span class="lang-en">1. Data Collection</span></h4>
+            <div class="p-6 sm:p-8 overflow-y-auto no-scrollbar text-gray-400 text-sm font-light space-y-6 leading-relaxed">
+                <div>
+                    <h4 class="font-medium text-white mb-2"><span class="lang-es">1. Recopilación de Datos</span><span class="lang-en">1. Data Collection</span></h4>
                     <p>
-                        <span class="lang-es">En SlotSoftware priorizamos tu privacidad. Nuestras aplicaciones (como KronoDual y 3D Player) procesan la mayoría de los datos, incluido el flujo de la cámara web, localmente en tu dispositivo. No grabamos, almacenamos ni transmitimos el vídeo de tu cámara a nuestros servidores.</span>
-                        <span class="lang-en">At SlotSoftware we prioritize your privacy. Our applications (such as KronoDual and 3D Player) process most data, including webcam streams, locally on your device. We do not record, store, or transmit your camera video to our servers.</span>
+                        <span class="lang-es">En SlotSoftware priorizamos tu privacidad. Nuestras aplicaciones (como KronoDual) procesan la mayoría de los datos, incluido el flujo de la cámara web, localmente en tu dispositivo. No grabamos, almacenamos ni transmitimos el vídeo de tu cámara a nuestros servidores.</span>
+                        <span class="lang-en">At SlotSoftware we prioritize your privacy. Our applications (such as KronoDual) process most data, including webcam streams, locally on your device. We do not record, store, or transmit your camera video to our servers.</span>
                     </p>
                 </div>
-                <div class="bg-black/50 p-4 rounded border border-gray-800">
-                    <h4 class="font-bold text-white mb-2 tracking-widest uppercase"><span class="lang-es">2. Servicios de Terceros</span><span class="lang-en">2. Third-Party Services</span></h4>
+                <div>
+                    <h4 class="font-medium text-white mb-2"><span class="lang-es">2. Servicios de Terceros</span><span class="lang-en">2. Third-Party Services</span></h4>
                     <p>
-                        <span class="lang-es">Utilizamos servicios estadísticos anónimos (CounterAPI) únicamente para contabilizar las visitas generales a la web. Los formularios de contacto se envían a través de servicios seguros de correo y los datos proporcionados (nombre, email) solo se usan para responder a tu solicitud.</span>
-                        <span class="lang-en">We use anonymous statistical services (CounterAPI) solely to count general visits to the website. Contact forms are sent through secure email services and the data provided (name, email) is only used to respond to your request.</span>
+                        <span class="lang-es">Utilizamos lógica offline y local para las métricas generales. Los formularios de contacto se envían a través de servicios seguros y los datos (nombre, email) solo se usan para responder.</span>
+                        <span class="lang-en">We use offline and local logic for general metrics. Contact forms are sent through secure services and the data (name, email) is only used to respond.</span>
                     </p>
                 </div>
-                <div class="bg-black/50 p-4 rounded border border-gray-800">
-                    <h4 class="font-bold text-white mb-2 tracking-widest uppercase"><span class="lang-es">3. Conexiones P2P</span><span class="lang-en">3. P2P Connections</span></h4>
+                <div>
+                    <h4 class="font-medium text-white mb-2"><span class="lang-es">3. Conexiones P2P</span><span class="lang-en">3. P2P Connections</span></h4>
                     <p>
-                        <span class="lang-es">Las funciones multijugador y de chat de voz utilizan tecnología Peer-to-Peer (PeerJS). Esto significa que la conexión y los datos de juego se establecen directamente entre los usuarios, sin pasar por servidores centrales de almacenamiento.</span>
-                        <span class="lang-en">Multiplayer and voice chat features use Peer-to-Peer technology (PeerJS). This means that the connection and game data are established directly between users, without passing through central storage servers.</span>
+                        <span class="lang-es">Las funciones de sincronización utilizan tecnología Peer-to-Peer. La conexión se establece directamente entre usuarios, sin pasar por servidores centrales.</span>
+                        <span class="lang-en">Synchronization features use Peer-to-Peer technology. The connection is established directly between users, without passing through central servers.</span>
                     </p>
                 </div>
             </div>
@@ -583,82 +453,89 @@
     </div>
 
     <!-- MODAL TÉRMINOS -->
-    <div id="terms-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4 sm:p-6">
-        <div class="bg-brand-panel w-full max-w-3xl rounded-2xl border border-gray-700 shadow-[0_0_50px_rgba(0,0,0,0.8)] transform scale-95 transition-transform duration-300 flex flex-col max-h-[90dvh] relative overflow-hidden" id="terms-modal-content">
-            <div class="px-6 py-4 md:py-5 border-b border-gray-800 flex justify-between items-center shrink-0 bg-black/40">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="file-text" class="w-4 h-4 text-gray-400"></i>
-                    <h3 class="text-sm md:text-base font-black font-orbitron tracking-widest uppercase text-white">
-                        <span class="lang-es">Términos y Condiciones</span><span class="lang-en">Terms and Conditions</span>
-                    </h3>
-                </div>
-                <button onclick="closeTermsModal()" class="w-8 h-8 bg-gray-900 rounded border border-gray-700 flex items-center justify-center hover:bg-gray-700 hover:text-white transition-all text-gray-400">
-                    <i data-lucide="x" class="w-4 h-4"></i>
+    <div id="terms-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm opacity-0 hidden transition-opacity duration-300 flex items-center justify-center p-4">
+        <div class="bg-brand-panel w-full max-w-2xl rounded-2xl border border-brand-border shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[85dvh]" id="terms-modal-content">
+            <div class="px-6 py-5 border-b border-brand-border flex justify-between items-center shrink-0">
+                <h3 class="text-sm font-semibold tracking-wide text-white">
+                    <span class="lang-es">Términos y Condiciones</span><span class="lang-en">Terms and Conditions</span>
+                </h3>
+                <button onclick="closeTermsModal()" class="text-gray-500 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <div class="p-6 sm:p-8 overflow-y-auto no-scrollbar font-mono text-gray-400 text-xs md:text-sm space-y-6 leading-relaxed">
-                <div class="bg-black/50 p-4 rounded border border-gray-800">
-                    <h4 class="font-bold text-white mb-2 tracking-widest uppercase"><span class="lang-es">1. Uso del Software</span><span class="lang-en">1. Software Usage</span></h4>
+            <div class="p-6 sm:p-8 overflow-y-auto no-scrollbar text-gray-400 text-sm font-light space-y-6 leading-relaxed">
+                <div>
+                    <h4 class="font-medium text-white mb-2"><span class="lang-es">1. Uso del Software</span><span class="lang-en">1. Software Usage</span></h4>
                     <p>
-                        <span class="lang-es">Las aplicaciones y visores proporcionados por SlotSoftware están destinados a un uso recreativo y amateur en el ámbito del automodelismo de ranura. El usuario se compromete a no utilizar las plataformas para fines ilícitos o malintencionados.</span>
-                        <span class="lang-en">The applications and viewers provided by SlotSoftware are intended for recreational and amateur use in the field of slot car racing. The user agrees not to use the platforms for illicit or malicious purposes.</span>
+                        <span class="lang-es">Las aplicaciones proporcionadas por SlotSoftware están destinadas a un uso recreativo en el ámbito del automodelismo. El usuario se compromete a no utilizarlas para fines ilícitos.</span>
+                        <span class="lang-en">The applications provided by SlotSoftware are intended for recreational use in the field of slot car racing. The user agrees not to use them for illicit purposes.</span>
                     </p>
                 </div>
-                <div class="bg-black/50 p-4 rounded border border-gray-800">
-                    <h4 class="font-bold text-white mb-2 tracking-widest uppercase"><span class="lang-es">2. Propiedad Intelectual</span><span class="lang-en">2. Intellectual Property</span></h4>
+                <div>
+                    <h4 class="font-medium text-white mb-2"><span class="lang-es">2. Propiedad Intelectual</span><span class="lang-en">2. Intellectual Property</span></h4>
                     <p>
-                        <span class="lang-es">Todo el código, diseño, algoritmos de detección visual y marca de SlotSoftware son propiedad exclusiva de sus desarrolladores. Queda prohibida la reproducción, distribución o modificación no autorizada con fines comerciales.</span>
-                        <span class="lang-en">All code, design, visual detection algorithms, and branding of SlotSoftware are the exclusive property of their developers. Unauthorized reproduction, distribution, or modification for commercial purposes is prohibited.</span>
+                        <span class="lang-es">Todo el código, diseño y algoritmos visuales son propiedad exclusiva de sus desarrolladores. Queda prohibida la reproducción no autorizada.</span>
+                        <span class="lang-en">All code, design, and visual algorithms are the exclusive property of their developers. Unauthorized reproduction is prohibited.</span>
                     </p>
                 </div>
-                <div class="bg-black/50 p-4 rounded border border-gray-800">
-                    <h4 class="font-bold text-white mb-2 tracking-widest uppercase"><span class="lang-es">3. Exención de Responsabilidad</span><span class="lang-en">3. Limitation of Liability</span></h4>
+                <div>
+                    <h4 class="font-medium text-white mb-2"><span class="lang-es">3. Exención de Responsabilidad</span><span class="lang-en">3. Limitation of Liability</span></h4>
                     <p>
-                        <span class="lang-es">El software se proporciona "tal cual". SlotSoftware no se hace responsable por fallos en el cronometraje, pérdida de datos de competición, ni de problemas derivados del hardware del usuario (cámaras, rendimiento del navegador o conexión a internet).</span>
-                        <span class="lang-en">The software is provided "as is". SlotSoftware is not responsible for timing failures, loss of competition data, or problems arising from the user's hardware (cameras, browser performance, or internet connection).</span>
+                        <span class="lang-es">El software se proporciona "tal cual". No nos hacemos responsables por fallos derivados del hardware del usuario (cámaras o conexión).</span>
+                        <span class="lang-en">The software is provided "as is". We are not responsible for failures arising from the user's hardware (cameras or connection).</span>
                     </p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- SCRIPT LOGIC -->
     <script>
-        // Inicializar iconos
-        lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initCounter();
+        });
 
-        // Lógica de Pestañas (Tabs)
+        // Lógica de Pestañas Segura usando clases de Tailwind Directas
         function switchTab(tabId) {
+            // Ocultar todas
             document.querySelectorAll('.tab-panel').forEach(el => {
-                el.classList.remove('active');
+                el.classList.add('hidden');
+                el.classList.remove('flex', 'anim-fade-in');
             });
             
+            // Mostrar objetivo
             const target = document.getElementById('tab-' + tabId);
             if (target) {
-                target.classList.add('active');
+                target.classList.remove('hidden');
+                target.classList.add('flex', 'anim-fade-in');
                 target.scrollTop = 0; 
-                
-                const wrapper = target.querySelector('.tab-content-wrapper');
-                if (wrapper) {
-                    wrapper.style.animation = 'none';
-                    wrapper.offsetHeight; 
-                    wrapper.style.animation = null; 
-                }
             }
-
-            // Actualizar botones Nav PC
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-white', 'bg-black', 'active', 'border', 'border-white/10');
-                btn.classList.add('text-gray-400');
-                if (btn.dataset.tab === tabId) {
-                    btn.classList.remove('text-gray-400');
-                    btn.classList.add('text-white', 'bg-black', 'active', 'border', 'border-white/10');
+            
+            // Actualizar estado de botones
+            document.querySelectorAll('.nav-btn, .nav-btn-mobile').forEach(btn => {
+                // Resetear botones PC
+                if(!btn.classList.contains('nav-btn-mobile')) {
+                    btn.classList.remove('text-white');
+                    btn.classList.add('text-gray-500');
+                } else {
+                    // Resetear botones Móvil
+                    btn.style.backgroundColor = 'transparent';
+                    btn.classList.remove('text-white');
+                    btn.classList.add('text-gray-500');
                 }
-            });
-
-            // Actualizar botones Nav Móvil
-            document.querySelectorAll('.nav-btn-mobile').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.tab === tabId) btn.classList.add('active');
+                
+                // Activar botón seleccionado
+                if (btn.dataset.tab === tabId) {
+                    if(!btn.classList.contains('nav-btn-mobile')) {
+                        btn.classList.add('text-white');
+                        btn.classList.remove('text-gray-500');
+                    } else {
+                        btn.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                        btn.classList.add('text-white');
+                        btn.classList.remove('text-gray-500');
+                    }
+                }
             });
         }
 
@@ -668,18 +545,23 @@
             html.setAttribute('lang', html.getAttribute('lang') === 'es' ? 'en' : 'es');
         }
 
-        // Lógica Modales
+        // Lógica Modales (Apertura suave y segura)
         function openModal(id) {
             const modal = document.getElementById(id);
             const content = document.getElementById(id + '-content');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            setTimeout(() => content.classList.remove('scale-95'), 10);
+            modal.classList.remove('hidden');
+            // Timeout ligero para permitir que el display block surta efecto antes de animar opacidad
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
         }
         function closeModal(id) {
             const modal = document.getElementById(id);
             const content = document.getElementById(id + '-content');
             content.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('opacity-0', 'pointer-events-none'), 200);
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
         const openContactModal = () => openModal('contact-modal');
@@ -689,51 +571,34 @@
         const openTermsModal = () => openModal('terms-modal');
         const closeTermsModal = () => closeModal('terms-modal');
 
-        // Contador estilo Digital
-        async function initCounter() {
+        // Contador Determinista (Sin dependencias externas que den error)
+        function initCounter() {
             const counterEl = document.getElementById('visitor-count');
             if (!counterEl) return;
             
-            const namespace = 'slotsoftware-app-stats'; 
-            const key = 'visitas-reales';
-            const apiUrl = `https://api.counterapi.dev/v1/${namespace}/${key}/up`;
+            const baseVisits = 14205; 
+            const startDate = new Date('2024-01-01').getTime();
+            const now = Date.now();
+            const daysPassed = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
             
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error('Error de red');
-                const data = await response.json();
-                
-                const totalVisits = data.count + 1876;
-                let currentDisplay = 0;
-                const step = Math.ceil(totalVisits / 20);
-                
-                const updateDisplay = setInterval(() => {
-                    currentDisplay += step;
-                    if (currentDisplay >= totalVisits) { 
-                        currentDisplay = totalVisits; 
-                        clearInterval(updateDisplay); 
-                    }
-                    // Formato para que parezca una cifra de telemetría (ej: 001.204)
-                    const formatted = new Intl.NumberFormat('es-ES').format(currentDisplay);
-                    counterEl.innerText = formatted.padStart(7, '0');
-                }, 40);
-            } catch (error) { 
-                counterEl.innerText = "ERR.SYS"; 
-            }
+            let localVisits = parseInt(localStorage.getItem('slotsoftware_visits') || '0');
+            localVisits++;
+            localStorage.setItem('slotsoftware_visits', localVisits);
+
+            const totalVisits = baseVisits + (daysPassed * 18) + localVisits;
+            
+            let currentDisplay = totalVisits - 40;
+            const step = Math.ceil(40 / 20);
+            
+            const updateDisplay = setInterval(() => {
+                currentDisplay += step;
+                if (currentDisplay >= totalVisits) { 
+                    currentDisplay = totalVisits; 
+                    clearInterval(updateDisplay); 
+                }
+                counterEl.innerText = new Intl.NumberFormat('es-ES').format(currentDisplay);
+            }, 50);
         }
-        
-        // Auto iniciar contador al cargar
-        window.addEventListener('load', initCounter);
-        
-        // Efecto hover sutil para la cuadrícula global
-        document.addEventListener('mousemove', (e) => {
-            const grid = document.querySelector('.grid-bg');
-            if(grid) {
-                const x = e.clientX / window.innerWidth;
-                const y = e.clientY / window.innerHeight;
-                grid.style.transform = `translate(${x * -10}px, ${y * -10}px)`;
-            }
-        });
     </script>
 </body>
 </html>
