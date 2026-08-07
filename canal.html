@@ -15,10 +15,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        dark: '#020617', 
-                        card: '#0f172a', 
-                    },
+                    colors: { dark: '#020617', card: '#0f172a' },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -34,75 +31,30 @@
         }
     </script>
     <style>
-        body { 
-            background-color: #020617; 
-            color: #f8fafc; 
-            overflow-x: hidden;
-        }
+        body { background-color: #020617; color: #f8fafc; overflow-x: hidden; }
         
         .bg-grid {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background-size: 40px 40px;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            position: fixed; inset: 0; z-index: -1; background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
             mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
             -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
         }
 
-        .glow-blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.4;
-            z-index: -1;
-        }
-
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-        }
-        
+        .glow-blob { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.4; z-index: -1; }
+        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .news-card { 
-            animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
-            transition: all 0.3s ease;
-        }
-        .news-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255,255,255,0.15);
-            box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.3);
-        }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .news-card { animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; transition: all 0.3s ease; }
+        .news-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.15); box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.3); }
 
-        @keyframes heartBurst {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.4); }
-            100% { transform: scale(1); }
-        }
+        @keyframes heartBurst { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
         .heart-active i { animation: heartBurst 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         
-        .comments-section {
-            transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-        }
-        .comments-section.open {
-            max-height: 800px;
-            opacity: 1;
-            overflow-y: auto;
-        }
+        .comments-section { transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        .comments-section.open { max-height: 800px; opacity: 1; overflow-y: auto; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans antialiased relative">
@@ -122,20 +74,22 @@
                     </div>
                 </div>
                 <div>
-                    <h1 class="font-extrabold text-lg leading-tight tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">SlotSoftware</h1>
+                    <h1 class="font-extrabold text-lg leading-tight tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 flex items-center gap-2">
+                        SlotSoftware
+                        <span id="status-dot" class="flex h-2.5 w-2.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]" title="Conectando..."></span>
+                    </h1>
                     <p class="text-[10px] text-cyan-400 font-bold tracking-widest uppercase">Canal de Novedades</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-2 sm:gap-3">
-                <a href="https://slotsoftware.github.io/Web/" title="Visitar Web Principal" class="flex items-center gap-1.5 sm:gap-2 text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all text-slate-300 hover:text-white group shadow-lg hover:shadow-cyan-500/20">
+                <a href="https://slotsoftware.github.io/Web/" target="_self" title="Visitar Web Principal" class="flex items-center gap-1.5 sm:gap-2 text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all text-slate-300 hover:text-white group shadow-lg hover:shadow-cyan-500/20">
                     <i data-lucide="layout-dashboard" class="w-4 h-4 group-hover:text-cyan-400 transition-colors"></i>
                     <span class="hidden sm:inline">Web Oficial</span>
                 </a>
 
                 <div id="admin-badge" class="hidden items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-red-500/20 to-orange-500/20 text-red-400 rounded-full text-xs font-bold border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.3)]">
-                    <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
-                    ADMIN
+                    <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> ADMIN
                 </div>
             </div>
         </div>
@@ -150,24 +104,17 @@
                 <i data-lucide="radio" class="w-5 h-5 text-blue-400 animate-pulse"></i> Transmitir Novedad
             </h2>
             <form id="news-form" class="flex flex-col gap-4 relative z-10">
-                <div>
-                    <select id="news-category" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-medium">
-                        <option value="KRONO PERSONAL V.4 TV">KRONO PERSONAL V.4 TV</option>
-                        <option value="KRONO DUAL V.4 TV">KRONO DUAL V.4 TV</option>
-                        <option value="TRACKS TELEMETRY V.1.0">TRACKS TELEMETRY V.1.0</option>
-                        <option value="3D GAME ON LINE V.1.0">3D GAME ON LINE V.1.0</option>
-                        <option value="GENERAL">GENERAL</option>
-                    </select>
-                </div>
-                <div>
-                    <textarea id="news-text" rows="3" placeholder="Escribe el anuncio espectacular aquí..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all resize-none font-medium placeholder-slate-500" required></textarea>
-                </div>
-                <div>
-                    <input type="text" id="news-media" placeholder="URL de Imagen, Vídeo (.mp4) o YouTube (Opcional)" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-medium placeholder-slate-500">
-                </div>
-                <div>
-                    <input type="text" id="news-link" placeholder="Enlace a tu web (Opcional)" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-medium placeholder-slate-500">
-                </div>
+                <select id="news-category" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 transition-all font-medium">
+                    <option value="KRONO PERSONAL V.4 TV">KRONO PERSONAL V.4 TV</option>
+                    <option value="KRONO DUAL V.4 TV">KRONO DUAL V.4 TV</option>
+                    <option value="TRACKS TELEMETRY V.1.0">TRACKS TELEMETRY V.1.0</option>
+                    <option value="3D GAME ON LINE V.1.0">3D GAME ON LINE V.1.0</option>
+                    <option value="GENERAL">GENERAL</option>
+                </select>
+                <textarea id="news-text" rows="3" placeholder="Escribe el anuncio espectacular aquí..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 transition-all resize-none font-medium" required></textarea>
+                <input type="text" id="news-media" placeholder="URL de Imagen, Vídeo (.mp4) o YouTube (Opcional)" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 transition-all font-medium">
+                <input type="text" id="news-link" placeholder="Enlace a tu web (Opcional)" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 transition-all font-medium">
+                
                 <button type="submit" class="relative group overflow-hidden bg-slate-900 text-white font-bold py-3 rounded-xl transition-all border border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)]">
                     <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-80 group-hover:opacity-100 transition-opacity"></div>
                     <div class="relative flex justify-center items-center gap-2">
@@ -179,7 +126,7 @@
 
         <div class="overflow-x-auto hide-scrollbar -mx-4 px-4 pb-2 sticky top-20 z-40">
             <div class="flex gap-2 min-w-max p-1 bg-slate-900/50 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl" id="filters-container">
-                <button onclick="setFilter('KRONO PERSONAL V.4 TV')" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">Krono Personal</button>
+                <button onclick="setFilter('KRONO PERSONAL V.4 TV')" class="filter-btn active px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg transition-all">Krono Personal</button>
                 <button onclick="setFilter('KRONO DUAL V.4 TV')" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">Krono Dual</button>
                 <button onclick="setFilter('TRACKS TELEMETRY V.1.0')" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">Telemetry</button>
                 <button onclick="setFilter('3D GAME ON LINE V.1.0')" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">3D Game</button>
@@ -192,7 +139,7 @@
                     <div class="absolute inset-0 bg-cyan-500 blur-xl opacity-20 rounded-full animate-pulse"></div>
                     <i data-lucide="aperture" class="w-10 h-10 animate-spin relative z-10"></i>
                 </div>
-                <p class="text-sm font-bold mt-4 tracking-widest uppercase bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">Conectando...</p>
+                <p class="text-sm font-bold mt-4 tracking-widest uppercase bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">Conectando con la nube...</p>
             </div>
             
             <div id="empty-state" class="hidden flex-col items-center justify-center py-24 text-center px-6 animate-float">
@@ -200,22 +147,16 @@
                     <i data-lucide="satellite" class="w-10 h-10 text-slate-500"></i>
                 </div>
                 <h3 class="text-xl font-bold text-white mb-2 tracking-tight">Pista Despejada</h3>
-                <p class="text-slate-400 text-sm max-w-xs">Aún no hay transmisiones. ¡Sé el primero en lanzar una!</p>
+                <p class="text-slate-400 text-sm max-w-xs">No hay transmisiones en esta categoría todavía.</p>
             </div>
         </div>
     </main>
 
     <div id="nickname-modal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)] transform transition-all">
-            <div class="flex justify-center mb-4">
-                <div class="w-16 h-16 bg-gradient-to-tr from-blue-600 to-cyan-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white/10">
-                    <i data-lucide="user-plus" class="w-8 h-8 text-white"></i>
-                </div>
-            </div>
             <h3 class="text-xl font-bold text-center text-white mb-2">Identificación de Piloto</h3>
-            <p class="text-sm text-slate-400 text-center mb-6">Dinos cómo te llamas para poder comentar.</p>
             <form id="nickname-form" class="flex flex-col gap-4">
-                <input type="text" id="nickname-input" placeholder="Ej: KronoRacer" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg font-bold text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" required maxlength="20">
+                <input type="text" id="nickname-input" placeholder="Ej: KronoRacer" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg font-bold text-white focus:outline-none focus:border-cyan-500" required maxlength="20">
                 <div class="flex gap-3 mt-2">
                     <button type="button" onclick="closeNicknameModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-all">Cancelar</button>
                     <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-cyan-500/20">Guardar</button>
@@ -226,13 +167,8 @@
 
     <div id="confirm-modal" class="fixed inset-0 z-[300] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.2)] transform transition-all text-center">
-            <div class="flex justify-center mb-4">
-                <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center border-2 border-red-500/30">
-                    <i data-lucide="alert-triangle" class="w-8 h-8 text-red-500"></i>
-                </div>
-            </div>
             <h3 class="text-xl font-bold text-white mb-2">¿Confirmar Borrado?</h3>
-            <p class="text-sm text-slate-400 mb-6">Esta acción es permanente.</p>
+            <p class="text-sm text-slate-400 mb-6">Esta acción borrará la noticia de internet para todos.</p>
             <div class="flex gap-3 mt-2">
                 <button id="btn-cancel-delete" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-all">Cancelar</button>
                 <button id="btn-confirm-delete" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-red-500/20">Borrar</button>
@@ -247,31 +183,39 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        let allNews = JSON.parse(localStorage.getItem('slot_news_backup')) || [];
-        let currentFilter = 'ALL';
+        // === TU CONFIGURACIÓN MÁGICA DE FIREBASE ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyD42jUfZAHQxgB_sufnWFjpNbkyxeQq640",
+            authDomain: "slotsoftware-98893.firebaseapp.com",
+            projectId: "slotsoftware-98893",
+            storageBucket: "slotsoftware-98893.firebasestorage.app",
+            messagingSenderId: "758147068859",
+            appId: "1:758147068859:web:471b9bd137d2b0baedca9e",
+            measurementId: "G-QP0Y1GEXCC"
+        };
+        // ============================================
+
+        let allNews = [];
+        let currentFilter = 'KRONO PERSONAL V.4 TV';
         let isAdmin = false;
         let db = null;
         let auth = null;
-        let appId = typeof __app_id !== 'undefined' ? __app_id : 'slotsoftware-news';
         let currentUserUid = null;
         let userNickname = localStorage.getItem('slot_nickname') || null; 
         let pendingCommentNewsId = null; 
         let openComments = new Set(); 
         let pendingDeleteAction = null;
 
-        function enableAdmin() {
+        // Comprobar si somos administradores con la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('admin') === 'krono') {
             isAdmin = true;
             document.getElementById('admin-panel').classList.remove('hidden');
             document.getElementById('admin-badge').classList.remove('hidden');
             document.getElementById('admin-badge').classList.add('flex');
-        }
-
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('admin') === 'krono') {
-            enableAdmin();
         }
 
         window.showToast = function(message, type = 'success') {
@@ -308,8 +252,24 @@
 
         window.setFilter = function(category) {
             currentFilter = category;
+            
+            // ACTUALIZAR BOTONES - ¡ESTA ES LA CORRECCIÓN EXACTA QUE PEDÍAS!
             document.querySelectorAll('.filter-btn').forEach(btn => {
-                if (btn.innerText.toUpperCase().includes(category)) {
+                let buttonText = btn.innerText.toUpperCase();
+                let isMatch = false;
+
+                // Ahora busca coincidencia exacta, no se confundirán
+                if (category === 'KRONO PERSONAL V.4 TV' && buttonText === 'KRONO PERSONAL') {
+                    isMatch = true;
+                } else if (category === 'KRONO DUAL V.4 TV' && buttonText === 'KRONO DUAL') {
+                    isMatch = true;
+                } else if (category === 'TRACKS TELEMETRY V.1.0' && buttonText === 'TELEMETRY') {
+                    isMatch = true;
+                } else if (category === '3D GAME ON LINE V.1.0' && buttonText === '3D GAME') {
+                    isMatch = true;
+                }
+
+                if (isMatch) {
                     btn.className = 'filter-btn active px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg transition-all';
                 } else {
                     btn.className = 'filter-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all';
@@ -344,7 +304,7 @@
             const existingCards = container.querySelectorAll('.news-card-el');
             existingCards.forEach(card => card.remove());
 
-            let filteredNews = currentFilter === 'ALL' ? allNews : allNews.filter(n => n.category === currentFilter);
+            let filteredNews = allNews.filter(n => n.category === currentFilter);
 
             if (filteredNews.length === 0) {
                 if(emptyState) emptyState.style.display = 'flex';
@@ -383,7 +343,7 @@
 
                 if (news.mediaUrl) {
                     const mediaContainer = document.createElement('div');
-                    mediaContainer.className = 'relative mt-2 rounded-xl overflow-hidden border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] group cursor-pointer bg-slate-900';
+                    mediaContainer.className = 'relative mt-2 rounded-xl overflow-hidden border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] group bg-slate-900';
                     const ytMatch = news.mediaUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
                     const videoMatch = news.mediaUrl.match(/\.(mp4|webm|ogg)$/i);
                     
@@ -394,7 +354,7 @@
                     } else {
                         const img = document.createElement('img');
                         img.src = news.mediaUrl;
-                        img.className = 'w-full h-auto object-cover max-h-80 transition-transform duration-700 group-hover:scale-105';
+                        img.className = 'w-full h-auto object-cover max-h-80 transition-transform duration-700 group-hover:scale-105 cursor-pointer';
                         mediaContainer.appendChild(img);
                     }
                     card.appendChild(mediaContainer);
@@ -433,7 +393,7 @@
                 if (news.link) {
                     const linkBtn = document.createElement('a');
                     linkBtn.href = news.link;
-                    linkBtn.target = '_blank';
+                    linkBtn.target = '_self';
                     linkBtn.className = 'inline-flex items-center gap-2 text-sm font-bold text-white px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 transition-colors';
                     linkBtn.innerHTML = `Ver <i data-lucide="external-link" class="w-4 h-4"></i>`;
                     rightActions.appendChild(linkBtn);
@@ -476,16 +436,16 @@
                     const input = commentForm.querySelector('input');
                     if(!input.value.trim()) return;
                     submitComment(news.id, input.value.trim());
+                    input.value = '';
                 };
                 commentForm.innerHTML = `
-                    <input type="text" placeholder="Escribe tu mensaje en la pista..." class="flex-grow bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:border-cyan-500 outline-none transition-all focus:ring-1 focus:ring-cyan-500">
+                    <input type="text" placeholder="Escribe tu mensaje..." class="flex-grow bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:border-cyan-500 outline-none transition-all focus:ring-1 focus:ring-cyan-500">
                     <button type="submit" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-2 rounded-xl transition-all shadow-lg"><i data-lucide="send" class="w-4 h-4"></i></button>
                 `;
                 commentsInner.appendChild(commentForm);
                 commentsSection.appendChild(commentsInner);
                 
                 card.appendChild(commentsSection);
-
                 container.appendChild(card);
             });
 
@@ -494,10 +454,9 @@
 
         document.getElementById('news-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!isAdmin) return;
+            if (!isAdmin || !db) return;
 
             const newPost = {
-                id: 'temp-' + Date.now(), 
                 category: document.getElementById('news-category').value,
                 text: document.getElementById('news-text').value,
                 mediaUrl: document.getElementById('news-media').value.trim(),
@@ -507,57 +466,46 @@
                 comments: []
             };
 
-            allNews.unshift(newPost);
-            localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
-            
-            setFilter('ALL'); 
-            renderNews(); 
-            
-            document.getElementById('news-form').reset(); 
-            showToast("¡NOVEDAD EN PISTA!");
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> ENVIANDO A LA NUBE...';
+            lucide.createIcons();
 
-            if (db) {
-                try {
-                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
-                    const postToSave = { ...newPost };
-                    delete postToSave.id; 
-                    await addDoc(colRef, postToSave);
-                } catch (error) {
-                    console.error("Modo Offline: Guardado localmente.");
-                }
+            try {
+                // Guarda directamente en tu nube "novedades"
+                await addDoc(collection(db, 'novedades'), newPost);
+                
+                document.getElementById('news-form').reset(); 
+                showToast("¡NOVEDAD EN PISTA!");
+                setFilter(newPost.category);
+            } catch (error) {
+                console.error("Error al guardar: ", error);
+                showToast("Error. Revisa los permisos de Firebase", "error");
+            } finally {
+                btn.innerHTML = '<div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-80 group-hover:opacity-100 transition-opacity"></div><div class="relative flex justify-center items-center gap-2"><i data-lucide="zap" class="w-5 h-5 text-yellow-300"></i> FORZAR ENVÍO A PISTA</div>';
+                lucide.createIcons();
             }
         });
 
         window.deleteNewsItem = function(docId) {
             askConfirmDialog(async () => {
-                allNews = allNews.filter(n => String(n.id) !== String(docId));
-                localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
-                renderNews(); 
-                if (db && !docId.toString().startsWith('temp-')) {
+                if (db) {
                     try {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId)));
-                    } catch (e) {}
+                        await deleteDoc(doc(db, 'novedades', String(docId)));
+                        showToast("Novedad borrada para todos");
+                    } catch (e) {
+                        showToast("Error al borrar", "error");
+                    }
                 }
             });
         };
 
         window.toggleLike = async function(docId, currentlyLiked) {
-            const uid = currentUserUid || 'local';
-            const newsItem = allNews.find(n => String(n.id) === String(docId));
-            if (newsItem) {
-                if (!newsItem.likedBy) newsItem.likedBy = [];
-                if (currentlyLiked) newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
-                else newsItem.likedBy.push(uid);
-                localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
-                renderNews();
-            }
-            if (db && !docId.toString().startsWith('temp-')) {
-                try {
-                    const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(docId));
-                    if (currentlyLiked) await updateDoc(postRef, { likedBy: arrayRemove(uid) });
-                    else await updateDoc(postRef, { likedBy: arrayUnion(uid) });
-                } catch(e) {}
-            }
+            if (!db || !currentUserUid) return;
+            try {
+                const postRef = doc(db, 'novedades', String(docId));
+                if (currentlyLiked) await updateDoc(postRef, { likedBy: arrayRemove(currentUserUid) });
+                else await updateDoc(postRef, { likedBy: arrayUnion(currentUserUid) });
+            } catch(e) {}
         };
 
         window.closeNicknameModal = function() {
@@ -587,78 +535,56 @@
         };
 
         window.executeComment = async function(newsId, text) {
-            const newsItem = allNews.find(n => String(n.id) === String(newsId));
-            if (newsItem) {
-                if (!newsItem.comments) newsItem.comments = [];
+            if (!db) return;
+            try {
                 const newComment = { author: userNickname, text: text, timestamp: Date.now() };
-                newsItem.comments.push(newComment);
-                
-                localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
+                const postRef = doc(db, 'novedades', String(newsId));
+                await updateDoc(postRef, { comments: arrayUnion(newComment) });
                 openComments.add(newsId);
-                renderNews();
-
-                if (db && !String(newsId).startsWith('temp-')) {
-                    try {
-                        const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'news_feed', String(newsId));
-                        await updateDoc(postRef, { comments: arrayUnion(newComment) });
-                    } catch(e) { console.error("Error offline"); }
-                }
+                showToast("Comentario publicado");
+            } catch(e) { 
+                showToast("Error al comentar", "error"); 
             }
         };
 
         async function initApp() {
-            const loading = document.getElementById('loading-state');
-            if (loading) loading.style.display = 'none';
-
             try {
-                // 🪄 MAGIA APLICADA AQUÍ: Configuración automática de la nube integrada
-                const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-                const firebaseConfig = JSON.parse(configStr);
-                
-                if (!firebaseConfig.projectId) {
-                    console.log("Modo local de emergencia activado.");
-                    renderNews();
-                    return;
-                }
-
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Iniciar sesión de forma invisible y segura
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // Autenticar anónimamente a los visitantes para que puedan leer y dar "likes"
+                await signInAnonymously(auth);
 
                 onAuthStateChanged(auth, (user) => {
-                    if (!user) return; // Seguridad
-                    
-                    currentUserUid = user.uid;
-                    // Ruta correcta y obligatoria para la nube
-                    const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed'); 
-                    
-                    onSnapshot(newsRef, (snapshot) => {
-                        const fetchedNews = [];
-                        snapshot.forEach((docSnap) => {
-                            fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
+                    if (user) {
+                        currentUserUid = user.uid;
+                        
+                        // Escuchar en tiempo real los cambios en tu nube "novedades"
+                        const newsRef = collection(db, 'novedades');
+                        onSnapshot(newsRef, (snapshot) => {
+                            const fetchedNews = [];
+                            snapshot.forEach((docSnap) => {
+                                fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
+                            });
+                            
+                            // Ordenar de más nuevo a más viejo
+                            fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
+                            allNews = fetchedNews;
+                            
+                            // Puntito en verde = Todo funciona!
+                            document.getElementById('status-dot').className = "flex h-2.5 w-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]";
+                            document.getElementById('status-dot').title = "Base de datos conectada correctamente";
+                            
+                            renderNews(); 
                         });
-                        
-                        // Ordenar de más nuevo a más antiguo
-                        fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
-                        allNews = fetchedNews;
-                        
-                        // Guardar copia de seguridad en el dispositivo
-                        localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
-                        renderNews(); 
-                    }, (error) => {
-                        console.error("Error al escuchar novedades:", error);
-                    });
+                    }
                 });
+
             } catch (error) {
-                console.warn("Fallo al conectar con la nube. Entrando en modo local.", error);
-                renderNews();
+                console.error("Fallo al conectar con Firebase.", error);
+                document.getElementById('status-dot').className = "flex h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]";
+                document.getElementById('status-dot').title = "Error de conexión";
             }
         }
 
