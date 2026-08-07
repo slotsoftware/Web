@@ -611,11 +611,12 @@
             if (loading) loading.style.display = 'none';
 
             try {
+                // 🪄 MAGIA APLICADA AQUÍ: Configuración automática de la nube integrada
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
                 const firebaseConfig = JSON.parse(configStr);
                 
                 if (!firebaseConfig.projectId) {
-                    console.log("Iniciando en modo local (sin Firebase configurado)");
+                    console.log("Modo local de emergencia activado.");
                     renderNews();
                     return;
                 }
@@ -624,6 +625,7 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
+                // Iniciar sesión de forma invisible y segura
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
@@ -631,23 +633,31 @@
                 }
 
                 onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        currentUserUid = user.uid;
-                        const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed');
-                        onSnapshot(newsRef, (snapshot) => {
-                            const fetchedNews = [];
-                            snapshot.forEach((docSnap) => {
-                                fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
-                            });
-                            fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
-                            allNews = fetchedNews;
-                            localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
-                            renderNews(); 
+                    if (!user) return; // Seguridad
+                    
+                    currentUserUid = user.uid;
+                    // Ruta correcta y obligatoria para la nube
+                    const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'news_feed'); 
+                    
+                    onSnapshot(newsRef, (snapshot) => {
+                        const fetchedNews = [];
+                        snapshot.forEach((docSnap) => {
+                            fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
                         });
-                    }
+                        
+                        // Ordenar de más nuevo a más antiguo
+                        fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
+                        allNews = fetchedNews;
+                        
+                        // Guardar copia de seguridad en el dispositivo
+                        localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
+                        renderNews(); 
+                    }, (error) => {
+                        console.error("Error al escuchar novedades:", error);
+                    });
                 });
             } catch (error) {
-                console.warn("Fallo al conectar con Firebase. Entrando en modo Offline.", error);
+                console.warn("Fallo al conectar con la nube. Entrando en modo local.", error);
                 renderNews();
             }
         }
