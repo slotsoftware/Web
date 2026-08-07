@@ -577,14 +577,30 @@
                             document.getElementById('status-dot').title = "Base de datos conectada correctamente";
                             
                             renderNews(); 
+                        }, (error) => {
+                            // Si Firestore bloquea la lectura
+                            console.error("Error al leer la base de datos:", error);
+                            document.getElementById('status-dot').className = "flex h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]";
+                            document.getElementById('status-dot').title = "Error de base de datos";
+                            
+                            const loadingState = document.getElementById('loading-state');
+                            if (loadingState) loadingState.style.display = 'none';
+                            renderNews();
                         });
                     }
                 });
 
             } catch (error) {
+                // Si falla el acceso anónimo, quitamos la ruleta y avisamos
                 console.error("Fallo al conectar con Firebase.", error);
                 document.getElementById('status-dot').className = "flex h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]";
-                document.getElementById('status-dot').title = "Error de conexión";
+                document.getElementById('status-dot').title = "Falta activar 'Anónimo' en Autenticación";
+                
+                const loadingState = document.getElementById('loading-state');
+                if (loadingState) loadingState.style.display = 'none';
+                
+                showToast("Error. Activa el acceso Anónimo en Firebase", "error");
+                renderNews();
             }
         }
 
