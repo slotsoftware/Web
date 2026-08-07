@@ -106,6 +106,7 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans antialiased relative">
+
     <div class="bg-grid"></div>
     <div class="glow-blob bg-blue-600 w-96 h-96 top-[-10%] left-[-10%] animate-pulse-slow"></div>
     <div class="glow-blob bg-purple-600 w-80 h-80 top-[40%] right-[-10%] animate-pulse-slow" style="animation-delay: 2s;"></div>
@@ -180,6 +181,7 @@
                 </button>
             </form>
         </div>
+
         <div class="overflow-x-auto hide-scrollbar -mx-4 px-4 pb-2 sticky top-20 z-40">
             <div class="flex gap-2 min-w-max p-1 bg-slate-900/50 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl" id="filters-container">
                 <button onclick="setFilter('ALL')" class="filter-btn active px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg transition-all">Explorar Todo</button>
@@ -208,6 +210,7 @@
             </div>
         </div>
     </main>
+
     <div id="nickname-modal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)] transform transition-all">
             <div class="flex justify-center mb-4">
@@ -247,6 +250,7 @@
         <i id="toast-icon" data-lucide="info" class="w-5 h-5"></i>
         <span id="toast-msg">Mensaje</span>
     </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -255,7 +259,8 @@
         // Carga de almacenamiento local como red de seguridad
         let allNews = JSON.parse(localStorage.getItem('slot_news_backup')) || [];
         let currentFilter = 'ALL';
-        let isAdmin = localStorage.getItem('slot_admin') === 'true';
+        // Inicializar leyendo del localStorage para persistencia
+        let isAdmin = localStorage.getItem('slot_admin') === 'true'; 
         let db = null;
         let auth = null;
         let appId = typeof __app_id !== 'undefined' ? __app_id : 'slotsoftware-news';
@@ -268,22 +273,16 @@
         // --- SISTEMA DE ADMINISTRADOR ---
         function enableAdmin() {
             isAdmin = true;
-            localStorage.setItem('slot_admin', 'true'); // Guardar sesión para siempre
+            localStorage.setItem('slot_admin', 'true'); // Guardar sesión de admin para siempre
             document.getElementById('admin-panel').classList.remove('hidden');
             document.getElementById('admin-badge').classList.remove('hidden');
             document.getElementById('admin-badge').classList.add('flex');
             
-            // Ocultamos el botón del candado
+            // Ocultamos el botón del candado si ya eres admin
             const loginBtn = document.getElementById('login-btn');
             if(loginBtn) loginBtn.classList.add('hidden');
             
             renderNews(); // Refrescar para mostrar los botones de borrar
-        }
-
-        // Mantenemos el truco de la URL por si acaso, pero priorizamos si ya eres admin guardado
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('admin') === 'krono' || isAdmin) {
-            enableAdmin();
         }
 
         // Lógica al pulsar el botón del candado
@@ -298,6 +297,12 @@
                     showToast("Contraseña incorrecta", "error");
                 }
             });
+        }
+
+        // Recuperar sesión si ya eras admin o si se usa el parámetro en URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('admin') === 'krono' || isAdmin) {
+            enableAdmin();
         }
 
         // --- FUNCIONES AUXILIARES ---
@@ -361,6 +366,7 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Renderizado principal de tarjetas y media ---
         window.renderNews = function() {
             const container = document.getElementById('feed-container');
             const loadingState = document.getElementById('loading-state');
@@ -413,8 +419,8 @@
                     const mediaContainer = document.createElement('div');
                     mediaContainer.className = 'relative mt-2 rounded-xl overflow-hidden border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] group cursor-pointer bg-slate-900';
                     
-                    // Regex patterns
-                    const ytMatch = news.mediaUrl.match(/(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})(?:\S+)?/i);
+                    // Regex patterns actualizados para incluir YouTube Shorts
+                    const ytMatch = news.mediaUrl.match(/(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})(?:\S+)?/i);
                     const videoMatch = news.mediaUrl.match(/\.(mp4|webm|ogg)$/i);
                     const imageMatch = news.mediaUrl.match(/\.(jpeg|jpg|gif|png|webp|avif)$/i);
                     
@@ -428,7 +434,7 @@
                         img.className = 'w-full h-auto object-cover max-h-80 transition-transform duration-700 group-hover:scale-105';
                         mediaContainer.appendChild(img);
                     } else {
-                        // Fallback attempt to load as an image if it doesn't match standard extensions
+                        // Fallback attempt to load as an image
                         const img = document.createElement('img');
                         img.src = news.mediaUrl;
                         img.className = 'w-full h-auto object-cover max-h-80 transition-transform duration-700 group-hover:scale-105';
@@ -532,6 +538,7 @@
             lucide.createIcons();
         }
 
+        // --- STREAMING_CHUNK:Lógica de creación de novedades ---
         document.getElementById('news-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isAdmin) return;
@@ -569,6 +576,7 @@
             }
         });
 
+        // --- STREAMING_CHUNK:Eliminación e interacciones ---
         window.deleteNewsItem = function(docId) {
             askConfirmDialog(async () => {
                 allNews = allNews.filter(n => String(n.id) !== String(docId));
@@ -647,6 +655,7 @@
             }
         };
 
+        // --- STREAMING_CHUNK:Inicialización segura de Firebase (con corrección de Snapshot) ---
         async function initApp() {
             // Fuerza la eliminación del mensaje "Conectando..." inmediatamente
             const loading = document.getElementById('loading-state');
@@ -682,8 +691,14 @@
                             snapshot.forEach((docSnap) => {
                                 fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
                             });
-                            fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
-                            allNews = fetchedNews;
+                            
+                            // SOLUCIÓN: Mantener publicaciones locales pendientes para que no desaparezcan
+                            const localTempNews = allNews.filter(n => String(n.id).startsWith('temp-'));
+                            const combinedNews = [...fetchedNews, ...localTempNews];
+                            
+                            combinedNews.sort((a, b) => b.timestamp - a.timestamp);
+                            allNews = combinedNews;
+                            
                             // Sincronizar el backup local con lo que llega de Firebase
                             localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
                             renderNews(); 
