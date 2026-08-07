@@ -179,7 +179,6 @@
 
         <div class="overflow-x-auto hide-scrollbar -mx-4 px-4 pb-2 sticky top-20 z-40">
             <div class="flex gap-2 min-w-max p-1 bg-slate-900/50 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl" id="filters-container">
-                <button onclick="setFilter('ALL')" class="filter-btn active px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg transition-all">Explorar Todo</button>
                 <button onclick="setFilter('KRONO PERSONAL V.4 TV')" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">Krono Personal</button>
                 <button onclick="setFilter('KRONO DUAL V.4 TV')" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">Krono Dual</button>
                 <button onclick="setFilter('TRACKS TELEMETRY V.1.0')" class="filter-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all">Telemetry</button>
@@ -251,7 +250,6 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Carga de almacenamiento local como red de seguridad
         let allNews = JSON.parse(localStorage.getItem('slot_news_backup')) || [];
         let currentFilter = 'ALL';
         let isAdmin = false;
@@ -264,7 +262,6 @@
         let openComments = new Set(); 
         let pendingDeleteAction = null;
 
-        // --- SISTEMA DE ADMINISTRADOR ---
         function enableAdmin() {
             isAdmin = true;
             document.getElementById('admin-panel').classList.remove('hidden');
@@ -277,7 +274,6 @@
             enableAdmin();
         }
 
-        // --- FUNCIONES AUXILIARES ---
         window.showToast = function(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
@@ -313,7 +309,7 @@
         window.setFilter = function(category) {
             currentFilter = category;
             document.querySelectorAll('.filter-btn').forEach(btn => {
-                if (btn.innerText.toUpperCase() === category || (category === 'ALL' && btn.innerText === 'Explorar Todo')) {
+                if (btn.innerText.toUpperCase().includes(category)) {
                     btn.className = 'filter-btn active px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg transition-all';
                 } else {
                     btn.className = 'filter-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-all';
@@ -338,13 +334,11 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Lógica principal de renderizado y chat ---
         window.renderNews = function() {
             const container = document.getElementById('feed-container');
             const loadingState = document.getElementById('loading-state');
             const emptyState = document.getElementById('empty-state');
             
-            // Ocultar mensaje de "Conectando..." siempre que se renderice
             if(loadingState) loadingState.style.display = 'none';
 
             const existingCards = container.querySelectorAll('.news-card-el');
@@ -406,7 +400,6 @@
                     card.appendChild(mediaContainer);
                 }
 
-                // --- BOTONES: LIKE Y CHAT ---
                 const bottomBar = document.createElement('div');
                 bottomBar.className = 'flex flex-wrap justify-between items-center mt-2 pt-4 border-t border-white/5 gap-3';
                 const leftActions = document.createElement('div');
@@ -434,7 +427,6 @@
 
                 bottomBar.appendChild(leftActions);
 
-                // --- BOTONES: ENLACE Y BORRAR ---
                 const rightActions = document.createElement('div');
                 rightActions.className = 'flex gap-2 ml-auto';
 
@@ -458,7 +450,6 @@
                 if(rightActions.childNodes.length > 0) bottomBar.appendChild(rightActions);
                 card.appendChild(bottomBar);
 
-                // --- SECCIÓN DEL CHAT Y COMENTARIOS ---
                 const commentsSection = document.createElement('div');
                 commentsSection.className = `comments-section mt-2 ${openComments.has(news.id) ? 'open' : ''}`;
                 
@@ -501,7 +492,6 @@
             lucide.createIcons();
         }
 
-        // --- STREAMING_CHUNK:Lógica de Forzado y Chat ---
         document.getElementById('news-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isAdmin) return;
@@ -517,7 +507,6 @@
                 comments: []
             };
 
-            // Inyectamos a la lista y actualizamos el almacenamiento local inmediatamente
             allNews.unshift(newPost);
             localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
             
@@ -542,7 +531,7 @@
         window.deleteNewsItem = function(docId) {
             askConfirmDialog(async () => {
                 allNews = allNews.filter(n => String(n.id) !== String(docId));
-                localStorage.setItem('slot_news_backup', JSON.stringify(allNews)); // Guardar cambio en local
+                localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
                 renderNews(); 
                 if (db && !docId.toString().startsWith('temp-')) {
                     try {
@@ -559,7 +548,7 @@
                 if (!newsItem.likedBy) newsItem.likedBy = [];
                 if (currentlyLiked) newsItem.likedBy = newsItem.likedBy.filter(id => id !== uid);
                 else newsItem.likedBy.push(uid);
-                localStorage.setItem('slot_news_backup', JSON.stringify(allNews)); // Guardar cambio
+                localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
                 renderNews();
             }
             if (db && !docId.toString().startsWith('temp-')) {
@@ -604,7 +593,7 @@
                 const newComment = { author: userNickname, text: text, timestamp: Date.now() };
                 newsItem.comments.push(newComment);
                 
-                localStorage.setItem('slot_news_backup', JSON.stringify(allNews)); // ¡Crítico para que no se borre el chat!
+                localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
                 openComments.add(newsId);
                 renderNews();
 
@@ -617,9 +606,7 @@
             }
         };
 
-        // --- STREAMING_CHUNK:Inicialización segura de Firebase ---
         async function initApp() {
-            // Fuerza la eliminación del mensaje "Conectando..." inmediatamente
             const loading = document.getElementById('loading-state');
             if (loading) loading.style.display = 'none';
 
@@ -627,7 +614,6 @@
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
                 const firebaseConfig = JSON.parse(configStr);
                 
-                // Si no hay configuración válida, saltamos directamente al modo local
                 if (!firebaseConfig.projectId) {
                     console.log("Iniciando en modo local (sin Firebase configurado)");
                     renderNews();
@@ -655,7 +641,6 @@
                             });
                             fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
                             allNews = fetchedNews;
-                            // Sincronizar el backup local con lo que llega de Firebase
                             localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
                             renderNews(); 
                         });
@@ -663,11 +648,10 @@
                 });
             } catch (error) {
                 console.warn("Fallo al conectar con Firebase. Entrando en modo Offline.", error);
-                renderNews(); // Si hay cualquier fallo, fuerza a cargar la app local
+                renderNews();
             }
         }
 
-        // Ejecutar inicialización y renderizar iconos base
         initApp();
         lucide.createIcons();
     </script>
