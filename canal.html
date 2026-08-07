@@ -133,11 +133,6 @@
                     <span class="hidden sm:inline">Web Oficial</span>
                 </a>
 
-                <!-- Botón de Candado para acceso rápido -->
-                <button id="login-btn" title="Acceso Admin" class="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-cyan-400 transition-colors shadow-lg">
-                    <i data-lucide="lock" class="w-4 h-4"></i>
-                </button>
-
                 <div id="admin-badge" class="hidden items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-red-500/20 to-orange-500/20 text-red-400 rounded-full text-xs font-bold border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.3)]">
                     <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
                     ADMIN
@@ -259,8 +254,7 @@
         // Carga de almacenamiento local como red de seguridad
         let allNews = JSON.parse(localStorage.getItem('slot_news_backup')) || [];
         let currentFilter = 'ALL';
-        // Inicializar leyendo del localStorage para persistencia
-        let isAdmin = localStorage.getItem('slot_admin') === 'true'; 
+        let isAdmin = false;
         let db = null;
         let auth = null;
         let appId = typeof __app_id !== 'undefined' ? __app_id : 'slotsoftware-news';
@@ -273,35 +267,13 @@
         // --- SISTEMA DE ADMINISTRADOR ---
         function enableAdmin() {
             isAdmin = true;
-            localStorage.setItem('slot_admin', 'true'); // Guardar sesión de admin para siempre
             document.getElementById('admin-panel').classList.remove('hidden');
             document.getElementById('admin-badge').classList.remove('hidden');
             document.getElementById('admin-badge').classList.add('flex');
-            
-            // Ocultamos el botón del candado si ya eres admin
-            const loginBtn = document.getElementById('login-btn');
-            if(loginBtn) loginBtn.classList.add('hidden');
-            
-            renderNews(); // Refrescar para mostrar los botones de borrar
         }
 
-        // Lógica al pulsar el botón del candado
-        const loginBtn = document.getElementById('login-btn');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', () => {
-                const pwd = prompt("Contraseña de acceso a Pista:");
-                if (pwd === 'krono') { 
-                    enableAdmin();
-                    showToast("¡Panel de Control Desbloqueado!");
-                } else if (pwd !== null) {
-                    showToast("Contraseña incorrecta", "error");
-                }
-            });
-        }
-
-        // Recuperar sesión si ya eras admin o si se usa el parámetro en URL
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('admin') === 'krono' || isAdmin) {
+        if (urlParams.get('admin') === 'krono') {
             enableAdmin();
         }
 
@@ -366,7 +338,7 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Renderizado principal de tarjetas y media ---
+        // --- STREAMING_CHUNK:Lógica principal de renderizado y chat ---
         window.renderNews = function() {
             const container = document.getElementById('feed-container');
             const loadingState = document.getElementById('loading-state');
@@ -418,23 +390,14 @@
                 if (news.mediaUrl) {
                     const mediaContainer = document.createElement('div');
                     mediaContainer.className = 'relative mt-2 rounded-xl overflow-hidden border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] group cursor-pointer bg-slate-900';
-                    
-                    // Regex patterns actualizados para incluir YouTube Shorts
-                    const ytMatch = news.mediaUrl.match(/(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})(?:\S+)?/i);
+                    const ytMatch = news.mediaUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
                     const videoMatch = news.mediaUrl.match(/\.(mp4|webm|ogg)$/i);
-                    const imageMatch = news.mediaUrl.match(/\.(jpeg|jpg|gif|png|webp|avif)$/i);
                     
                     if (ytMatch && ytMatch[1]) {
                         mediaContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytMatch[1]}" class="w-full aspect-video" allowfullscreen frameborder="0"></iframe>`;
                     } else if (videoMatch) {
                         mediaContainer.innerHTML = `<video src="${news.mediaUrl}" class="w-full aspect-video object-cover" controls preload="metadata"></video>`;
-                    } else if (imageMatch) {
-                        const img = document.createElement('img');
-                        img.src = news.mediaUrl;
-                        img.className = 'w-full h-auto object-cover max-h-80 transition-transform duration-700 group-hover:scale-105';
-                        mediaContainer.appendChild(img);
                     } else {
-                        // Fallback attempt to load as an image
                         const img = document.createElement('img');
                         img.src = news.mediaUrl;
                         img.className = 'w-full h-auto object-cover max-h-80 transition-transform duration-700 group-hover:scale-105';
@@ -538,7 +501,7 @@
             lucide.createIcons();
         }
 
-        // --- STREAMING_CHUNK:Lógica de creación de novedades ---
+        // --- STREAMING_CHUNK:Lógica de Forzado y Chat ---
         document.getElementById('news-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isAdmin) return;
@@ -576,7 +539,6 @@
             }
         });
 
-        // --- STREAMING_CHUNK:Eliminación e interacciones ---
         window.deleteNewsItem = function(docId) {
             askConfirmDialog(async () => {
                 allNews = allNews.filter(n => String(n.id) !== String(docId));
@@ -655,7 +617,7 @@
             }
         };
 
-        // --- STREAMING_CHUNK:Inicialización segura de Firebase (con corrección de Snapshot) ---
+        // --- STREAMING_CHUNK:Inicialización segura de Firebase ---
         async function initApp() {
             // Fuerza la eliminación del mensaje "Conectando..." inmediatamente
             const loading = document.getElementById('loading-state');
@@ -691,14 +653,8 @@
                             snapshot.forEach((docSnap) => {
                                 fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
                             });
-                            
-                            // SOLUCIÓN: Mantener publicaciones locales pendientes para que no desaparezcan
-                            const localTempNews = allNews.filter(n => String(n.id).startsWith('temp-'));
-                            const combinedNews = [...fetchedNews, ...localTempNews];
-                            
-                            combinedNews.sort((a, b) => b.timestamp - a.timestamp);
-                            allNews = combinedNews;
-                            
+                            fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
+                            allNews = fetchedNews;
                             // Sincronizar el backup local con lo que llega de Firebase
                             localStorage.setItem('slot_news_backup', JSON.stringify(allNews));
                             renderNews(); 
