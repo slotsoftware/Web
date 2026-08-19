@@ -42,6 +42,7 @@
             }
         }
     </script>
+    
     <style>
         :root {
             --cyan: #00e5ff;
@@ -74,7 +75,7 @@
         /* Título de fondo sobre la galaxia */
         #bg-title {
             position: absolute;
-            top: 25%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: clamp(2.5rem, 8vw, 7rem);
@@ -114,7 +115,7 @@
             background: rgba(0, 102, 255, 0.2); border-color: var(--cyan);
             box-shadow: 0 0 30px rgba(0, 229, 255, 0.4) inset, 0 0 20px rgba(0, 102, 255, 0.6); text-shadow: 0 0 10px var(--cyan);
         }
-
+        
         /* Nav Sup */
         .top-nav {
             position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px;
@@ -253,7 +254,6 @@
     </div>
 
     <div id="ui-layer">
-        
         <div class="top-nav">
             <div class="flex items-center gap-4">
                 <button onclick="toggleLanguage(); playDigitalChime(true);" class="text-cyan-neon/60 hover:text-cyan-neon font-bold text-xs tracking-widest transition-colors pointer-events-auto bg-black/40 px-2 py-1 rounded">
@@ -269,7 +269,7 @@
             <div>STATUS // OPERACIONAL</div>
         </div>
 
-        <!-- Terminal Menú -->
+        <!-- Terminal Menú Constelaciones -->
         <div id="panel-menu" class="menu-modal">
             <h2 class="menu-titulo">
                 <span id="menu-title-text">MÓDULO</span>
@@ -300,7 +300,7 @@
         </div>
     </div>
 
-    <!-- Contacto Form -->
+    <!-- Contacto Form Modal -->
     <div id="contact-modal" class="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md overflow-y-auto opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4">
         <div class="glass-modal w-full max-w-xl p-8 relative" id="contact-modal-content">
             <div class="border-b border-cyan-neon/30 pb-4 mb-6 flex justify-between items-center">
@@ -331,6 +331,59 @@
                     <span class="lang-es">EJECUTAR ENVÍO</span><span class="lang-en">EXECUTE SEND</span>
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Productos 6 Imágenes -->
+    <div id="productos-modal" class="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md overflow-y-auto opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4 sm:p-8">
+        <div class="glass-modal w-full max-w-5xl p-6 sm:p-10 relative flex flex-col" id="productos-modal-content">
+            <div class="border-b border-cyan-neon/30 pb-4 mb-6 flex justify-between items-center sticky top-0 bg-[#00040c]/90 z-20 backdrop-blur-sm px-2">
+                <h3 class="text-xl md:text-3xl font-bold font-sans text-cyan-neon uppercase tracking-widest text-shadow-[0_0_10px_#00e5ff]">
+                    <span class="lang-es">CATÁLOGO DE PRODUCTOS</span><span class="lang-en">PRODUCTS CATALOG</span>
+                </h3>
+                <button onclick="closeModal('productos-modal')" class="text-cyan-neon hover:text-white transition-colors bg-cyan-neon/10 p-2 rounded">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <!-- Grid de 3 columnas para formar 2 filas de 6 imágenes -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 overflow-y-auto pr-2 pb-4 animate-fade-in">
+                <!-- Imagen 1 convertida en enlace TiemposPersonal -->
+                <a href="https://slotsoftware.github.io/TiemposPersonal/" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
+                    <div class="relative w-full overflow-hidden rounded aspect-[2/3]">
+                        <img src="1.png" alt="Producto 1" onerror="this.src='https://placehold.co/600x900/000205/00e5ff?text=PRODUCTO+1'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                </a>
+                <!-- Imagen 2 convertida en enlace TiemposDual -->
+                <a href="https://slotsoftware.github.io/TiemposDual/" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
+                    <div class="relative w-full overflow-hidden rounded aspect-[2/3]">
+                        <img src="2.png" alt="Producto 2" onerror="this.src='https://placehold.co/600x900/000205/00e5ff?text=PRODUCTO+2'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                </a>
+                <!-- Imagen 3 convertida en enlace Telemetria -->
+                <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
+                    <div class="relative w-full overflow-hidden rounded aspect-[2/3]">
+                        <img src="3.png" alt="Producto 3" onerror="this.src='https://placehold.co/600x900/000205/00e5ff?text=PRODUCTO+3'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                </a>
+                <!-- Imagen 4 convertida en enlace KronoPerTV -->
+                <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
+                    <div class="relative w-full overflow-hidden rounded aspect-[2/3]">
+                        <img src="4.png" alt="Producto 4" onerror="this.src='https://placehold.co/600x900/000205/00e5ff?text=PRODUCTO+4'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                </a>
+                <!-- Imagen 5 convertida en enlace KronoDual-TV -->
+                <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
+                    <div class="relative w-full overflow-hidden rounded aspect-[2/3]">
+                        <img src="5.png" alt="Producto 5" onerror="this.src='https://placehold.co/600x900/000205/00e5ff?text=PRODUCTO+5'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                </a>
+                <!-- Imagen 6 convertida en enlace Canal -->
+                <a href="https://slotsoftware.github.io/Web/canal.html" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
+                    <div class="relative w-full overflow-hidden rounded aspect-[2/3]">
+                        <img src="6.png" alt="Producto 6" onerror="this.src='https://placehold.co/600x900/000205/00e5ff?text=PRODUCTO+6'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -378,6 +431,10 @@
             }, 300);
             
             if(id === 'info-modal') currentActiveInfoKey = null;
+        }
+
+        function openProductosModal() {
+            openModal('productos-modal');
         }
 
         let currentActiveInfoKey = null;
@@ -656,6 +713,13 @@
                     { textEs: "INICIAR TRANSMISIÓN (CONTACTO)", textEn: "INITIATE TRANSMISSION (CONTACT)", action: () => openModal('contact-modal') },
                     { textEs: "POLÍTICAS Y TÉRMINOS", textEn: "POLICIES & TERMS", action: () => showDynamicInfo('privacidad_terminos') }
                 ] 
+            },
+            { 
+                id: "PRODUCTOS", nombre: { es: "MÓDULO PRODUCTOS", en: "PRODUCTS MODULE" },
+                voz: { es: "Desplegando catálogo de productos visuales.", en: "Deploying visual products catalog." },
+                links: [
+                    { textEs: "ABRIR CATÁLOGO VISUAL", textEn: "OPEN VISUAL CATALOG", action: () => openProductosModal() }
+                ] 
             }
         ];
 
@@ -664,15 +728,17 @@
             [{x:0, y:0}, {x:-30, y:-35}, {x:-60, y:-30}, {x:-12, y:30}, {x:20, y:50}],
             [{x:0, y:0}, {x:-18, y:-45}, {x:25, y:-55}, {x:35, y:-18}, {x:30, y:30}],
             [{x:0, y:0}, {x:-35, y:-12}, {x:-18, y:30}, {x:30, y:18}],
-            [{x:0, y:0}, {x:-30, y:-45}, {x:12, y:-70}, {x:48, y:-52}, {x:40, y:-12}, {x:70, y:18}]
+            [{x:0, y:0}, {x:-30, y:-45}, {x:12, y:-70}, {x:48, y:-52}, {x:40, y:-12}, {x:70, y:18}],
+            [{x:0, y:0}, {x:20, y:-30}, {x:45, y:-10}, {x:25, y:25}, {x:-15, y:20}]
         ];
+        
         const nombresZodiaco = {
-            es: ["CATÁLOGO", "SIMULACIÓN", "ARQUITECTURA", "DIRECTIVAS", "COMUNICACIÓN"],
-            en: ["CATALOG", "SIMULATION", "ARCHITECTURE", "DIRECTIVES", "COMMUNICATION"]
+            es: ["CATÁLOGO", "SIMULACIÓN", "ARQUITECTURA", "DIRECTIVAS", "COMUNICACIÓN", "PRODUCTOS"],
+            en: ["CATALOG", "SIMULATION", "ARCHITECTURE", "DIRECTIVES", "COMMUNICATION", "PRODUCTS"]
         };
         const descripcionesZodiaco = {
-            es: ["APLICACIONES Y GESTORES", "ENTORNOS 3D Y TELEMETRÍA", "MOTORES GRÁFICOS E IA", "FILOSOFÍA DEL ECOSISTEMA", "CONTACTO Y POLÍTICAS"],
-            en: ["APPLICATIONS & MANAGERS", "3D ENVIRONMENTS & TELEMETRY", "GRAPHICS ENGINES & AI", "ECOSYSTEM PHILOSOPHY", "CONTACT & POLICIES"]
+            es: ["APLICACIONES Y GESTORES", "ENTORNOS 3D Y TELEMETRÍA", "MOTORES GRÁFICOS E IA", "FILOSOFÍA DEL ECOSISTEMA", "CONTACTO Y POLÍTICAS", "CATÁLOGO DE INVENTARIO"],
+            en: ["APPLICATIONS & MANAGERS", "3D ENVIRONMENTS & TELEMETRY", "GRAPHICS ENGINES & AI", "ECOSYSTEM PHILOSOPHY", "CONTACT & POLICIES", "INVENTORY CATALOG"]
         };
 
         const URL_MUSICA_GITHUB = "./1.mp3";
@@ -870,14 +936,24 @@
                 nodes.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25, r: Math.random() * 1.0 + 0.3, isNexus: false, alpha: Math.random() * 0.7 + 0.2, pulseRate: Math.random() * 0.04 + 0.01 });
             }
 
-            let marginsX = w < 768 ? w * 0.25 : w * 0.20;
-            let marginsY = w < 768 ? h * 0.25 : h * 0.30;
-
+            let isMobile = w < 768;
+            
+            const rx = w * (isMobile ? 0.35 : 0.30);
+            const ry = h * (isMobile ? 0.35 : 0.35);
+            
             const nexusPositions = [
-                { x: marginsX, y: marginsY }, { x: w - marginsX, y: marginsY }, 
-                { x: w - marginsX * 0.8, y: h / 2 }, 
-                { x: marginsX, y: h - marginsY }, { x: w - marginsX, y: h - marginsY }
+                { x: w * 0.5 - rx, y: h * 0.5 - ry * 0.7 }, // 0: CATÁLOGO (Top-Left)
+                { x: w * 0.5 + rx, y: h * 0.5 - ry * 0.7 }, // 1: SIMULACIÓN (Top-Right)
+                { x: w * 0.5 - rx, y: h * 0.5 + ry * 0.6 }, // 2: ARQUITECTURA (Bottom-Left)
+                { x: w * 0.5, y: h * 0.5 + ry * 1.0 },      // 3: DIRECTIVAS (Bottom-Center)
+                { x: w * 0.5 + rx, y: h * 0.5 + ry * 0.6 }, // 4: COMUNICACIÓN (Bottom-Right)
+                { x: w * 0.5, y: h * 0.5 - ry * 1.0 }       // 5: PRODUCTOS (Top-Center)
             ];
+            
+            nexusPositions.forEach(p => {
+                p.x = Math.max(w * 0.1, Math.min(w * 0.9, p.x));
+                p.y = Math.max(h * 0.1, Math.min(h * 0.9, p.y));
+            });
 
             nexusPositions.forEach((pos, idx) => {
                 let nNode = { x: pos.x, y: pos.y, baseX: pos.x, baseY: pos.y, vx: 0, vy: 0, r: 0, isNexus: true, menuIdx: idx, pulse: Math.random() * Math.PI };
@@ -909,18 +985,30 @@
         function drawNexusLightPoint(ctx, x, y, isHovered, isDragged, pulse) {
             ctx.save();
             let isMobile = w < 768;
-            let radius = (isHovered || isDragged ? 4.0 : 2.5) * (isMobile ? 1.2 : 1.0);
-            let glowRadius = (isHovered || isDragged ? 25 : 15) * (isMobile ? 1.2 : 1.0);
-            let pulseScale = Math.max(0.1, 1 + Math.sin(pulse) * 0.2);
-            let outerRadius = Math.max(0.1, glowRadius * pulseScale);
             
+            let flash = Math.sin(pulse * 4.0); 
+            let flashAlpha = 0.5 + (flash * 0.5); 
+            
+            let radius = (isHovered || isDragged ? 4.0 : 2.0 + flashAlpha * 1.5) * (isMobile ? 1.2 : 1.0);
+            let glowRadius = (isHovered || isDragged ? 25 : 12 + flashAlpha * 12) * (isMobile ? 1.2 : 1.0);
+            let outerRadius = Math.max(0.1, glowRadius);
+            
+            let coreAlpha = isHovered || isDragged ? 1 : 0.5 + flashAlpha * 0.5;
+            let glowAlpha1 = isHovered || isDragged ? 0.95 : 0.3 + flashAlpha * 0.65;
+            let glowAlpha2 = isHovered || isDragged ? 0.35 : 0.1 + flashAlpha * 0.25;
+
             let radGlow = ctx.createRadialGradient(x, y, 0, x, y, outerRadius);
-            radGlow.addColorStop(0, isDragged ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 229, 255, 0.95)');
-            radGlow.addColorStop(0.25, isDragged ? 'rgba(0, 255, 255, 0.5)' : 'rgba(0, 102, 255, 0.35)');
+            radGlow.addColorStop(0, isDragged ? 'rgba(255, 255, 255, 1)' : `rgba(0, 229, 255, ${glowAlpha1})`);
+            radGlow.addColorStop(0.25, isDragged ? 'rgba(0, 255, 255, 0.5)' : `rgba(0, 102, 255, ${glowAlpha2})`);
             radGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
             ctx.beginPath(); ctx.arc(x, y, outerRadius, 0, Math.PI * 2); ctx.fillStyle = radGlow; ctx.fill();
-            ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fillStyle = "#ffffff"; ctx.shadowBlur = 12; ctx.shadowColor = "#00e5ff"; ctx.fill();
+            
+            ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); 
+            ctx.fillStyle = `rgba(255, 255, 255, ${coreAlpha})`; 
+            ctx.shadowBlur = 12; ctx.shadowColor = "#00e5ff"; 
+            ctx.fill();
+            
             ctx.restore();
         }
 
@@ -929,6 +1017,8 @@
             let scaleFactor = w < 768 ? 1.4 : 1.8;
             const lang = getCurrentLang();
             let hitRadius = w < 768 ? 55 : 45;
+            
+            let baseTitleSize = w < 768 ? 14 : 18;
 
             menuNodes.forEach(n => {
                 let isHovered = Math.hypot(n.x - pointer.x, n.y - pointer.y) < hitRadius;
@@ -948,16 +1038,29 @@
                 }
                 ctx.stroke(); ctx.fill();
                 
-                ctx.font = isHighlighted ? "bold 15px 'Share Tech Mono'" : "13px 'Share Tech Mono'"; 
-                ctx.fillStyle = isHighlighted ? "rgba(0, 229, 255, 1)" : "rgba(0, 229, 255, 0.65)"; 
-                ctx.shadowBlur = isHighlighted ? 10 : 3; 
-                ctx.shadowColor = "#00e5ff";
-                ctx.fillText(nombresZodiaco[lang][n.menuIdx], n.x + 25, n.y - 14);
+                let alignRight = n.x > w * 0.55;
+                ctx.textAlign = alignRight ? "right" : "left";
+                let textOffsetX = alignRight ? (w < 768 ? -22 : -32) : (w < 768 ? 22 : 32);
                 
-                ctx.font = isHighlighted ? "12px 'Share Tech Mono'" : "11px 'Share Tech Mono'"; 
-                ctx.fillStyle = isHighlighted ? "rgba(255, 255, 255, 0.95)" : "rgba(255, 255, 255, 0.5)"; 
-                ctx.shadowBlur = isHighlighted ? 4 : 0;
-                ctx.fillText(descripcionesZodiaco[lang][n.menuIdx], n.x + 25, n.y + 6);
+                let titleSize = isHighlighted ? baseTitleSize + 2 : baseTitleSize;
+                ctx.font = `bold ${titleSize}px 'Montserrat', sans-serif`; 
+                if (ctx.letterSpacing !== undefined) ctx.letterSpacing = "3px";
+                
+                ctx.fillStyle = "#ffffff"; 
+                ctx.shadowBlur = isHighlighted ? 25 : 12; 
+                ctx.shadowColor = "#00e5ff";
+                
+                ctx.fillText(nombresZodiaco[lang][n.menuIdx], n.x + textOffsetX, n.y - 8);
+                
+                let descSize = w < 768 ? 9 : 11;
+                ctx.font = `${isHighlighted ? 'bold' : 'normal'} ${descSize}px 'Montserrat', sans-serif`; 
+                if (ctx.letterSpacing !== undefined) ctx.letterSpacing = "2px";
+                ctx.fillStyle = isHighlighted ? "rgba(255, 255, 255, 0.9)" : "rgba(0, 229, 255, 0.7)"; 
+                ctx.shadowBlur = isHighlighted ? 10 : 5;
+                ctx.fillText(descripcionesZodiaco[lang][n.menuIdx], n.x + textOffsetX, n.y + (w < 768 ? 12 : 16));
+                
+                if (ctx.letterSpacing !== undefined) ctx.letterSpacing = "0px";
+                ctx.textAlign = "left";
             });
             ctx.restore();
         }
@@ -1093,7 +1196,8 @@
 
         function handlePointerStart(e) {
             if (document.getElementById('info-modal').classList.contains('opacity-100') ||
-                document.getElementById('contact-modal').classList.contains('opacity-100')) {
+                document.getElementById('contact-modal').classList.contains('opacity-100') ||
+                document.getElementById('productos-modal').classList.contains('opacity-100')) {
                 return;
             }
             updatePointerPos(e); dragStartPos = { x: pointer.x, y: pointer.y };
@@ -1103,7 +1207,8 @@
 
         function handlePointerMove(e) {
             if (document.getElementById('info-modal').classList.contains('opacity-100') ||
-                document.getElementById('contact-modal').classList.contains('opacity-100')) {
+                document.getElementById('contact-modal').classList.contains('opacity-100') ||
+                document.getElementById('productos-modal').classList.contains('opacity-100')) {
                 return;
             }
             updatePointerPos(e);
