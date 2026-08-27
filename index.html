@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#000205">
-    <title>SlotSoftware | Cosmic Immersion</title>
+    <meta name="theme-color" content="#030b14">
+    <title>SlotSoftware | Cosmic OS</title>
     
-    <!-- LIBRERÍAS EXTERNAS -->
+    <!-- Librerías Externas -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Montserrat:wght@100;300;400&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
@@ -16,25 +16,34 @@
             theme: {
                 extend: {
                     colors: {
-                        'cyan-neon': '#00e5ff',
-                        'blue-neon': '#0066ff',
-                        'dark-abyss': '#000205',
+                        'neon-cyan': '#00f3ff',
+                        'neon-blue': '#0066ff',
+                        'space-dark': '#01050a', /* Más oscuro para resaltar la galaxia */
+                        'space-light': '#0a192f',
+                        'glass': 'rgba(10, 25, 47, 0.7)',
                     },
                     fontFamily: {
-                        sans: ['Montserrat', 'sans-serif'],
-                        mono: ['Share Tech Mono', 'monospace'],
+                        'title': ['Orbitron', 'sans-serif'],
+                        'body': ['Rajdhani', 'sans-serif'],
+                        'prometheus': ['Montserrat', 'sans-serif'],
                     },
                     animation: {
-                        'pulse-glow': 'pulseGlow 2s infinite alternate',
                         'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'fade-out': 'fadeOut 0.5s ease-in forwards',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
-                        pulseGlow: {
-                            '0%': { opacity: '0.6', textShadow: '0 0 5px #00e5ff' },
-                            '100%': { opacity: '1', textShadow: '0 0 15px #00e5ff, 0 0 25px #0066ff' },
-                        },
                         fadeIn: {
-                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        fadeOut: {
+                            '0%': { opacity: '1' },
+                            '100%': { opacity: '0' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
                         }
                     }
@@ -45,821 +54,661 @@
     
     <style>
         :root {
-            --cyan: #00e5ff;
-            --blue-neon: #0066ff;
-            --dark-abyss: #000205;
+            --cyan: #00f3ff;
+            --blue: #0066ff;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: var(--dark-abyss); overflow: hidden;
-            font-family: 'Share Tech Mono', monospace;
-            color: #ffffff; user-select: none; touch-action: manipulation;
+            background: radial-gradient(circle at 50% 50%, #010a14 0%, #000205 75%, #000000 100%); 
+            color: #ffffff; 
+            overflow: hidden;
+            font-family: 'Rajdhani', sans-serif;
+            user-select: none;
         }
 
-        #bg-gradient {
+        /* Canvas Background */
+        #space-canvas {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
-            background: radial-gradient(circle at 50% 50%, #010a14 0%, var(--dark-abyss) 75%, #000000 100%);
+            pointer-events: none; /* Let clicks pass through to UI */
         }
-
-        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
         
+        /* Scanlines Overlay */
         .scanlines {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
             background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.25) 51%);
             background-size: 100% 4px; pointer-events: none; opacity: 0.3;
         }
 
-        /* Título de fondo sobre la galaxia */
-        #bg-title {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: clamp(2.5rem, 8vw, 7rem);
-            color: rgba(255, 255, 255, 0.6);
-            text-shadow: 0 0 40px rgba(0, 229, 255, 0.9), 0 0 80px rgba(0, 102, 255, 0.8), 0 0 120px rgba(0, 229, 255, 0.5);
-            z-index: 3;
-            pointer-events: none;
-            text-align: center;
-            line-height: 1.1;
-            opacity: 0;
-            transition: opacity 4s ease-in-out 1s;
-        }
-        #bg-title.visible {
-            opacity: 1;
-        }
-
+        /* Overlay UI */
         #ui-layer {
-            position: relative; z-index: 10; width: 100%; height: 100%;
-            pointer-events: none; display: flex; flex-direction: column; justify-content: space-between;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
+            display: flex; flex-direction: column;
+            pointer-events: none; /* Only children are clickable */
         }
 
-        /* Pantalla de inicio */
+        .clickable { pointer-events: auto; }
+
+        /* Contenedor Principal (Panel de datos) */
+        #main-viewer {
+            transition: opacity 0.8s ease-in-out, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .viewer-hidden {
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+            pointer-events: none;
+        }
+
+        .viewer-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(3, 11, 20, 0.85) 0%, rgba(10, 25, 47, 0.75) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 243, 255, 0.05);
+        }
+
+        .glass-panel::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 15px; height: 15px;
+            border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan);
+        }
+        .glass-panel::after {
+            content: ''; position: absolute; bottom: 0; right: 0; width: 15px; height: 15px;
+            border-bottom: 2px solid var(--cyan); border-right: 2px solid var(--cyan);
+        }
+
+        /* Neon Text */
+        .text-neon {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7), 0 0 20px rgba(0, 102, 255, 0.5);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.4); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+        /* Start Screen */
         #start-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000;
-            background-color: #000000; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 2s ease-in-out; padding: 20px; text-align: center;
+            position: fixed; inset: 0; z-index: 50;
+            background: #000000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 2s ease-in-out;
         }
-        
-        .btn-start {
-            font-family: 'Montserrat', sans-serif; font-weight: 300; letter-spacing: 0.4em;
-            padding: 16px 32px; background: rgba(0, 10, 25, 0.4); color: var(--cyan);
-            cursor: pointer; text-transform: uppercase; font-size: 0.85rem;
-            border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: 0 0 20px rgba(0, 102, 255, 0.15) inset;
-            transition: all 0.4s ease; pointer-events: auto; backdrop-filter: blur(5px);
+
+        .btn-boot {
+            font-family: 'Orbitron', sans-serif;
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            text-transform: uppercase; letter-spacing: 0.2em;
+            padding: 1rem 2.5rem;
+            position: relative; overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 15px rgba(0, 102, 255, 0.3);
         }
-        .btn-start:hover, .btn-start:active { 
-            background: rgba(0, 102, 255, 0.2); border-color: var(--cyan);
-            box-shadow: 0 0 30px rgba(0, 229, 255, 0.4) inset, 0 0 20px rgba(0, 102, 255, 0.6); text-shadow: 0 0 10px var(--cyan);
+        .btn-boot:hover {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 0 30px rgba(0, 243, 255, 0.4), 0 0 20px rgba(0, 102, 255, 0.6);
+            transform: scale(1.05);
         }
-        
-        /* Nav Sup */
-        .top-nav {
-            position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px;
-            display: flex; justify-content: flex-end; align-items: flex-start;
-            pointer-events: auto; z-index: 20;
-        }
-        
-        .prometheus-title {
+
+        /* Estilo Prometheus para los Títulos */
+        .prometheus-style {
             font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
+            font-weight: 100;
             letter-spacing: 0.65em;
             text-transform: uppercase;
-            color: #ffffff;
-            text-shadow: 0 0 20px rgba(0, 229, 255, 0.8), 0 0 30px rgba(0, 102, 255, 0.6);
-            margin-right: -0.65em;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.8), 0 0 40px rgba(0, 102, 255, 0.6), 0 0 80px rgba(0, 243, 255, 0.4);
+            margin-right: -0.65em; /* Compensar letter spacing al centro */
         }
 
-        /* Menú Modal Constelaciones */
-        .menu-modal {
+        /* Fondo de Prometheus (Flotante) */
+        #idle-title {
             position: absolute;
-            background: linear-gradient(135deg, rgba(0, 10, 25, 0.88) 0%, rgba(0, 5, 15, 0.78) 100%);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            padding: 20px; width: 320px; max-height: 75vh; overflow-y: auto;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; transform: scale(0.9);
-            border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: 0 0 30px rgba(0, 229, 255, 0.15) inset, 0 0 20px rgba(0, 102, 255, 0.3);
-            z-index: 30; border-radius: 2px;
-            transform-origin: center;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5; /* Detrás de la UI, delante del canvas */
+            pointer-events: none;
+            text-align: center;
+            transition: opacity 1.5s ease-in-out;
+            opacity: 0; /* Oculto hasta que arranca el sistema */
         }
-        @media (min-width: 768px) { .menu-modal { padding: 25px; width: 360px; } }
-        .menu-modal::before, .menu-modal::after {
-            content: ''; position: absolute; width: 16px; height: 16px; border-color: var(--cyan); border-style: solid; opacity: 0.8; box-shadow: 0 0 8px var(--cyan);
-        }
-        .menu-modal::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
-        .menu-modal::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
         
-        .menu-modal.active { pointer-events: auto; animation: holoUnfold 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        .menu-modal.active > * { opacity: 0; animation: holoFadeIn 0.8s ease-out 0.5s forwards; }
+        #idle-title.visible { opacity: 1; }
 
-        @keyframes holoUnfold {
-            0% { transform: scale(1, 0.01); opacity: 0; filter: brightness(3); box-shadow: 0 0 50px #00e5ff inset; }
-            30% { transform: scale(1, 0.02); opacity: 1; filter: brightness(2); box-shadow: 0 0 30px #00e5ff inset; }
-            70% { transform: scale(1, 1.02); }
-            100% { transform: scale(1, 1); opacity: 1; filter: brightness(1); }
-        }
-
-        @keyframes holoFadeIn {
-            0% { opacity: 0; transform: translateY(-5px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes sciFiModal {
-            0% { opacity: 0; transform: perspective(800px) rotateX(20deg) scale(0.7, 0.01); box-shadow: 0 0 100px var(--cyan) inset; }
-            40% { opacity: 1; transform: perspective(800px) rotateX(10deg) scale(1, 0.02); box-shadow: 0 0 50px var(--cyan) inset; }
-            70% { transform: perspective(800px) rotateX(-2deg) scale(1, 1.02); }
-            100% { opacity: 1; transform: perspective(800px) rotateX(0deg) scale(1, 1); box-shadow: 0 0 40px rgba(0, 229, 255, 0.15) inset, 0 10px 40px rgba(0, 0, 0, 0.9); }
-        }
-
-        @keyframes sciFiModalClose {
-            0% { opacity: 1; transform: perspective(800px) rotateX(0deg) scale(1, 1); }
-            100% { opacity: 0; transform: perspective(800px) rotateX(10deg) scale(0.9, 0.01); box-shadow: 0 0 80px var(--cyan) inset; }
-        }
-
-        .animate-open { animation: sciFiModal 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        .animate-close { animation: sciFiModalClose 0.5s ease-in forwards; }
-
-        .menu-titulo {
-            font-family: 'Montserrat', sans-serif; font-weight: 300; border-bottom: 1px dashed rgba(0, 229, 255, 0.3);
-            padding-bottom: 10px; margin-bottom: 15px; font-size: 0.85rem; letter-spacing: 0.18em; color: #fff;
-            display: flex; justify-content: space-between; align-items: center; text-shadow: 0 0 10px var(--cyan); text-transform: uppercase;
-        }
-        .menu-enlace {
-            display: flex; align-items: center; padding: 12px 12px; cursor: pointer; transition: all 0.3s ease; font-size: 0.75rem; letter-spacing: 0.12em; margin-bottom: 6px; border-bottom: 1px solid transparent; color: rgba(255,255,255,0.85); background: rgba(0, 229, 255, 0.03); pointer-events: auto; min-height: 38px; border-radius: 2px;
-        }
-        .menu-enlace:hover, .menu-enlace:active {
-            color: var(--cyan); background: rgba(0, 229, 255, 0.15); border-bottom: 1px solid var(--cyan); padding-left: 18px; text-shadow: 0 0 8px var(--cyan);
-        }
-        .menu-enlace .prefix { color: var(--cyan); margin-right: 8px; font-size: 0.65rem; }
-        .btn-cerrar {
-            margin-top: 18px; padding: 10px; width: 100%; background: transparent; border: 1px solid rgba(0, 229, 255, 0.3); text-align: center; cursor: pointer; font-weight: 300; letter-spacing: 0.2em; transition: all 0.3s ease; color: var(--cyan); font-size: 0.7rem; pointer-events: auto; display: flex; align-items: center; justify-content: center;
-        }
-        .btn-cerrar:hover, .btn-cerrar:active { background: rgba(0, 229, 255, 0.2); border-color: var(--cyan); }
-
-        .telemetry-data { position: absolute; bottom: 20px; left: 20px; font-size: 0.6rem; color: rgba(0, 229, 255, 0.5); pointer-events: none; letter-spacing: 0.15em; line-height: 1.8; }
-        #subtitle-container {
-            position: absolute; bottom: 70px; left: 5%; width: 90%; text-align: center; font-size: clamp(0.75rem, 2.5vw, 0.95rem); color: #fff; letter-spacing: 0.08em; opacity: 0; transition: opacity 0.5s ease; text-shadow: 0 0 10px var(--cyan), 0 0 20px var(--blue-neon); pointer-events: none; background: rgba(0, 2, 8, 0.6); padding: 8px 12px; border-radius: 4px; backdrop-filter: blur(4px);
-        }
-        @media (min-width: 768px) { #subtitle-container { bottom: 40px; left: 15%; width: 70%; padding: 10px; } }
-        .cursor-blink { animation: blink 1s step-end infinite; color: var(--cyan); }
-        @keyframes blink { 50% { opacity: 0; } }
-
-        .glass-modal {
-            background: linear-gradient(135deg, rgba(0, 8, 20, 0.95) 0%, rgba(0, 4, 12, 0.92) 100%);
-            backdrop-filter: blur(16px); border: 1px solid rgba(0, 229, 255, 0.4);
-            box-shadow: 0 0 40px rgba(0, 229, 255, 0.15) inset, 0 10px 40px rgba(0, 0, 0, 0.9);
-            position: relative; max-height: 85vh;
-        }
-        .glass-modal::before, .glass-modal::after {
-            content: ''; position: absolute; width: 30px; height: 30px; border-color: var(--cyan); border-style: solid; opacity: 0.8; box-shadow: 0 0 15px var(--cyan);
-        }
-        .glass-modal::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
-        .glass-modal::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
-        
-        .sci-fi-card {
-            background: rgba(0, 15, 30, 0.4); border: 1px solid rgba(0, 229, 255, 0.15);
+        /* Nav Item Styles */
+        .nav-item {
             transition: all 0.3s ease;
+            border-left: 2px solid transparent;
         }
-        .sci-fi-card:hover { border-color: rgba(0, 229, 255, 0.6); box-shadow: 0 0 15px rgba(0, 229, 255, 0.15) inset; transform: translateY(-2px); }
-        .sci-fi-img { filter: contrast(1.1) brightness(0.9); transition: all 0.5s ease; }
-        .sci-fi-card:hover .sci-fi-img { filter: contrast(1.2) brightness(1.1); transform: scale(1.05); }
+        .nav-item.active {
+            background: rgba(0, 243, 255, 0.15);
+            border-left: 2px solid var(--cyan);
+            color: var(--cyan);
+            box-shadow: inset 20px 0 20px -20px rgba(0, 243, 255, 0.5);
+        }
+        .nav-item:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 2px solid rgba(0, 243, 255, 0.5);
+        }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.5); }
-        ::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.3); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 229, 255, 0.6); }
-
-        input, textarea { background: rgba(0, 229, 255, 0.05) !important; border: 1px solid rgba(0, 229, 255, 0.2) !important; color: #fff !important; font-family: 'Share Tech Mono', monospace !important; }
-        input:focus, textarea:focus { border-color: var(--cyan) !important; box-shadow: 0 0 10px rgba(0, 229, 255, 0.3) inset !important; outline: none; }
+        /* Image Hover FX */
+        .sci-fi-img-container { overflow: hidden; position: relative; border: 1px solid rgba(0, 243, 255, 0.2); }
+        .sci-fi-img-container img { transition: transform 0.7s ease, filter 0.3s ease; filter: grayscale(20%) brightness(0.8); }
+        .sci-fi-img-container:hover img { transform: scale(1.1); filter: grayscale(0%) brightness(1.1); }
+        .sci-fi-img-container::after {
+            content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0, 102, 255, 0.4), transparent); opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        }
+        .sci-fi-img-container:hover::after { opacity: 1; }
 
         html[lang="es"] .lang-en { display: none !important; }
         html[lang="en"] .lang-es { display: none !important; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .nav-item { border-left: none; border-bottom: 2px solid transparent; flex: 1; display: flex; justify-content: center; padding: 0.5rem; }
+            .nav-item.active { border-left: none; border-bottom: 2px solid var(--cyan); box-shadow: inset 0 -15px 15px -15px rgba(0, 243, 255, 0.5); }
+            .nav-item:hover:not(.active) { border-left: none; border-bottom: 2px solid rgba(0, 243, 255, 0.5); }
+            .hide-scroll-mobile::-webkit-scrollbar { display: none; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="bg-gradient"></div>
+    <!-- Space Background & Scanlines -->
+    <canvas id="space-canvas"></canvas>
     <div class="scanlines"></div>
-    <canvas id="bg-canvas"></canvas>
-    <div id="bg-title" class="prometheus-title">SLOT<br>SOFTWARE</div>
-
-    <div id="start-screen">
-        <h1 class="prometheus-title" style="font-size: clamp(2rem, 5vw, 4rem); margin-bottom: 50px; text-align: center; line-height: 1.1;">SLOT<br>SOFTWARE</h1>
-        <button class="btn-start animate-pulse-glow" onclick="iniciarSistema()">CONECTAR ENLACE DIGITAL</button>
-        <div style="font-size: 0.65rem; color: rgba(0,229,255,0.5); margin-top: 20px; letter-spacing: 0.2em;">
-            ENTORNO INTERACTIVO: EXPLORA LAS CONSTELACIONES PARA ACCEDER A LA BASE DE DATOS
-        </div>
+    
+    <!-- Título flotante estilo Prometheus (Estado inactivo) -->
+    <div id="idle-title">
+        <h2 class="prometheus-style text-5xl md:text-[6rem] text-white/80 leading-[1.1]">SLOT<br>SOFTWARE</h2>
     </div>
 
-    <div id="ui-layer">
-        <div class="top-nav">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleLanguage(); playDigitalChime(true);" class="text-cyan-neon/60 hover:text-cyan-neon font-bold text-xs tracking-widest transition-colors pointer-events-auto bg-black/40 px-2 py-1 rounded">
-                    <span class="lang-es">[EN]</span><span class="lang-en">[ES]</span>
-                </button>
-                <button id="audio-toggle" class="pointer-events-auto bg-cyan-neon/10 border border-cyan-neon/30 text-cyan-neon px-3 py-1.5 text-[0.65rem] tracking-widest hover:bg-cyan-neon/20 transition-all rounded" onclick="toggleAudioMute()">AUDIO: ON</button>
-            </div>
-        </div>
-
-        <div class="telemetry-data">
-            <div>SYS_LINK // <span id="telemetry-1">100.00</span>%</div>
-            <div>NET_NODE // PEERJS</div>
-            <div>STATUS // OPERACIONAL</div>
-        </div>
-
-        <!-- Terminal Menú Constelaciones -->
-        <div id="panel-menu" class="menu-modal">
-            <h2 class="menu-titulo">
-                <span id="menu-title-text">MÓDULO</span>
-                <span style="font-size: 0.65rem; color: var(--cyan);">DATALINK</span>
-            </h2>
-            <div id="menu-enlaces"></div>
-            <div class="btn-cerrar" onclick="cerrarMenu()">
-                <span class="lang-es">CERRAR TRANSMISIÓN</span><span class="lang-en">CLOSE TRANSMISSION</span>
-            </div>
-        </div>
-
-        <div id="subtitle-container">
-            <span id="subtitle-text"></span><span class="cursor-blink">_</span>
-        </div>
+    <!-- Splash Screen -->
+    <div id="start-screen" class="clickable">
+        <h1 class="prometheus-style text-5xl md:text-[5rem] mb-12 text-white text-center leading-[1.1]">SLOT<br>SOFTWARE</h1>
+        <p class="font-body text-cyan-400 mb-12 tracking-[0.3em] text-sm text-center">COSMIC IMMERSION SYSTEM V2.0</p>
+        <button class="btn-boot rounded-sm animate-pulse-slow" onclick="bootSystem()">
+            <span class="lang-es">INICIAR ENLACE DIGITAL</span>
+            <span class="lang-en">INITIATE DIGITAL LINK</span>
+        </button>
     </div>
 
-    <!-- MODAL DE CONTENIDO ENRIQUECIDO -->
-    <div id="info-modal" class="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md overflow-y-auto opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4 sm:p-8">
-        <div class="glass-modal w-full max-w-6xl p-6 sm:p-10 relative flex flex-col" id="info-modal-content">
-            <div class="border-b border-cyan-neon/30 pb-4 mb-6 flex justify-between items-center sticky top-0 bg-[#00040c]/90 z-20 backdrop-blur-sm px-2">
-                <h3 id="info-title" class="text-xl md:text-3xl font-bold font-sans text-cyan-neon uppercase tracking-widest text-shadow-[0_0_10px_#00e5ff]">TÍTULO</h3>
-                <button onclick="closeModal('info-modal')" class="text-cyan-neon hover:text-white transition-colors bg-cyan-neon/10 p-2 rounded">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            <div id="info-body" class="text-gray-300 text-sm md:text-base leading-relaxed tracking-wide space-y-8 overflow-y-auto pr-2 pb-4 animate-fade-in flex-grow">
-            </div>
-        </div>
-    </div>
-
-    <!-- Contacto Form Modal -->
-    <div id="contact-modal" class="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md overflow-y-auto opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4">
-        <div class="glass-modal w-full max-w-xl p-8 relative" id="contact-modal-content">
-            <div class="border-b border-cyan-neon/30 pb-4 mb-6 flex justify-between items-center">
-                <h3 class="text-xl font-bold font-sans text-cyan-neon uppercase tracking-widest">
-                    <span class="lang-es">> TRANSMISIÓN DE DATOS</span><span class="lang-en">> DATA TRANSMISSION</span>
-                </h3>
-                <button onclick="closeModal('contact-modal')" class="text-cyan-neon hover:text-white transition-colors">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            <form action="https://formsubmit.co/slotcarhome@gmail.com" method="POST" class="flex flex-col gap-5 text-sm">
-                <input type="hidden" name="_subject" value="Transmisión desde Red SlotSoftware">
-                <input type="hidden" name="_captcha" value="false">
-                
-                <div>
-                    <label class="block text-cyan-neon/70 mb-1"><span class="lang-es">IDENTIFICADOR (NOMBRE)</span><span class="lang-en">IDENTIFIER (NAME)</span></label>
-                    <input type="text" name="name" required class="w-full p-3 rounded-sm">
-                </div>
-                <div>
-                    <label class="block text-cyan-neon/70 mb-1"><span class="lang-es">RUTA DE RETORNO (EMAIL)</span><span class="lang-en">RETURN PATH (EMAIL)</span></label>
-                    <input type="email" name="email" required class="w-full p-3 rounded-sm">
-                </div>
-                <div>
-                    <label class="block text-cyan-neon/70 mb-1"><span class="lang-es">PAQUETE DE DATOS (MENSAJE)</span><span class="lang-en">DATA PACKET (MESSAGE)</span></label>
-                    <textarea name="message" rows="4" required class="w-full p-3 rounded-sm resize-none"></textarea>
-                </div>
-                <button type="submit" class="border border-cyan-neon text-cyan-neon hover:bg-cyan-neon/20 hover:text-white transition-all py-3 mt-2 tracking-widest font-bold">
-                    <span class="lang-es">EJECUTAR ENVÍO</span><span class="lang-en">EXECUTE SEND</span>
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Productos 6 Imágenes -->
-    <div id="productos-modal" class="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md overflow-y-auto opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4 sm:p-8">
-        <div class="glass-modal w-full max-w-5xl p-6 sm:p-10 relative flex flex-col" id="productos-modal-content">
-            <div class="border-b border-cyan-neon/30 pb-4 mb-6 flex justify-between items-center sticky top-0 bg-[#00040c]/90 z-20 backdrop-blur-sm px-2">
-                <h3 class="text-xl md:text-3xl font-bold font-sans text-cyan-neon uppercase tracking-widest text-shadow-[0_0_10px_#00e5ff]">
-                    <span class="lang-es">CATÁLOGO DE PRODUCTOS</span><span class="lang-en">PRODUCTS CATALOG</span>
-                </h3>
-                <button onclick="closeModal('productos-modal')" class="text-cyan-neon hover:text-white transition-colors bg-cyan-neon/10 p-2 rounded">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            <!-- Grid de 3 columnas para formar 2 filas de 6 imágenes -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 overflow-y-auto pr-2 pb-4 animate-fade-in">
-                <!-- Imagen 1 convertida en enlace TiemposPersonal -->
-                <a href="https://slotsoftware.github.io/TiemposPersonal/" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
-                    <div class="relative w-full overflow-hidden rounded aspect-[1/2]">
-                        <img src="1.jpg" alt="Producto 1" onerror="this.src='https://placehold.co/600x1200/000205/00e5ff?text=PRODUCTO+1'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
-                    </div>
-                </a>
-                <!-- Imagen 2 convertida en enlace TiemposDual -->
-                <a href="https://slotsoftware.github.io/TiemposDual/" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
-                    <div class="relative w-full overflow-hidden rounded aspect-[1/2]">
-                        <img src="2.jpg" alt="Producto 2" onerror="this.src='https://placehold.co/600x1200/000205/00e5ff?text=PRODUCTO+2'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
-                    </div>
-                </a>
-                <!-- Imagen 3 convertida en enlace Telemetria -->
-                <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
-                    <div class="relative w-full overflow-hidden rounded aspect-[1/2]">
-                        <img src="3.jpg" alt="Producto 3" onerror="this.src='https://placehold.co/600x1200/000205/00e5ff?text=PRODUCTO+3'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
-                    </div>
-                </a>
-                <!-- Imagen 4 convertida en enlace KronoPerTV -->
-                <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
-                    <div class="relative w-full overflow-hidden rounded aspect-[1/2]">
-                        <img src="4.jpeg" alt="Producto 4" onerror="this.src='https://placehold.co/600x1200/000205/00e5ff?text=PRODUCTO+4'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
-                    </div>
-                </a>
-                <!-- Imagen 5 convertida en enlace KronoDual-TV -->
-                <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
-                    <div class="relative w-full overflow-hidden rounded aspect-[1/2]">
-                        <img src="5.jpeg" alt="Producto 5" onerror="this.src='https://placehold.co/600x1200/000205/00e5ff?text=PRODUCTO+5'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
-                    </div>
-                </a>
-                <!-- Imagen 6 convertida en enlace Canal -->
-                <a href="https://slotsoftware.github.io/Web/canal.html" target="_blank" rel="noopener noreferrer" class="sci-fi-card p-2 rounded cursor-pointer group block">
-                    <div class="relative w-full overflow-hidden rounded aspect-[1/2]">
-                        <img src="6.jpeg" alt="Producto 6" onerror="this.src='https://placehold.co/600x1200/000205/00e5ff?text=PRODUCTO+6'" class="absolute inset-0 w-full h-full object-cover sci-fi-img group-hover:scale-110 transition-transform duration-500">
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- SCRIPT DEL SISTEMA INMERSIVO -->
-    <script>
-        lucide.createIcons();
-
-        function toggleLanguage() {
-            const html = document.documentElement;
-            const currentLang = html.getAttribute('lang') || 'es';
-            html.setAttribute('lang', currentLang === 'es' ? 'en' : 'es');
-            if (activeMenuIndex !== -1) {
-                const info = configuracionMenus[activeMenuIndex];
-                animarMenuEnlaces(info.links);
-            }
-            if(currentActiveInfoKey) {
-                showDynamicInfo(currentActiveInfoKey);
-            }
-        }
-        function getCurrentLang() { return document.documentElement.getAttribute('lang') || 'es'; }
-
-        function openModal(id) {
-            playDigitalChime(true);
-            const modal = document.getElementById(id);
-            const content = document.getElementById(id + '-content');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            modal.classList.add('opacity-100', 'pointer-events-auto');
-            
-            content.classList.remove('animate-close');
-            void content.offsetWidth;
-            content.classList.add('animate-open');
-        }
+    <!-- Main OS Interface -->
+    <div id="ui-layer" class="opacity-0 transition-opacity duration-1000">
         
-        function closeModal(id) {
-            playDigitalChime(false);
-            const modal = document.getElementById(id);
-            const content = document.getElementById(id + '-content');
+        <!-- Top Bar -->
+        <header class="w-full p-4 md:p-6 flex justify-between items-start clickable z-20">
+            <div class="flex flex-col">
+                <h2 class="font-title font-bold text-xl md:text-2xl tracking-widest text-neon">SLOT SOFTWARE</h2>
+                <div class="flex items-center gap-2 text-xs font-body text-cyan-400/70 tracking-widest mt-1">
+                    <span class="animate-pulse">●</span> SYS_LINK: <span id="telemetry-sys">100.00</span>%
+                </div>
+            </div>
             
-            content.classList.remove('animate-open');
-            content.classList.add('animate-close');
+            <div class="flex items-center gap-3">
+                <button onclick="toggleLanguage()" class="bg-glass border border-cyan-400/30 px-3 py-1.5 text-xs font-title tracking-widest text-white hover:bg-cyan-400/20 hover:border-cyan-400 transition-all rounded-sm">
+                    <span class="lang-es">EN</span><span class="lang-en">ES</span>
+                </button>
+                <button id="btn-audio" onclick="toggleAudio()" class="bg-glass border border-cyan-400/30 p-1.5 text-cyan-400 hover:bg-cyan-400/20 hover:border-cyan-400 transition-all rounded-sm">
+                    <i data-lucide="volume-2" class="w-4 h-4" id="icon-audio"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <main class="flex-1 flex flex-col md:flex-row overflow-hidden pb-4 md:pb-6 px-4 md:px-6 gap-4 md:gap-6">
             
-            setTimeout(() => {
-                modal.classList.remove('opacity-100', 'pointer-events-auto');
-                modal.classList.add('opacity-0', 'pointer-events-none');
-            }, 300);
-            
-            if(id === 'info-modal') currentActiveInfoKey = null;
-        }
+            <!-- Navigation Sidebar (Desktop) / Bottom Nav (Mobile) -->
+            <nav class="clickable w-full md:w-64 flex-shrink-0 glass-panel rounded-sm flex flex-row md:flex-col order-2 md:order-1 overflow-x-auto md:overflow-y-auto hide-scroll-mobile z-20">
+                <div class="p-4 border-b border-cyan-400/20 hidden md:block">
+                    <h3 class="font-title text-sm tracking-widest text-gray-400"><span class="lang-es">MÓDULOS</span><span class="lang-en">MODULES</span></h3>
+                </div>
+                <div class="flex flex-row md:flex-col w-full min-w-max md:min-w-0" id="nav-container">
+                    <!-- Nav items injected via JS -->
+                </div>
+            </nav>
 
-        function openProductosModal() {
-            openModal('productos-modal');
-        }
+            <!-- Content Display Area (Inicialmente oculto) -->
+            <section id="main-viewer" class="clickable flex-1 glass-panel rounded-sm flex flex-col order-1 md:order-2 overflow-hidden relative z-10 viewer-hidden">
+                
+                <!-- Content Header -->
+                <div class="p-4 md:p-6 border-b border-cyan-400/30 bg-space-dark/80 flex justify-between items-center">
+                    <h2 id="content-title" class="font-title text-xl md:text-2xl font-bold tracking-widest text-cyan-400 uppercase">
+                        <!-- Título se inyecta dinámicamente -->
+                    </h2>
+                    <div class="flex gap-4 items-center">
+                        <i id="content-icon" data-lucide="satellite" class="text-cyan-400/50 w-6 h-6 hidden md:block"></i>
+                        <button onclick="closeViewer()" class="text-cyan-400/70 hover:text-cyan-400 bg-cyan-400/10 p-1 rounded transition-colors hidden md:block border border-cyan-400/20 hover:border-cyan-400" title="Cerrar Módulo">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
 
-        let currentActiveInfoKey = null;
+                <!-- Subtitles / Voice Text -->
+                <div id="subtitle-bar" class="w-full bg-cyan-950/60 border-b border-cyan-400/20 p-2 px-6 text-xs font-title text-cyan-300 tracking-wider h-8 flex items-center overflow-hidden">
+                    <span id="subtitle-text"></span><span class="animate-pulse">_</span>
+                </div>
 
-        const infoPanels = {
-            'catalogo_completo': {
-                title: { es: "BASE DE DATOS: CATÁLOGO", en: "DATABASE: CATALOG" },
-                body: { 
+                <!-- Scrollable Content Body -->
+                <div id="content-body" class="flex-1 overflow-y-auto p-4 md:p-8 relative bg-black/40">
+                    <!-- Contenido inyectado aquí -->
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <!-- Data Definitions -->
+    <script>
+        // Content Database
+        const db = {
+            'catalogo': {
+                icon: 'layout-grid',
+                title: { es: "CATÁLOGO DE APLICACIONES", en: "APPLICATIONS CATALOG" },
+                voice: { es: "Accediendo al catálogo de módulos. Listando aplicaciones.", en: "Accessing module catalog. Listing applications." },
+                content: {
                     es: `
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div class="sci-fi-card p-4 flex flex-col rounded">
-                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
-                                <img src="4.jpeg" alt="Krono Personal" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Krono+Personal'">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-up">
+                        <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
+                                <img src="4.jpeg" alt="Krono Personal" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=KRONO+PER'">
                             </div>
-                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> KRONO PERSONAL V.4.0</h4>
-                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">Es el gestor de tiempos ideal para entrenamientos personales. Esta aplicación no necesita instalación, es compatible Android, IOS, Windows y Linux.</p>
-                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">ABRIR MÓDULO</a>
+                            <h4 class="font-title font-bold text-cyan-400 mb-2">> KRONO PERSONAL V.4.0</h4>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">El gestor de tiempos ideal para entrenamientos personales. Sin instalación, compatible con Android, IOS, Windows y Linux.</p>
+                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EJECUTAR</a>
                         </div>
-                        <div class="sci-fi-card p-4 flex flex-col rounded">
-                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
-                                <img src="5.jpeg" alt="Krono Dual" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Krono+Dual'">
+                        <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
+                                <img src="5.jpeg" alt="Krono Dual" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=KRONO+DUAL'">
                             </div>
-                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> KRONO DUAL V.4.0</h4>
-                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">Este es nuestro sistema diseñado para competiciones, los Detectores de cámara son para dos coches, máxima precisión. Esta aplicación no necesita instalación, es compatible Android, IOS, Windows y Linux.</p>
-                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">ABRIR MÓDULO</a>
+                            <h4 class="font-title font-bold text-cyan-400 mb-2">> KRONO DUAL V.4.0</h4>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Sistema para competiciones con detectores de cámara para dos coches y máxima precisión. Compatible multiplataforma.</p>
+                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EJECUTAR</a>
                         </div>
-                        <div class="sci-fi-card p-4 flex flex-col rounded">
-                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
-                                <img src="core.jpg" alt="Tracks Telemetry" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Tracks+Telemetry'">
+                        <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
+                                <img src="core.jpg" alt="Tracks Telemetry" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=TRACKS'">
                             </div>
-                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> TRACKS TELEMETRY</h4>
-                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">Lleva el análisis de tu pista a límites increíbles, desde Diseño en 2D hasta 8 carriles, transformando tu Diseño en un motor potente en 3D, con controles de Motores, Neumáticos, Piñones, Peso y Voltaje. Comunidad Web integrada.</p>
-                            <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">ABRIR MÓDULO</a>
+                            <h4 class="font-title font-bold text-cyan-400 mb-2">> TRACKS TELEMETRY</h4>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Análisis de pista avanzado, diseño 2D a 8 carriles y motor potente en 3D. Control total de setup y comunidad integrada.</p>
+                            <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EJECUTAR</a>
                         </div>
                     </div>
-                    `, 
+                    `,
                     en: `
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div class="sci-fi-card p-4 flex flex-col rounded">
-                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
-                                <img src="app.jpg" alt="Krono Personal" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Krono+Personal'">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-up">
+                        <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
+                                <img src="4.jpeg" alt="Krono Personal" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=KRONO+PER'">
                             </div>
-                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> KRONO PERSONAL V.4.0</h4>
-                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">It is the ideal time manager for personal training. This application does not require installation and is compatible with Android, iOS, Windows, and Linux.</p>
-                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">OPEN MODULE</a>
+                            <h4 class="font-title font-bold text-cyan-400 mb-2">> KRONO PERSONAL V.4.0</h4>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Ideal time manager for personal training. No installation required, compatible with Android, iOS, Windows and Linux.</p>
+                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EXECUTE</a>
                         </div>
-                        <div class="sci-fi-card p-4 flex flex-col rounded">
-                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
-                                <img src="datos.jpg" alt="Krono Dual" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Krono+Dual'">
+                        <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
+                                <img src="5.jpeg" alt="Krono Dual" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=KRONO+DUAL'">
                             </div>
-                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> KRONO DUAL V.4.0</h4>
-                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">This is our system designed for competitions, camera detectors are for two cars, maximum precision. Requires no installation and is compatible with Android, iOS, Windows, and Linux.</p>
-                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">OPEN MODULE</a>
+                            <h4 class="font-title font-bold text-cyan-400 mb-2">> KRONO DUAL V.4.0</h4>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Competition system with camera detectors for two cars and maximum precision. Cross-platform compatible.</p>
+                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EXECUTE</a>
                         </div>
-                        <div class="sci-fi-card p-4 flex flex-col rounded">
-                            <div class="relative w-full overflow-hidden rounded mb-4" style="padding-bottom: 177.78%; height: 0;">
-                                <img src="core.jpg" alt="Tracks Telemetry" class="absolute top-0 left-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/400x700/000205/00e5ff?text=Tracks+Telemetry'">
+                        <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
+                                <img src="core.jpg" alt="Tracks Telemetry" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=TRACKS'">
                             </div>
-                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-2">> TRACKS TELEMETRY</h4>
-                            <p class="text-gray-400 text-xs sm:text-sm mb-4 flex-grow">Take your track analysis to incredible limits, from 2D Design up to 8 lanes, transforming your Design into a powerful 3D engine, with controls for Motors, Tires, Pinions, Weight, Voltage. Integrated Web Community.</p>
-                            <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="block text-center border border-cyan-neon/50 text-cyan-neon py-2 hover:bg-cyan-neon/20 transition-all font-bold">OPEN MODULE</a>
+                            <h4 class="font-title font-bold text-cyan-400 mb-2">> TRACKS TELEMETRY</h4>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Advanced track analysis, 2D to 8-lane design and powerful 3D engine. Full setup control and integrated community.</p>
+                            <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EXECUTE</a>
                         </div>
                     </div>
-                    ` 
+                    `
                 }
             },
-            'simulacion_avanzada': {
+            'simulacion': {
+                icon: 'cpu',
                 title: { es: "SISTEMAS AVANZADOS", en: "ADVANCED SYSTEMS" },
-                body: { 
+                voice: { es: "Entorno visual hiperrealista. Preparando telemetría.", en: "Hyper-realistic visual environment. Preparing telemetry." },
+                content: {
                     es: `
-                    <div class="flex flex-col gap-12">
-                        <div class="sci-fi-card p-4 lg:p-6 flex flex-col lg:flex-row gap-6 items-center">
-                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="w-full lg:w-1/2 relative overflow-hidden rounded border border-cyan-neon/30 aspect-video block">
-                                <img src="k1.png" alt="Krono TV" class="absolute inset-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/1920x1080/000205/00e5ff?text=KRONO+TV'">
+                    <div class="flex flex-col gap-8 animate-slide-up">
+                        <div class="bg-white/5 border border-white/10 p-4 lg:p-6 flex flex-col lg:flex-row gap-6 items-center rounded-sm">
+                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="w-full lg:w-1/2 sci-fi-img-container rounded-sm aspect-video block border-cyan-400/30">
+                                <img src="k1.png" alt="Krono TV" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x450/030b14/00f3ff?text=KRONO+TV'">
                             </a>
                             <div class="w-full lg:w-1/2">
-                                <h4 class="text-2xl font-bold font-sans text-white mb-3">> KRONO V.4.0: Fotodetector Profesional.</h4>
-                                <p class="text-cyan-neon/80 text-sm leading-relaxed mb-4">KRONO V.4.0 es una innovadora aplicación de cronometraje y telemetría que transforma la cámara de tu dispositivo en un fotodetector profesional. Utiliza algoritmos de visión por IA para registrar automáticamente el paso de los vehículos, midiendo tiempos, deltas y velocidades con extrema precisión. Permite configurar modos de carrera por vueltas o tiempo, ofreciendo análisis avanzados de consistencia y asistencia auditiva con voz de ingeniero. Destaca por su espectacular "Modo TV", que sincroniza un panel de telemetría inmersivo en una segunda pantalla vía nube.</p>
+                                <h4 class="font-title text-2xl font-bold text-white mb-3">> KRONO V.4.0</h4>
+                                <h5 class="font-title text-cyan-400 mb-4 text-sm tracking-widest">FOTODETECTOR PROFESIONAL</h5>
+                                <p class="text-gray-300 text-sm md:text-base leading-relaxed font-body">Transforma la cámara de tu dispositivo en un fotodetector profesional mediante algoritmos de visión por IA. Registra tiempos, deltas y velocidades con precisión milimétrica. Destaca por su "Modo TV", que sincroniza un panel de telemetría inmersivo en una segunda pantalla vía nube.</p>
                             </div>
                         </div>
 
-                        <div class="sci-fi-card p-4 lg:p-6 flex flex-col lg:flex-row-reverse gap-6 items-center border-blue-neon/40">
-                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="w-full lg:w-1/2 relative overflow-hidden rounded border border-blue-neon/40 aspect-video block">
-                                <img src="k2.png" alt="Krono Dual TV" class="absolute inset-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/1920x1080/000205/0066ff?text=KRONO+DUAL+TV'">
+                        <div class="bg-white/5 border border-white/10 p-4 lg:p-6 flex flex-col lg:flex-row-reverse gap-6 items-center rounded-sm">
+                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="w-full lg:w-1/2 sci-fi-img-container rounded-sm aspect-video block border-blue-500/30">
+                                <img src="k2.png" alt="Krono Dual TV" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x450/030b14/0066ff?text=KRONO+DUAL+TV'">
                             </a>
                             <div class="w-full lg:w-1/2">
-                                <h4 class="text-2xl font-bold font-sans text-white mb-3">> KronoDual V.4.0: Telemetría Definitiva.</h4>
-                                <p class="text-blue-200/80 text-sm leading-relaxed mb-4">El sistema definitivo para carreras. Detecta el paso a 30fps sin hardware adicional. Modos 1 o 2 jugadores, registrando consistencia y récords con precisión milimétrica. Conecta cualquier Smart TV para mostrar un panel en tiempo real. Control total con avisos por voz, banderas amarillas y anti-rebotes inteligente. Comentarista IA analiza tu rendimiento al finalizar. Transforma tu pista casera en un circuito profesional.</p>
+                                <h4 class="font-title text-2xl font-bold text-white mb-3">> KronoDual V.4.0</h4>
+                                <h5 class="font-title text-blue-400 mb-4 text-sm tracking-widest">TELEMETRÍA DEFINITIVA</h5>
+                                <p class="text-gray-300 text-sm md:text-base leading-relaxed font-body">El sistema definitivo para carreras. Detecta el paso a 30fps sin hardware adicional. Modos 1 o 2 jugadores. Conecta cualquier Smart TV para mostrar un panel en tiempo real. Incluye avisos por voz, banderas amarillas y comentarista IA que analiza tu rendimiento.</p>
                             </div>
                         </div>
                     </div>
-                    `, 
+                    `,
                     en: `
-                    <div class="flex flex-col gap-12">
-                        <div class="sci-fi-card p-4 lg:p-6 flex flex-col lg:flex-row gap-6 items-center">
-                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="w-full lg:w-1/2 relative overflow-hidden rounded border border-cyan-neon/30 aspect-video block">
-                                <img src="k1.png" alt="Krono TV" class="absolute inset-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/1920x1080/000205/00e5ff?text=KRONO+TV'">
+                    <div class="flex flex-col gap-8 animate-slide-up">
+                        <div class="bg-white/5 border border-white/10 p-4 lg:p-6 flex flex-col lg:flex-row gap-6 items-center rounded-sm">
+                            <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="w-full lg:w-1/2 sci-fi-img-container rounded-sm aspect-video block border-cyan-400/30">
+                                <img src="k1.png" alt="Krono TV" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x450/030b14/00f3ff?text=KRONO+TV'">
                             </a>
                             <div class="w-full lg:w-1/2">
-                                <h4 class="text-2xl font-bold font-sans text-white mb-3">> KRONO V.4.0: Professional Photodetector.</h4>
-                                <p class="text-cyan-neon/80 text-sm leading-relaxed mb-4">Transforms your device's camera into a professional photodetector. It uses AI vision algorithms to automatically record passing vehicles, measuring times, deltas, and speeds with extreme precision. It features a spectacular "TV Mode," which synchronizes an immersive telemetry panel on a second screen via the cloud.</p>
+                                <h4 class="font-title text-2xl font-bold text-white mb-3">> KRONO V.4.0</h4>
+                                <h5 class="font-title text-cyan-400 mb-4 text-sm tracking-widest">PROFESSIONAL PHOTODETECTOR</h5>
+                                <p class="text-gray-300 text-sm md:text-base leading-relaxed font-body">Transforms your device's camera into a professional photodetector using AI vision algorithms. Records times, deltas, and speeds with pinpoint accuracy. Features a spectacular "TV Mode" that syncs an immersive telemetry panel on a second screen via the cloud.</p>
                             </div>
                         </div>
-                        <div class="sci-fi-card p-4 lg:p-6 flex flex-col lg:flex-row-reverse gap-6 items-center border-blue-neon/40">
-                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="w-full lg:w-1/2 relative overflow-hidden rounded border border-blue-neon/40 aspect-video block">
-                                <img src="k2.png" alt="Krono Dual TV" class="absolute inset-0 w-full h-full object-cover sci-fi-img" onerror="this.src='https://placehold.co/1920x1080/000205/0066ff?text=KRONO+DUAL+TV'">
+
+                        <div class="bg-white/5 border border-white/10 p-4 lg:p-6 flex flex-col lg:flex-row-reverse gap-6 items-center rounded-sm">
+                            <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="w-full lg:w-1/2 sci-fi-img-container rounded-sm aspect-video block border-blue-500/30">
+                                <img src="k2.png" alt="Krono Dual TV" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x450/030b14/0066ff?text=KRONO+DUAL+TV'">
                             </a>
                             <div class="w-full lg:w-1/2">
-                                <h4 class="text-2xl font-bold font-sans text-white mb-3">> KronoDual V.4.0: Ultimate Telemetry.</h4>
-                                <p class="text-blue-200/80 text-sm leading-relaxed mb-4">The definitive timing and telemetry system. Detects passing cars at 30fps without additional hardware. Enjoy game modes for 1 or 2 players, recording consistency and records with pinpoint accuracy. Connect any Smart TV via the cloud to display a real-time panel. Total control with voice prompts, yellow flags, and smart anti-bounce.</p>
+                                <h4 class="font-title text-2xl font-bold text-white mb-3">> KronoDual V.4.0</h4>
+                                <h5 class="font-title text-blue-400 mb-4 text-sm tracking-widest">ULTIMATE TELEMETRY</h5>
+                                <p class="text-gray-300 text-sm md:text-base leading-relaxed font-body">The definitive racing system. Detects passes at 30fps without extra hardware. 1 or 2 player modes. Connect any Smart TV for real-time display. Includes voice alerts, yellow flags, and an AI commentator that analyzes your performance.</p>
                             </div>
                         </div>
                     </div>
-                    ` 
+                    `
                 }
             },
             'arquitectura': {
+                icon: 'network',
                 title: { es: "TECNOLOGÍA DE COMPETICIÓN", en: "COMPETITION TECHNOLOGY" },
-                body: { 
+                voice: { es: "Sistemas operativos de IA y motor gráfico 3D en línea.", en: "Operating systems of AI and 3D graphics engine online." },
+                content: {
                     es: `
-                    <div class="flex flex-col md:flex-row gap-8 justify-center">
-                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-cyan-neon text-center">
-                            <i data-lucide="camera" class="w-10 h-10 mx-auto text-cyan-neon mb-4"></i>
-                            <h4 class="text-lg font-bold font-sans text-white mb-3">> VISIÓN ARTIFICIAL</h4>
-                            <p class="text-gray-400 text-sm">Sistemas de cronometraje sin hardware dedicado. Usamos tu cámara web y algoritmos de detección de movimiento para calcular tiempos por vuelta exactos.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-full items-center animate-slide-up">
+                        <div class="bg-white/5 border border-white/10 p-8 rounded-sm text-center hover:bg-cyan-900/20 transition-all border-t-4 border-t-cyan-400">
+                            <i data-lucide="camera" class="w-12 h-12 mx-auto text-cyan-400 mb-6"></i>
+                            <h4 class="font-title text-lg font-bold text-white mb-4 tracking-widest">VISIÓN ARTIFICIAL</h4>
+                            <p class="text-gray-400 text-sm font-body">Sistemas de cronometraje sin hardware dedicado. Usamos tu cámara web y algoritmos de detección de movimiento para calcular tiempos por vuelta exactos.</p>
                         </div>
-                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-blue-neon text-center">
-                            <i data-lucide="monitor-play" class="w-10 h-10 mx-auto text-blue-neon mb-4"></i>
-                            <h4 class="text-lg font-bold font-sans text-white mb-3">> SIMULACIÓN 3D</h4>
-                            <p class="text-gray-400 text-sm">Motores gráficos en navegador (Three.js) para recrear tus pistas. Físicas de gravedad, control de derrape y personalización de vehículos.</p>
+                        <div class="bg-white/5 border border-white/10 p-8 rounded-sm text-center hover:bg-blue-900/20 transition-all border-t-4 border-t-blue-500">
+                            <i data-lucide="monitor-play" class="w-12 h-12 mx-auto text-blue-500 mb-6"></i>
+                            <h4 class="font-title text-lg font-bold text-white mb-4 tracking-widest">SIMULACIÓN 3D</h4>
+                            <p class="text-gray-400 text-sm font-body">Motores gráficos en navegador (Three.js) para recrear tus pistas. Físicas de gravedad, control de derrape y personalización total.</p>
                         </div>
-                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-purple-500 text-center">
-                            <i data-lucide="wifi" class="w-10 h-10 mx-auto text-purple-500 mb-4"></i>
-                            <h4 class="text-lg font-bold font-sans text-white mb-3">> MULTIJUGADOR P2P</h4>
-                            <p class="text-gray-400 text-sm">Conexiones Peer-to-Peer directas. Compite en tiempo real con amigos de todo el mundo, comparte circuitos y comunícate por voz sin latencia.</p>
+                        <div class="bg-white/5 border border-white/10 p-8 rounded-sm text-center hover:bg-purple-900/20 transition-all border-t-4 border-t-purple-500">
+                            <i data-lucide="wifi" class="w-12 h-12 mx-auto text-purple-500 mb-6"></i>
+                            <h4 class="font-title text-lg font-bold text-white mb-4 tracking-widest">MULTIJUGADOR P2P</h4>
+                            <p class="text-gray-400 text-sm font-body">Conexiones Peer-to-Peer directas. Compite en tiempo real globalmente, comparte circuitos y comunícate por voz sin latencia.</p>
                         </div>
                     </div>
-                    `, 
+                    `,
                     en: `
-                    <div class="flex flex-col md:flex-row gap-8 justify-center">
-                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-cyan-neon text-center">
-                            <i data-lucide="camera" class="w-10 h-10 mx-auto text-cyan-neon mb-4"></i>
-                            <h4 class="text-lg font-bold font-sans text-white mb-3">> COMPUTER VISION</h4>
-                            <p class="text-gray-400 text-sm">Timing systems without dedicated hardware. We use your webcam and motion detection algorithms to calculate exact lap times.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-full items-center animate-slide-up">
+                        <div class="bg-white/5 border border-white/10 p-8 rounded-sm text-center hover:bg-cyan-900/20 transition-all border-t-4 border-t-cyan-400">
+                            <i data-lucide="camera" class="w-12 h-12 mx-auto text-cyan-400 mb-6"></i>
+                            <h4 class="font-title text-lg font-bold text-white mb-4 tracking-widest">COMPUTER VISION</h4>
+                            <p class="text-gray-400 text-sm font-body">Timing systems without dedicated hardware. We use your webcam and motion detection algorithms to calculate exact lap times.</p>
                         </div>
-                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-blue-neon text-center">
-                            <i data-lucide="monitor-play" class="w-10 h-10 mx-auto text-blue-neon mb-4"></i>
-                            <h4 class="text-lg font-bold font-sans text-white mb-3">> 3D SIMULATION</h4>
-                            <p class="text-gray-400 text-sm">Browser-based graphics engines (Three.js) to recreate your tracks. Gravity physics, drift control, and vehicle customization.</p>
+                        <div class="bg-white/5 border border-white/10 p-8 rounded-sm text-center hover:bg-blue-900/20 transition-all border-t-4 border-t-blue-500">
+                            <i data-lucide="monitor-play" class="w-12 h-12 mx-auto text-blue-500 mb-6"></i>
+                            <h4 class="font-title text-lg font-bold text-white mb-4 tracking-widest">3D SIMULATION</h4>
+                            <p class="text-gray-400 text-sm font-body">Browser-based graphics engines (Three.js) to recreate your tracks. Gravity physics, drift control, and full customization.</p>
                         </div>
-                        <div class="sci-fi-card p-6 flex-1 rounded border-t-4 border-t-purple-500 text-center">
-                            <i data-lucide="wifi" class="w-10 h-10 mx-auto text-purple-500 mb-4"></i>
-                            <h4 class="text-lg font-bold font-sans text-white mb-3">> P2P MULTIPLAYER</h4>
-                            <p class="text-gray-400 text-sm">Direct Peer-to-Peer connections. Compete in real-time with friends worldwide, share circuits, and communicate via voice with zero latency.</p>
+                        <div class="bg-white/5 border border-white/10 p-8 rounded-sm text-center hover:bg-purple-900/20 transition-all border-t-4 border-t-purple-500">
+                            <i data-lucide="wifi" class="w-12 h-12 mx-auto text-purple-500 mb-6"></i>
+                            <h4 class="font-title text-lg font-bold text-white mb-4 tracking-widest">P2P MULTIPLAYER</h4>
+                            <p class="text-gray-400 text-sm font-body">Direct Peer-to-Peer connections. Compete in real-time globally, share circuits, and communicate via voice with zero latency.</p>
                         </div>
                     </div>
-                    ` 
+                    `
                 }
             },
             'filosofia': {
-                title: { es: "PASIÓN POR EL SLOT", en: "PASSION FOR SLOT" },
-                body: { 
+                icon: 'flame',
+                title: { es: "FILOSOFÍA DEL ECOSISTEMA", en: "ECOSYSTEM PHILOSOPHY" },
+                voice: { es: "Leyendo manifiesto base. Pasión por la simulación pura.", en: "Reading base manifesto. Passion for pure simulation." },
+                content: {
                     es: `
-                    <div class="p-4 md:p-8 text-center max-w-4xl mx-auto">
-                        <h2 class="text-3xl md:text-5xl font-bold tracking-tight mb-8 font-sans text-white">Software de Slot.<br/><span class="text-cyan-neon">Simulación Pura.</span></h2>
-                        <p class="text-gray-300 text-lg mb-6 leading-relaxed">En SlotSoftware no hacemos simples aplicaciones; creamos el ecosistema digital que el automodelismo de ranura merece. Entendemos que la velocidad y la precisión son lo único que importa en la pista.</p>
-                        <p class="text-gray-400 text-base leading-relaxed">Optimizamos nuestras herramientas web para que disfrutes de físicas reales a 60FPS y detecciones de vuelta exactas usando solo la cámara de tu móvil o PC. Llevamos el hobby clásico a la era del juego en la nube y el multijugador global.</p>
+                    <div class="flex flex-col justify-center items-center h-full text-center max-w-4xl mx-auto animate-slide-up p-4">
+                        <h2 class="font-title text-4xl md:text-6xl font-bold tracking-tight mb-8 text-white">
+                            Software de Slot.<br/>
+                            <span class="text-cyan-400 text-neon">Simulación Pura.</span>
+                        </h2>
+                        <div class="w-24 h-1 bg-cyan-400 mb-8 mx-auto"></div>
+                        <p class="text-gray-300 text-lg md:text-xl mb-6 leading-relaxed font-body">En SlotSoftware no hacemos simples aplicaciones; creamos el ecosistema digital que el automodelismo de ranura merece. Entendemos que la velocidad y la precisión son lo único que importa en la pista.</p>
+                        <p class="text-gray-400 text-base md:text-lg leading-relaxed font-body">Optimizamos nuestras herramientas web para que disfrutes de físicas reales a 60FPS y detecciones de vuelta exactas usando solo la cámara de tu móvil o PC. Llevamos el hobby clásico a la era del juego en la nube y el multijugador global.</p>
                     </div>
-                    `, 
+                    `,
                     en: `
-                    <div class="p-4 md:p-8 text-center max-w-4xl mx-auto">
-                        <h2 class="text-3xl md:text-5xl font-bold tracking-tight mb-8 font-sans text-white">Slot Software.<br/><span class="text-cyan-neon">Pure Simulation.</span></h2>
-                        <p class="text-gray-300 text-lg mb-6 leading-relaxed">At SlotSoftware we don't just make apps; we create the digital ecosystem that slot car racing deserves. We understand that speed and precision are all that matter on the track.</p>
-                        <p class="text-gray-400 text-base leading-relaxed">We optimize our web tools so you can enjoy real physics at 60FPS and exact lap detections using only your phone or PC camera. We bring the classic hobby into the era of cloud gaming and global multiplayer.</p>
+                    <div class="flex flex-col justify-center items-center h-full text-center max-w-4xl mx-auto animate-slide-up p-4">
+                        <h2 class="font-title text-4xl md:text-6xl font-bold tracking-tight mb-8 text-white">
+                            Slot Software.<br/>
+                            <span class="text-cyan-400 text-neon">Pure Simulation.</span>
+                        </h2>
+                        <div class="w-24 h-1 bg-cyan-400 mb-8 mx-auto"></div>
+                        <p class="text-gray-300 text-lg md:text-xl mb-6 leading-relaxed font-body">At SlotSoftware we don't just make apps; we create the digital ecosystem that slot car racing deserves. We understand that speed and precision are all that matter on the track.</p>
+                        <p class="text-gray-400 text-base md:text-lg leading-relaxed font-body">We optimize our web tools so you can enjoy real physics at 60FPS and exact lap detections using only your phone or PC camera. We bring the classic hobby into the era of cloud gaming and global multiplayer.</p>
                     </div>
-                    ` 
+                    `
                 }
             },
-            'privacidad_terminos': {
-                title: { es: "POLÍTICAS DEL SISTEMA", en: "SYSTEM POLICIES" },
-                body: { 
+            'productos': {
+                icon: 'image',
+                title: { es: "INVENTARIO VISUAL", en: "VISUAL INVENTORY" },
+                voice: { es: "Desplegando catálogo de productos visuales.", en: "Deploying visual products catalog." },
+                content: {
                     es: `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-                        <div class="sci-fi-card p-6">
-                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-4 border-b border-cyan-neon/20 pb-2">PRIVACIDAD</h4>
-                            <p class="text-white mb-2"><strong>1. Recopilación de Datos</strong></p>
-                            <p class="text-gray-400 text-sm mb-4">Nuestras aplicaciones procesan el flujo de la cámara localmente. No grabamos ni transmitimos el vídeo a servidores.</p>
-                            <p class="text-white mb-2"><strong>2. Conexiones P2P</strong></p>
-                            <p class="text-gray-400 text-sm">El multijugador utiliza Peer-to-Peer. La conexión se establece directamente entre usuarios.</p>
-                        </div>
-                        <div class="sci-fi-card p-6">
-                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-4 border-b border-cyan-neon/20 pb-2">TÉRMINOS</h4>
-                            <p class="text-white mb-2"><strong>1. Propiedad Intelectual</strong></p>
-                            <p class="text-gray-400 text-sm mb-4">El código, diseño y algoritmos son propiedad de SlotSoftware. Prohibida su distribución comercial.</p>
-                            <p class="text-white mb-2"><strong>2. Exención de Responsabilidad</strong></p>
-                            <p class="text-gray-400 text-sm">Software suministrado "tal cual". No nos hacemos responsables por fallos derivados del hardware del usuario.</p>
-                        </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 animate-slide-up">
+                        <a href="https://slotsoftware.github.io/TiemposPersonal/" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="1.jpg" alt="Producto 1" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+1'">
+                        </a>
+                        <a href="https://slotsoftware.github.io/TiemposDual/" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="2.jpg" alt="Producto 2" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+2'">
+                        </a>
+                        <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="3.jpg" alt="Producto 3" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+3'">
+                        </a>
+                        <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="4.jpeg" alt="Producto 4" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+4'">
+                        </a>
+                        <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="5.jpeg" alt="Producto 5" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+5'">
+                        </a>
+                        <a href="https://slotsoftware.github.io/Web/canal.html" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="6.jpeg" alt="Producto 6" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+6'">
+                        </a>
                     </div>
-                    `, 
+                    `,
                     en: `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-                        <div class="sci-fi-card p-6">
-                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-4 border-b border-cyan-neon/20 pb-2">PRIVACY</h4>
-                            <p class="text-white mb-2"><strong>1. Data Collection</strong></p>
-                            <p class="text-gray-400 text-sm mb-4">Our apps process the camera stream locally. We do not record or transmit video to servers.</p>
-                            <p class="text-white mb-2"><strong>2. P2P Connections</strong></p>
-                            <p class="text-gray-400 text-sm">Multiplayer uses Peer-to-Peer. Connections are established directly between users.</p>
+                    <!-- Same structure as ES, links remain identical -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 animate-slide-up">
+                        <a href="https://slotsoftware.github.io/TiemposPersonal/" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="1.jpg" alt="Producto 1" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+1'">
+                        </a>
+                        <a href="https://slotsoftware.github.io/TiemposDual/" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="2.jpg" alt="Producto 2" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+2'">
+                        </a>
+                        <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="3.jpg" alt="Producto 3" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+3'">
+                        </a>
+                        <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="4.jpeg" alt="Producto 4" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+4'">
+                        </a>
+                        <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="5.jpeg" alt="Producto 5" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+5'">
+                        </a>
+                        <a href="https://slotsoftware.github.io/Web/canal.html" target="_blank" class="sci-fi-img-container aspect-[1/2] rounded-sm">
+                            <img src="6.jpeg" alt="Producto 6" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x1200/030b14/00f3ff?text=MOD+6'">
+                        </a>
+                    </div>
+                    `
+                }
+            },
+            'comunicacion': {
+                icon: 'radio',
+                title: { es: "COMUNICACIÓN Y PROTOCOLOS", en: "COMMUNICATION & PROTOCOLS" },
+                voice: { es: "Canal de transmisión abierto. Protocolos listos.", en: "Transmission channel open. Protocols ready." },
+                content: {
+                    es: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-slide-up h-full">
+                        <!-- Contact Form -->
+                        <div class="bg-white/5 border border-white/10 p-6 rounded-sm flex flex-col">
+                            <h4 class="font-title text-xl font-bold text-cyan-400 mb-6 border-b border-cyan-400/20 pb-2">> TRANSMISIÓN DE DATOS</h4>
+                            <form action="https://formsubmit.co/slotcarhome@gmail.com" method="POST" class="flex flex-col gap-4 flex-1">
+                                <input type="hidden" name="_subject" value="Transmisión desde Red SlotSoftware">
+                                <input type="hidden" name="_captcha" value="false">
+                                
+                                <div>
+                                    <label class="block text-cyan-400/70 mb-1 text-xs font-title tracking-widest">IDENTIFICADOR (NOMBRE)</label>
+                                    <input type="text" name="name" required class="w-full bg-space-dark/50 border border-white/10 p-3 rounded-sm text-white focus:border-cyan-400 focus:outline-none transition-colors font-body">
+                                </div>
+                                <div>
+                                    <label class="block text-cyan-400/70 mb-1 text-xs font-title tracking-widest">RUTA DE RETORNO (EMAIL)</label>
+                                    <input type="email" name="email" required class="w-full bg-space-dark/50 border border-white/10 p-3 rounded-sm text-white focus:border-cyan-400 focus:outline-none transition-colors font-body">
+                                </div>
+                                <div class="flex-1 flex flex-col">
+                                    <label class="block text-cyan-400/70 mb-1 text-xs font-title tracking-widest">PAQUETE (MENSAJE)</label>
+                                    <textarea name="message" required class="w-full flex-1 bg-space-dark/50 border border-white/10 p-3 rounded-sm text-white focus:border-cyan-400 focus:outline-none transition-colors resize-none font-body min-h-[100px]"></textarea>
+                                </div>
+                                <button type="submit" class="mt-2 w-full bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-3 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EJECUTAR ENVÍO</button>
+                            </form>
                         </div>
-                        <div class="sci-fi-card p-6">
-                            <h4 class="text-xl font-bold font-sans text-cyan-neon mb-4 border-b border-cyan-neon/20 pb-2">TERMS</h4>
-                            <p class="text-white mb-2"><strong>1. Intellectual Property</strong></p>
-                            <p class="text-gray-400 text-sm mb-4">Code, design, and algorithms are property of SlotSoftware. Commercial distribution prohibited.</p>
-                            <p class="text-white mb-2"><strong>2. Limitation of Liability</strong></p>
-                            <p class="text-gray-400 text-sm">Software provided "as is". Not responsible for failures arising from user hardware.</p>
+
+                        <!-- Policies -->
+                        <div class="flex flex-col gap-6">
+                            <div class="bg-white/5 border border-white/10 p-6 rounded-sm">
+                                <h4 class="font-title text-xl font-bold text-cyan-400 mb-4 border-b border-cyan-400/20 pb-2">PRIVACIDAD</h4>
+                                <p class="text-white mb-1 font-title text-sm">1. Procesamiento Local</p>
+                                <p class="text-gray-400 text-sm mb-4 font-body">Nuestras aplicaciones procesan el flujo de la cámara localmente. No grabamos ni transmitimos el vídeo a servidores.</p>
+                                <p class="text-white mb-1 font-title text-sm">2. Conexiones P2P</p>
+                                <p class="text-gray-400 text-sm font-body">El multijugador utiliza Peer-to-Peer. La conexión se establece directamente entre usuarios.</p>
+                            </div>
+                            <div class="bg-white/5 border border-white/10 p-6 rounded-sm flex-1">
+                                <h4 class="font-title text-xl font-bold text-cyan-400 mb-4 border-b border-cyan-400/20 pb-2">TÉRMINOS</h4>
+                                <p class="text-white mb-1 font-title text-sm">1. Propiedad Intelectual</p>
+                                <p class="text-gray-400 text-sm mb-4 font-body">El código, diseño y algoritmos son propiedad de SlotSoftware. Prohibida su distribución comercial.</p>
+                                <p class="text-white mb-1 font-title text-sm">2. Software</p>
+                                <p class="text-gray-400 text-sm font-body">Suministrado "tal cual". No nos hacemos responsables por fallos derivados del hardware del usuario.</p>
+                            </div>
                         </div>
                     </div>
-                    ` 
+                    `,
+                    en: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-slide-up h-full">
+                        <!-- Contact Form -->
+                        <div class="bg-white/5 border border-white/10 p-6 rounded-sm flex flex-col">
+                            <h4 class="font-title text-xl font-bold text-cyan-400 mb-6 border-b border-cyan-400/20 pb-2">> DATA TRANSMISSION</h4>
+                            <form action="https://formsubmit.co/slotcarhome@gmail.com" method="POST" class="flex flex-col gap-4 flex-1">
+                                <input type="hidden" name="_subject" value="Transmission from SlotSoftware Network">
+                                <input type="hidden" name="_captcha" value="false">
+                                
+                                <div>
+                                    <label class="block text-cyan-400/70 mb-1 text-xs font-title tracking-widest">IDENTIFIER (NAME)</label>
+                                    <input type="text" name="name" required class="w-full bg-space-dark/50 border border-white/10 p-3 rounded-sm text-white focus:border-cyan-400 focus:outline-none transition-colors font-body">
+                                </div>
+                                <div>
+                                    <label class="block text-cyan-400/70 mb-1 text-xs font-title tracking-widest">RETURN PATH (EMAIL)</label>
+                                    <input type="email" name="email" required class="w-full bg-space-dark/50 border border-white/10 p-3 rounded-sm text-white focus:border-cyan-400 focus:outline-none transition-colors font-body">
+                                </div>
+                                <div class="flex-1 flex flex-col">
+                                    <label class="block text-cyan-400/70 mb-1 text-xs font-title tracking-widest">PACKET (MESSAGE)</label>
+                                    <textarea name="message" required class="w-full flex-1 bg-space-dark/50 border border-white/10 p-3 rounded-sm text-white focus:border-cyan-400 focus:outline-none transition-colors resize-none font-body min-h-[100px]"></textarea>
+                                </div>
+                                <button type="submit" class="mt-2 w-full bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-3 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EXECUTE SEND</button>
+                            </form>
+                        </div>
+
+                        <!-- Policies -->
+                        <div class="flex flex-col gap-6">
+                            <div class="bg-white/5 border border-white/10 p-6 rounded-sm">
+                                <h4 class="font-title text-xl font-bold text-cyan-400 mb-4 border-b border-cyan-400/20 pb-2">PRIVACY</h4>
+                                <p class="text-white mb-1 font-title text-sm">1. Local Processing</p>
+                                <p class="text-gray-400 text-sm mb-4 font-body">Our apps process the camera stream locally. We do not record or transmit video to servers.</p>
+                                <p class="text-white mb-1 font-title text-sm">2. P2P Connections</p>
+                                <p class="text-gray-400 text-sm font-body">Multiplayer uses Peer-to-Peer. Connections are established directly between users.</p>
+                            </div>
+                            <div class="bg-white/5 border border-white/10 p-6 rounded-sm flex-1">
+                                <h4 class="font-title text-xl font-bold text-cyan-400 mb-4 border-b border-cyan-400/20 pb-2">TERMS</h4>
+                                <p class="text-white mb-1 font-title text-sm">1. Intellectual Property</p>
+                                <p class="text-gray-400 text-sm mb-4 font-body">Code, design, and algorithms are property of SlotSoftware. Commercial distribution prohibited.</p>
+                                <p class="text-white mb-1 font-title text-sm">2. Software</p>
+                                <p class="text-gray-400 text-sm font-body">Provided "as is". We are not responsible for failures arising from user hardware.</p>
+                            </div>
+                        </div>
+                    </div>
+                    `
                 }
             }
         };
 
-        function showDynamicInfo(key) {
-            currentActiveInfoKey = key;
-            const data = infoPanels[key];
-            if (!data) return;
-            const lang = getCurrentLang();
-            document.getElementById('info-title').innerText = data.title[lang];
-            
-            const bodyContainer = document.getElementById('info-body');
-            bodyContainer.classList.remove('animate-fade-in');
-            void bodyContainer.offsetWidth;
-            bodyContainer.classList.add('animate-fade-in');
-            
-            bodyContainer.innerHTML = data.body[lang];
-            
-            openModal('info-modal');
-            lucide.createIcons();
-        }
-
-        const configuracionMenus = [
-            { 
-                id: "CATALOGO", nombre: { es: "MÓDULO CATÁLOGO", en: "CATALOG MODULE" },
-                voz: { es: "Accediendo al catálogo de módulos. Listando aplicaciones.", en: "Accessing module catalog. Listing applications." },
-                links: [
-                    { textEs: "VER CATÁLOGO COMPLETO (APP/DATOS)", textEn: "VIEW FULL CATALOG (APP/DATA)", action: () => showDynamicInfo('catalogo_completo') },
-                    { textEs: "ACCESO DIRECTO: KRONO PER", textEn: "DIRECT LINK: KRONO PER", action: () => window.open("https://slotsoftware.github.io/KronoPerTV/", "_blank") },
-                    { textEs: "ACCESO DIRECTO: KRONO DUAL", textEn: "DIRECT LINK: KRONO DUAL", action: () => window.open("https://slotsoftware.github.io/KronoDual-TV/", "_blank") },
-                ] 
-            },
-            { 
-                id: "SIMULACION", nombre: { es: "MÓDULO SIMULACIÓN", en: "SIMULATION MODULE" },
-                voz: { es: "Entorno visual hiperrealista. Preparando telemetría.", en: "Hyper-realistic visual environment. Preparing telemetry." },
-                links: [
-                    { textEs: "VER DETALLES DE SIMULACIÓN", textEn: "VIEW SIMULATION DETAILS", action: () => showDynamicInfo('simulacion_avanzada') },
-                    { textEs: "CANAL NOVEDADES RED", textEn: "NETWORK NEWS CHANNEL", action: () => window.open("canal.html", "_blank") }
-                ] 
-            },
-            { 
-                id: "ARQUITECTURA", nombre: { es: "MÓDULO ARQUITECTURA", en: "ARCHITECTURE MODULE" },
-                voz: { es: "Sistemas operativos de IA y motor gráfico 3D en línea.", en: "Operating systems of AI and 3D graphics engine online." },
-                links: [
-                    { textEs: "TECNOLOGÍA DE COMPETICIÓN", textEn: "COMPETITION TECHNOLOGY", action: () => showDynamicInfo('arquitectura') }
-                ] 
-            },
-            { 
-                id: "DIRECTIVAS", nombre: { es: "MÓDULO DIRECTIVAS", en: "DIRECTIVES MODULE" },
-                voz: { es: "Leyendo manifiesto base. Pasión por la simulación pura.", en: "Reading base manifesto. Passion for pure simulation." },
-                links: [
-                    { textEs: "NUESTRA FILOSOFÍA", textEn: "OUR PHILOSOPHY", action: () => showDynamicInfo('filosofia') }
-                ] 
-            },
-            { 
-                id: "COMUNICACION", nombre: { es: "MÓDULO COMUNICACIÓN", en: "COMMUNICATION MODULE" },
-                voz: { es: "Canal de transmisión abierto. Protocolos de seguridad listos.", en: "Transmission channel open. Security protocols ready." },
-                links: [
-                    { textEs: "INICIAR TRANSMISIÓN (CONTACTO)", textEn: "INITIATE TRANSMISSION (CONTACT)", action: () => openModal('contact-modal') },
-                    { textEs: "POLÍTICAS Y TÉRMINOS", textEn: "POLICIES & TERMS", action: () => showDynamicInfo('privacidad_terminos') }
-                ] 
-            },
-            { 
-                id: "PRODUCTOS", nombre: { es: "MÓDULO PRODUCTOS", en: "PRODUCTS MODULE" },
-                voz: { es: "Desplegando catálogo de productos visuales.", en: "Deploying visual products catalog." },
-                links: [
-                    { textEs: "ABRIR CATÁLOGO VISUAL", textEn: "OPEN VISUAL CATALOG", action: () => openProductosModal() }
-                ] 
-            }
+        const navConfig = [
+            { id: 'catalogo', label: { es: 'CATÁLOGO', en: 'CATALOG' } },
+            { id: 'simulacion', label: { es: 'SIMULACIÓN', en: 'SIMULATION' } },
+            { id: 'arquitectura', label: { es: 'ARQUITECTURA', en: 'ARCHITECTURE' } },
+            { id: 'filosofia', label: { es: 'FILOSOFÍA', en: 'PHILOSOPHY' } },
+            { id: 'productos', label: { es: 'PRODUCTOS', en: 'PRODUCTS' } },
+            { id: 'comunicacion', label: { es: 'COMUNICACIÓN', en: 'CONTACT' } }
         ];
 
-        const zodiacs = [
-            [{x:0, y:0}, {x:35, y:-20}, {x:70, y:12}],
-            [{x:0, y:0}, {x:-30, y:-35}, {x:-60, y:-30}, {x:-12, y:30}, {x:20, y:50}],
-            [{x:0, y:0}, {x:-18, y:-45}, {x:25, y:-55}, {x:35, y:-18}, {x:30, y:30}],
-            [{x:0, y:0}, {x:-35, y:-12}, {x:-18, y:30}, {x:30, y:18}],
-            [{x:0, y:0}, {x:-30, y:-45}, {x:12, y:-70}, {x:48, y:-52}, {x:40, y:-12}, {x:70, y:18}],
-            [{x:0, y:0}, {x:20, y:-30}, {x:45, y:-10}, {x:25, y:25}, {x:-15, y:20}]
-        ];
-        
-        const nombresZodiaco = {
-            es: ["CATÁLOGO", "SIMULACIÓN", "ARQUITECTURA", "DIRECTIVAS", "COMUNICACIÓN", "PRODUCTOS"],
-            en: ["CATALOG", "SIMULATION", "ARCHITECTURE", "DIRECTIVES", "COMMUNICATION", "PRODUCTS"]
-        };
-        const descripcionesZodiaco = {
-            es: ["APLICACIONES Y GESTORES", "ENTORNOS 3D Y TELEMETRÍA", "MOTORES GRÁFICOS E IA", "FILOSOFÍA DEL ECOSISTEMA", "CONTACTO Y POLÍTICAS", "CATÁLOGO DE INVENTARIO"],
-            en: ["APPLICATIONS & MANAGERS", "3D ENVIRONMENTS & TELEMETRY", "GRAPHICS ENGINES & AI", "ECOSYSTEM PHILOSOPHY", "CONTACT & POLICIES", "INVENTORY CATALOG"]
-        };
-
-        const URL_MUSICA_GITHUB = "./1.mp3";
-        let audioCtx, masterGain, musicMuted = false, bgAudioElement = null;
-
-        function prepararAudio() {
-            if (!bgAudioElement) {
-                bgAudioElement = new Audio();
-                bgAudioElement.src = URL_MUSICA_GITHUB;
-                bgAudioElement.loop = true;
-                bgAudioElement.volume = 0.5;
-            }
-        }
-
-        function initAudio() {
-            if (!audioCtx) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContext();
-                masterGain = audioCtx.createGain(); masterGain.gain.value = 0.6;
-                masterGain.connect(audioCtx.destination);
-            }
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            prepararAudio();
-            if (!musicMuted) bgAudioElement.play().catch(e => console.log("Musica no encontrada localmente", e));
-        }
-
-        function toggleAudioMute() {
-            musicMuted = !musicMuted;
-            const btn = document.getElementById('audio-toggle');
-            prepararAudio();
-            if (musicMuted) {
-                bgAudioElement.pause(); btn.innerText = "AUDIO: OFF"; btn.style.opacity = "0.5";
-            } else {
-                bgAudioElement.play().catch(e => {}); btn.innerText = "AUDIO: ON"; btn.style.opacity = "1";
-            }
-        }
-
-        function playDigitalChime(isOpen) {
-            if(!audioCtx) return;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = 'sine'; osc.frequency.setValueAtTime(isOpen ? 1800 : 1200, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(isOpen ? 2400 : 800, audioCtx.currentTime + 0.08);
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-            osc.connect(gain); gain.connect(masterGain);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.08);
-        }
-
+        let currentActiveId = null;
         let typeTimeoutSub;
-        function reproducirVozCinematica(textoObj) {
-            clearTimeout(typeTimeoutSub);
-            window.speechSynthesis.cancel();
-            
-            const lang = getCurrentLang();
-            const texto = textoObj[lang];
-            const subtitleContainer = document.getElementById('subtitle-container');
-            const subtitleText = document.getElementById('subtitle-text');
-            
-            subtitleContainer.style.opacity = 1; subtitleText.innerHTML = "";
-            
-            let msg = new SpeechSynthesisUtterance(texto);
-            msg.lang = lang === 'en' ? 'en-US' : 'es-ES';
-            msg.pitch = 0.8; msg.rate = 1.1; 
-            
-            let i = 0;
-            function teclear() {
-                if (i < texto.length) {
-                    subtitleText.innerHTML += texto.charAt(i); i++;
-                    typeTimeoutSub = setTimeout(teclear, 30); 
-                } else {
-                    typeTimeoutSub = setTimeout(() => { subtitleContainer.style.opacity = 0; }, 4000);
-                }
-            }
-            teclear();
-            window.speechSynthesis.speak(msg);
-        }
+        const bgAudioElement = new Audio('./1.mp3'); 
+        bgAudioElement.loop = true;
+        bgAudioElement.volume = 0.4;
+        let audioEnabled = true;
 
-        const canvas = document.getElementById('bg-canvas');
+        lucide.createIcons();
+
+        // Canvas Setup (Galaxy & Suns Original Logic)
+        const canvas = document.getElementById('space-canvas');
         const ctx = canvas.getContext('2d');
         let w, h;
-        let nodes = [], menuNodes = [], backgroundStars = [], distantSuns = [], shootingStars = [], galaxyParticles = [];
+        
+        let backgroundStars = [];
+        let distantSuns = []; 
+        let galaxyParticles = [];
         let galaxyCenter = {x: 0, y: 0}, galaxyRadius = 0;
-        let pointer = { x: -1000, y: -1000, screenX: -1000, screenY: -1000 };
-        let globalTime = 0, camera = { x: 0, y: 0, zoom: 1, angle: 0 }, targetCamera = { x: 0, y: 0, zoom: 1, angle: 0 };
-        let isDragging = false, draggedNode = null, dragStartPos = { x: 0, y: 0 }, activeMenuIndex = -1;
-        let typingIntervals = [];
-
-        function screenToWorld(sx, sy) {
-            let dx = sx - w / 2, dy = sy - h / 2;
-            let cos = Math.cos(-camera.angle), sin = Math.sin(-camera.angle);
-            let rx = dx * cos - dy * sin, ry = dx * sin + dy * cos;
-            return { x: camera.x + rx / camera.zoom, y: camera.y + ry / camera.zoom };
-        }
-
-        function worldToScreen(wx, wy) {
-            let dx = (wx - camera.x) * camera.zoom, dy = (wy - camera.y) * camera.zoom;
-            let cos = Math.cos(camera.angle), sin = Math.sin(camera.angle);
-            let sx = w / 2 + dx * cos - dy * sin, sy = h / 2 + dx * sin + dy * cos;
-            return { x: sx, y: sy };
-        }
+        let globalTime = 0;
+        
+        // Variables para reaccionar al ratón suavemente
+        let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
 
         function resize() {
-            w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight;
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
             iniciarUniversoProfundo();
-            if (activeMenuIndex === -1) { camera.x = targetCamera.x = w / 2; camera.y = targetCamera.y = h / 2; } 
-            else { posicionarMenuSobreNodo(activeMenuIndex); }
         }
 
         function iniciarUniversoProfundo() {
-            nodes = []; menuNodes = []; backgroundStars = []; distantSuns = []; shootingStars = []; galaxyParticles = [];
-            if (activeMenuIndex === -1) { camera.x = targetCamera.x = w / 2; camera.y = targetCamera.y = h / 2; camera.zoom = targetCamera.zoom = 1; camera.angle = targetCamera.angle = 0; }
+            backgroundStars = []; distantSuns = []; galaxyParticles = [];
             
             galaxyCenter = { x: w / 2, y: h / 2 };
             galaxyRadius = Math.max(w, h) * 0.65;
-            const gCount = w < 768 ? 1800 : 5000;
+            const gCount = w < 768 ? 1500 : 4000;
             let coreR = galaxyRadius * 0.15;
             
+            // 1. Crear partículas de la galaxia (Espirales)
             for (let i = 0; i < gCount; i++) {
                 let r, angle, color, size, alpha;
                 let speedMult = 1;
                 
                 if (i < gCount * 0.35) {
+                    // Núcleo galáctico
                     let u = Math.random(), v = Math.random();
                     r = coreR * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v) * 0.5; 
                     r = Math.abs(r);
@@ -870,18 +719,20 @@
                     angle = Math.atan2(y, x);
                     let coreColors = ['#ffffff', '#fff3e0', '#ffe0b2', '#ffcc80'];
                     color = coreColors[Math.floor(Math.random() * coreColors.length)];
-                    size = Math.random() * 2.0 + 0.5;
+                    size = (Math.random() * 1.5 + 0.5) * 0.6; // Más pequeñas
                     alpha = Math.random() * 0.8 + 0.2;
-                    speedMult = 1.2;
+                    speedMult = 1.0;
                 } else if (i < gCount * 0.55) {
+                    // Halo disperso
                     r = Math.random() * galaxyRadius;
                     r = r * Math.random();
                     angle = Math.random() * Math.PI * 2;
                     color = Math.random() > 0.5 ? '#00e5ff' : '#0066ff';
-                    size = Math.random() * 1.0 + 0.2;
+                    size = (Math.random() * 0.8 + 0.2) * 0.6; // Más pequeñas
                     alpha = Math.random() * 0.3 + 0.1;
-                    speedMult = 0.5;
+                    speedMult = 0.4;
                 } else {
+                    // Brazos espirales
                     let numArms = 2;
                     let arm = i % numArms;
                     let armOffset = (Math.PI * 2 / numArms) * arm;
@@ -902,209 +753,128 @@
                     let armColors = ['#ffffff', '#00e5ff', '#84ffff', '#0066ff', '#ff4081'];
                     if(Math.random() < 0.03) color = '#ff4081'; 
                     else color = armColors[Math.floor(Math.random() * 4)];
-                    size = Math.random() * 1.8 + 0.3;
+                    size = (Math.random() * 1.5 + 0.3) * 0.6; // Más pequeñas
                     alpha = Math.random() * 0.9 + 0.1;
+                    speedMult = 0.8;
                 }
 
                 galaxyParticles.push({
                     r: r,
                     angle: angle,
-                    speed: 0.0006 * speedMult * (coreR / Math.max(r, coreR * 0.3)), 
+                    // Reducimos enormemente la velocidad
+                    speed: 0.00015 * speedMult * (coreR / Math.max(r, coreR * 0.3)), 
                     size: size,
                     alpha: alpha,
                     color: color
                 });
             }
 
-            for (let i = 0; i < (w < 768 ? 150 : 350); i++) {
-                backgroundStars.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 0.8 + 0.1, alpha: Math.random() * 0.7 + 0.1, pulseSpeed: Math.random() * 0.02 + 0.005 });
-            }
-
-            const numSuns = w < 768 ? 2 : 4;
-            for (let i = 0; i < numSuns; i++) {
-                distantSuns.push({
-                    x: (i + 0.5) * (w / numSuns) + (Math.random() - 0.5) * 80, y: Math.random() * h,
-                    radius: (Math.random() * 6 + 12) * (w < 768 ? 0.8 : 1.0),
-                    colorInner: i % 2 === 0 ? 'rgba(0, 240, 255, ' : 'rgba(120, 215, 255, ',
-                    colorOuter: i % 2 === 0 ? 'rgba(0, 102, 255, ' : 'rgba(150, 0, 255, ',
-                    pulse: Math.random() * Math.PI, raysAngle: Math.random() * Math.PI, flareSpeed: Math.random() * 0.003 + 0.002
+            // 2. Estrellas de fondo parpadeantes (Más pequeñas)
+            for (let i = 0; i < (w < 768 ? 200 : 400); i++) {
+                backgroundStars.push({ 
+                    x: Math.random() * w, y: Math.random() * h, 
+                    r: (Math.random() * 0.6 + 0.1), // Mucho más pequeñas
+                    alpha: Math.random() * 0.7 + 0.1, 
+                    pulseSpeed: Math.random() * 0.015 + 0.002 // Pulsación más lenta
                 });
             }
 
-            const areaFactor = w < 768 ? 3200 : 2500;
-            for (let i = 0; i < Math.floor((w * h) / areaFactor); i++) {
-                nodes.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25, r: Math.random() * 1.0 + 0.3, isNexus: false, alpha: Math.random() * 0.7 + 0.2, pulseRate: Math.random() * 0.04 + 0.01 });
+            // 3. Soles Distantes (Menos y más pequeños)
+            const numSuns = w < 768 ? 2 : 3;
+            for (let i = 0; i < numSuns; i++) {
+                distantSuns.push({
+                    x: (i + 0.5) * (w / numSuns) + (Math.random() - 0.5) * 80, 
+                    y: Math.random() * h,
+                    radius: (Math.random() * 4 + 8) * (w < 768 ? 0.8 : 1.0), // Radio reducido
+                    colorInner: i % 2 === 0 ? 'rgba(0, 240, 255, ' : 'rgba(120, 215, 255, ',
+                    colorOuter: i % 2 === 0 ? 'rgba(0, 102, 255, ' : 'rgba(150, 0, 255, ',
+                    pulse: Math.random() * Math.PI, 
+                    raysAngle: Math.random() * Math.PI, 
+                    flareSpeed: Math.random() * 0.001 + 0.001 // Destellos más lentos
+                });
             }
-
-            let isMobile = w < 768;
-            
-            const rx = w * (isMobile ? 0.35 : 0.30);
-            const ry = h * (isMobile ? 0.35 : 0.35);
-            
-            const nexusPositions = [
-                { x: w * 0.5 - rx, y: h * 0.5 - ry * 0.7 }, // 0: CATÁLOGO (Top-Left)
-                { x: w * 0.5 + rx, y: h * 0.5 - ry * 0.7 }, // 1: SIMULACIÓN (Top-Right)
-                { x: w * 0.5 - rx, y: h * 0.5 + ry * 0.6 }, // 2: ARQUITECTURA (Bottom-Left)
-                { x: w * 0.5, y: h * 0.5 + ry * 1.0 },      // 3: DIRECTIVAS (Bottom-Center)
-                { x: w * 0.5 + rx, y: h * 0.5 + ry * 0.6 }, // 4: COMUNICACIÓN (Bottom-Right)
-                { x: w * 0.5, y: h * 0.5 - ry * 1.0 }       // 5: PRODUCTOS (Top-Center)
-            ];
-            
-            nexusPositions.forEach(p => {
-                p.x = Math.max(w * 0.1, Math.min(w * 0.9, p.x));
-                p.y = Math.max(h * 0.1, Math.min(h * 0.9, p.y));
-            });
-
-            nexusPositions.forEach((pos, idx) => {
-                let nNode = { x: pos.x, y: pos.y, baseX: pos.x, baseY: pos.y, vx: 0, vy: 0, r: 0, isNexus: true, menuIdx: idx, pulse: Math.random() * Math.PI };
-                nodes.push(nNode); menuNodes.push(nNode);
-            });
         }
 
         function drawDetailedSun(ctx, sun) {
-            sun.pulse += 0.02; sun.raysAngle += sun.flareSpeed;
+            sun.pulse += 0.01; sun.raysAngle += sun.flareSpeed;
             let r = sun.radius * (1 + Math.sin(sun.pulse) * 0.08);
+            
+            // Halo grande muy sutil
             let gradHalo = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, r * 5);
-            gradHalo.addColorStop(0, sun.colorInner + '0.22)'); gradHalo.addColorStop(0.3, sun.colorOuter + '0.08)'); gradHalo.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            gradHalo.addColorStop(0, sun.colorInner + '0.15)'); 
+            gradHalo.addColorStop(0.3, sun.colorOuter + '0.05)'); 
+            gradHalo.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            
             ctx.beginPath(); ctx.arc(sun.x, sun.y, r * 5, 0, Math.PI * 2); ctx.fillStyle = gradHalo; ctx.fill();
 
+            // Rayos
             ctx.save(); ctx.translate(sun.x, sun.y); ctx.rotate(sun.raysAngle);
             for (let i = 0; i < 4; i++) {
-                let rayL = (i % 2 === 0) ? r * 6.5 : r * 3.8;
+                let rayL = (i % 2 === 0) ? r * 5 : r * 2.5;
                 let rayGrad = ctx.createLinearGradient(-rayL, 0, rayL, 0);
-                rayGrad.addColorStop(0, 'rgba(0,0,0,0)'); rayGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.8)'); rayGrad.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.beginPath(); ctx.moveTo(-rayL, 0); ctx.lineTo(rayL, 0); ctx.strokeStyle = rayGrad; ctx.lineWidth = i % 2 === 0 ? 1.2 : 0.8; ctx.stroke(); ctx.rotate(Math.PI / 4);
+                rayGrad.addColorStop(0, 'rgba(0,0,0,0)'); rayGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.4)'); rayGrad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.beginPath(); ctx.moveTo(-rayL, 0); ctx.lineTo(rayL, 0); ctx.strokeStyle = rayGrad; ctx.lineWidth = i % 2 === 0 ? 0.8 : 0.4; ctx.stroke(); ctx.rotate(Math.PI / 4);
             }
             ctx.restore();
 
+            // Núcleo
             let gradCore = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, r);
-            gradCore.addColorStop(0, '#ffffff'); gradCore.addColorStop(0.65, sun.colorInner + '0.8)'); gradCore.addColorStop(1, 'transparent');
+            gradCore.addColorStop(0, '#ffffff'); gradCore.addColorStop(0.6, sun.colorInner + '0.6)'); gradCore.addColorStop(1, 'transparent');
             ctx.beginPath(); ctx.arc(sun.x, sun.y, r, 0, Math.PI * 2); ctx.fillStyle = gradCore; ctx.fill();
         }
 
-        function drawNexusLightPoint(ctx, x, y, isHovered, isDragged, pulse) {
-            ctx.save();
-            let isMobile = w < 768;
-            
-            let flash = Math.sin(pulse * 4.0); 
-            let flashAlpha = 0.5 + (flash * 0.5); 
-            
-            let radius = (isHovered || isDragged ? 4.0 : 2.0 + flashAlpha * 1.5) * (isMobile ? 1.2 : 1.0);
-            let glowRadius = (isHovered || isDragged ? 25 : 12 + flashAlpha * 12) * (isMobile ? 1.2 : 1.0);
-            let outerRadius = Math.max(0.1, glowRadius);
-            
-            let coreAlpha = isHovered || isDragged ? 1 : 0.5 + flashAlpha * 0.5;
-            let glowAlpha1 = isHovered || isDragged ? 0.95 : 0.3 + flashAlpha * 0.65;
-            let glowAlpha2 = isHovered || isDragged ? 0.35 : 0.1 + flashAlpha * 0.25;
-
-            let radGlow = ctx.createRadialGradient(x, y, 0, x, y, outerRadius);
-            radGlow.addColorStop(0, isDragged ? 'rgba(255, 255, 255, 1)' : `rgba(0, 229, 255, ${glowAlpha1})`);
-            radGlow.addColorStop(0.25, isDragged ? 'rgba(0, 255, 255, 0.5)' : `rgba(0, 102, 255, ${glowAlpha2})`);
-            radGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-            ctx.beginPath(); ctx.arc(x, y, outerRadius, 0, Math.PI * 2); ctx.fillStyle = radGlow; ctx.fill();
-            
-            ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); 
-            ctx.fillStyle = `rgba(255, 255, 255, ${coreAlpha})`; 
-            ctx.shadowBlur = 12; ctx.shadowColor = "#00e5ff"; 
-            ctx.fill();
-            
-            ctx.restore();
-        }
-
-        function drawConstellations(ctx) {
-            ctx.save();
-            let scaleFactor = w < 768 ? 1.4 : 1.8;
-            const lang = getCurrentLang();
-            let hitRadius = w < 768 ? 55 : 45;
-            
-            let baseTitleSize = w < 768 ? 14 : 18;
-
-            menuNodes.forEach(n => {
-                let isHovered = Math.hypot(n.x - pointer.x, n.y - pointer.y) < hitRadius;
-                let isMoving = (isDragging && draggedNode === n);
-                let isSelected = (activeMenuIndex === n.menuIdx);
-                let isHighlighted = isMoving || isSelected || isHovered;
-                let alpha = isHighlighted ? 1 : 0.3; 
-                
-                const z = zodiacs[n.menuIdx];
-                ctx.strokeStyle = `rgba(0, 229, 255, ${alpha})`; ctx.lineWidth = isHighlighted ? 1.5 : 0.8; ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-                
-                ctx.beginPath();
-                for(let i = 0; i < z.length; i++) {
-                    let px = n.x + z[i].x * scaleFactor, py = n.y + z[i].y * scaleFactor;
-                    ctx.moveTo(px + 2, py); ctx.arc(px, py, isHighlighted ? 2.5 : 1.5, 0, Math.PI*2);
-                    if(i > 0) { ctx.moveTo(n.x + z[i-1].x * scaleFactor, n.y + z[i-1].y * scaleFactor); ctx.lineTo(px, py); }
-                }
-                ctx.stroke(); ctx.fill();
-                
-                let alignRight = n.x > w * 0.55;
-                ctx.textAlign = alignRight ? "right" : "left";
-                let textOffsetX = alignRight ? (w < 768 ? -22 : -32) : (w < 768 ? 22 : 32);
-                
-                let titleSize = isHighlighted ? baseTitleSize + 2 : baseTitleSize;
-                ctx.font = `bold ${titleSize}px 'Montserrat', sans-serif`; 
-                if (ctx.letterSpacing !== undefined) ctx.letterSpacing = "3px";
-                
-                ctx.fillStyle = "#ffffff"; 
-                ctx.shadowBlur = isHighlighted ? 25 : 12; 
-                ctx.shadowColor = "#00e5ff";
-                
-                ctx.fillText(nombresZodiaco[lang][n.menuIdx], n.x + textOffsetX, n.y - 8);
-                
-                let descSize = w < 768 ? 9 : 11;
-                ctx.font = `${isHighlighted ? 'bold' : 'normal'} ${descSize}px 'Montserrat', sans-serif`; 
-                if (ctx.letterSpacing !== undefined) ctx.letterSpacing = "2px";
-                ctx.fillStyle = isHighlighted ? "rgba(255, 255, 255, 0.9)" : "rgba(0, 229, 255, 0.7)"; 
-                ctx.shadowBlur = isHighlighted ? 10 : 5;
-                ctx.fillText(descripcionesZodiaco[lang][n.menuIdx], n.x + textOffsetX, n.y + (w < 768 ? 12 : 16));
-                
-                if (ctx.letterSpacing !== undefined) ctx.letterSpacing = "0px";
-                ctx.textAlign = "left";
-            });
-            ctx.restore();
-        }
-
-        function dibujar() {
-            camera.x += (targetCamera.x - camera.x) * 0.1; 
-            camera.y += (targetCamera.y - camera.y) * 0.1;
-            camera.zoom += (targetCamera.zoom - camera.zoom) * 0.1; 
-            camera.angle += (targetCamera.angle - camera.angle) * 0.1;
-
-            if (Math.abs(targetCamera.x - camera.x) < 0.1) camera.x = targetCamera.x;
-            if (Math.abs(targetCamera.y - camera.y) < 0.1) camera.y = targetCamera.y;
-            if (Math.abs(targetCamera.zoom - camera.zoom) < 0.001) camera.zoom = targetCamera.zoom;
-            if (Math.abs(targetCamera.angle - camera.angle) < 0.001) camera.angle = targetCamera.angle;
-
+        function drawSpace() {
             ctx.clearRect(0, 0, w, h);
             globalTime += 1;
+            
+            // Suavizado del movimiento del ratón
+            mouseX += (targetMouseX - mouseX) * 0.03;
+            mouseY += (targetMouseY - mouseY) * 0.03;
 
-            if (Math.random() < 0.015) {
-                let startX = Math.random() * (w * 1.5) - w * 0.25, startY = Math.random() * (h * 0.5) - h * 0.2;
-                let angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2, speed = Math.random() * 8 + 12;
-                shootingStars.push({ x: startX, y: startY, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, length: Math.random() * 80 + 100, alpha: 1.0, decay: Math.random() * 0.015 + 0.01 });
-            }
+            // 1. Dibujar Soles
+            distantSuns.forEach(sun => {
+                // Parallax sutil basado en ratón
+                let sx = sun.x + (mouseX * 10);
+                let sy = sun.y + (mouseY * 10);
+                // Guardar original temporalmente
+                let ox = sun.x; let oy = sun.y;
+                sun.x = sx; sun.y = sy;
+                drawDetailedSun(ctx, sun);
+                sun.x = ox; sun.y = oy;
+            });
 
-            ctx.save(); ctx.translate(w / 2, h / 2); ctx.scale(camera.zoom, camera.zoom); ctx.rotate(camera.angle); ctx.translate(-camera.x, -camera.y);
-
-            distantSuns.forEach(sun => drawDetailedSun(ctx, sun));
+            // 2. Dibujar Estrellas de Fondo
             backgroundStars.forEach(star => {
                 star.alpha += Math.sin(globalTime * star.pulseSpeed) * 0.01;
                 if (star.alpha < 0.1) star.alpha = 0.1; if (star.alpha > 0.8) star.alpha = 0.8;
-                ctx.beginPath(); ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(180, 230, 255, ${star.alpha})`; ctx.fill();
+                
+                let px = star.x + (mouseX * 20 * star.r); // Parallax según tamaño
+                let py = star.y + (mouseY * 20 * star.r);
+                
+                ctx.beginPath(); 
+                ctx.arc(px, py, star.r, 0, Math.PI * 2); 
+                ctx.fillStyle = `rgba(180, 230, 255, ${star.alpha})`; 
+                ctx.fill();
             });
 
+            // 3. Dibujar Galaxia Central
             ctx.save();
-            ctx.translate(galaxyCenter.x, galaxyCenter.y);
-            ctx.rotate(0.4); 
-            ctx.scale(1, 0.40); 
+            // El centro se mueve ligeramente con el ratón
+            let cx = galaxyCenter.x + (mouseX * 15);
+            let cy = galaxyCenter.y + (mouseY * 15);
+            
+            ctx.translate(cx, cy);
+            ctx.rotate(0.3); // Inclinación estática
+            ctx.scale(1, 0.45); // Forma elíptica de galaxia
+            
             ctx.globalCompositeOperation = 'lighter';
             
-            let haloR = galaxyRadius * 0.45;
+            // Resplandor del núcleo galáctico
+            let haloR = galaxyRadius * 0.4;
             let coreGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, haloR);
-            coreGrad.addColorStop(0, 'rgba(255, 240, 220, 0.35)');
-            coreGrad.addColorStop(0.2, 'rgba(255, 180, 100, 0.15)');
-            coreGrad.addColorStop(0.5, 'rgba(0, 150, 255, 0.05)');
+            coreGrad.addColorStop(0, 'rgba(255, 240, 220, 0.25)');
+            coreGrad.addColorStop(0.2, 'rgba(255, 180, 100, 0.1)');
+            coreGrad.addColorStop(0.5, 'rgba(0, 150, 255, 0.03)');
             coreGrad.addColorStop(1, 'transparent');
             
             ctx.fillStyle = coreGrad;
@@ -1112,11 +882,13 @@
             ctx.arc(0, 0, haloR, 0, Math.PI * 2);
             ctx.fill();
 
+            // Partículas de la espiral
             galaxyParticles.forEach(p => {
-                p.angle += p.speed; 
+                p.angle += p.speed; // Rotación super lenta
                 let x = Math.cos(p.angle) * p.r; 
                 let y = Math.sin(p.angle) * p.r; 
                 let distFade = Math.max(0, 1 - (p.r / (galaxyRadius * 1.1))); 
+                
                 ctx.globalAlpha = p.alpha * distFade;
                 ctx.fillStyle = p.color;
                 ctx.beginPath();
@@ -1124,212 +896,195 @@
                 ctx.fill();
             });
             ctx.restore();
-
-            for (let i = shootingStars.length - 1; i >= 0; i--) {
-                let ss = shootingStars[i];
-                ss.x += ss.vx; ss.y += ss.vy; ss.alpha -= ss.decay;
-                if (ss.alpha <= 0) { shootingStars.splice(i, 1); continue; }
-                let tailX = ss.x - (ss.vx / 10) * ss.length, tailY = ss.y - (ss.vy / 10) * ss.length;
-                let gradSS = ctx.createLinearGradient(ss.x, ss.y, tailX, tailY);
-                gradSS.addColorStop(0, `rgba(255, 255, 255, ${ss.alpha})`); gradSS.addColorStop(0.3, `rgba(0, 229, 255, ${ss.alpha * 0.7})`); gradSS.addColorStop(1, 'transparent');
-                ctx.beginPath(); ctx.moveTo(ss.x, ss.y); ctx.lineTo(tailX, tailY); ctx.strokeStyle = gradSS; ctx.lineWidth = 2.0; ctx.stroke();
-            }
-
-            drawConstellations(ctx);
-            ctx.globalCompositeOperation = 'lighter';
-            const connectionDistance = w < 768 ? 65 : 85; 
-
-            for (let i = 0; i < nodes.length; i++) {
-                let n1 = nodes[i];
-                if(!n1.isNexus) {
-                    n1.x += n1.vx; n1.y += n1.vy;
-                    if(n1.x < 0) n1.x = w; if(n1.x > w) n1.x = 0;
-                    if(n1.y < 0) n1.y = h; if(n1.y > h) n1.y = 0;
-                    n1.alpha = 0.4 + Math.sin(globalTime * n1.pulseRate) * 0.4;
-                } else {
-                    n1.pulse += 0.03;
-                    if (draggedNode !== n1) {
-                        let dx = pointer.x - n1.x, dy = pointer.y - n1.y, dist = Math.hypot(dx, dy);
-                        if (dist < 120 && dist > 0.001 && !isDragging) {
-                            let force = (120 - dist) / 120; n1.vx -= (dx / dist) * force * 0.8; n1.vy -= (dy / dist) * force * 0.8;
-                        }
-                        n1.vx += (n1.baseX - n1.x) * 0.03; n1.vy += (n1.baseY - n1.y) * 0.03;
-                        n1.vx *= 0.85; n1.vy *= 0.85; n1.x += n1.vx; n1.y += n1.vy;
-                    }
-                }
-
-                if (n1.isNexus) {
-                    let hitRadius = w < 768 ? 55 : 45;
-                    drawNexusLightPoint(ctx, n1.x, n1.y, Math.hypot(n1.x - pointer.x, n1.y - pointer.y) < hitRadius, draggedNode === n1, n1.pulse);
-                } else {
-                    ctx.beginPath(); ctx.arc(n1.x, n1.y, n1.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(0, 150, 255, ${n1.alpha})`; ctx.fill();
-                }
-
-                for (let j = i + 1; j < nodes.length; j++) {
-                    let n2 = nodes[j];
-                    if (Math.abs(n1.x - n2.x) > connectionDistance || Math.abs(n1.y - n2.y) > connectionDistance) continue;
-                    let dist = Math.hypot(n1.x - n2.x, n1.y - n2.y);
-                    if (dist < connectionDistance) { 
-                        ctx.beginPath(); ctx.moveTo(n1.x, n1.y); ctx.lineTo(n2.x, n2.y);
-                        let op = (1 - dist/connectionDistance); 
-                        ctx.strokeStyle = (n1.isNexus || n2.isNexus) ? `rgba(0, 229, 255, ${op * 0.9})` : `rgba(0, 102, 255, ${op * 0.35})`; 
-                        ctx.lineWidth = (n1.isNexus || n2.isNexus) ? 0.8 : 0.4; ctx.stroke();
-                    }
-                }
-            }
-            ctx.restore();
-
-            if (activeMenuIndex !== -1) posicionarMenuSobreNodo(activeMenuIndex);
+            
             ctx.globalCompositeOperation = 'source-over';
-            requestAnimationFrame(dibujar);
+            requestAnimationFrame(drawSpace);
         }
 
-        window.addEventListener('resize', resize); resize();
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', (e) => {
+            targetMouseX = (e.clientX / w) * 2 - 1;
+            targetMouseY = (e.clientY / h) * 2 - 1;
+        });
 
-        function updatePointerPos(e) {
-            const rect = canvas.getBoundingClientRect();
-            pointer.screenX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-            pointer.screenY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-            let worldP = screenToWorld(pointer.screenX, pointer.screenY);
-            pointer.x = worldP.x; pointer.y = worldP.y;
+        function toggleLanguage() {
+            const html = document.documentElement;
+            const currentLang = html.getAttribute('lang') || 'es';
+            const newLang = currentLang === 'es' ? 'en' : 'es';
+            html.setAttribute('lang', newLang);
+            playBeep();
+            
+            buildNav();
+            if (currentActiveId) loadContent(currentActiveId);
         }
 
-        function handlePointerStart(e) {
-            if (document.getElementById('info-modal').classList.contains('opacity-100') ||
-                document.getElementById('contact-modal').classList.contains('opacity-100') ||
-                document.getElementById('productos-modal').classList.contains('opacity-100')) {
-                return;
-            }
-            updatePointerPos(e); dragStartPos = { x: pointer.x, y: pointer.y };
-            let hitRadius = w < 768 ? 60 : 50;
-            menuNodes.forEach(n => { if (Math.hypot(n.x - pointer.x, n.y - pointer.y) < hitRadius) { isDragging = true; draggedNode = n; } });
+        function getCurrentLang() {
+            return document.documentElement.getAttribute('lang') || 'es';
         }
 
-        function handlePointerMove(e) {
-            if (document.getElementById('info-modal').classList.contains('opacity-100') ||
-                document.getElementById('contact-modal').classList.contains('opacity-100') ||
-                document.getElementById('productos-modal').classList.contains('opacity-100')) {
-                return;
-            }
-            updatePointerPos(e);
-            if (isDragging && draggedNode) {
-                draggedNode.baseX = pointer.x; draggedNode.baseY = pointer.y; draggedNode.x = pointer.x; draggedNode.y = pointer.y; canvas.style.cursor = 'grabbing';
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const icon = document.getElementById('icon-audio');
+            if (audioEnabled) {
+                bgAudioElement.play().catch(e => console.log("Auto-play blocked"));
+                icon.setAttribute('data-lucide', 'volume-2');
             } else {
-                let hover = false, hitRadius = w < 768 ? 55 : 45;
-                menuNodes.forEach(n => { if (Math.hypot(n.x - pointer.x, n.y - pointer.y) < hitRadius) hover = true; });
-                canvas.style.cursor = hover ? 'grab' : 'crosshair';
+                bgAudioElement.pause();
+                icon.setAttribute('data-lucide', 'volume-x');
             }
+            lucide.createIcons();
         }
 
-        function handlePointerEnd() {
-            if (isDragging && draggedNode) {
-                if (Math.hypot(pointer.x - dragStartPos.x, pointer.y - dragStartPos.y) < 12) abrirMenu(draggedNode.menuIdx);
-                isDragging = false; draggedNode = null; canvas.style.cursor = 'grab';
-            }
+        function playBeep() {
+            if(!audioEnabled) return;
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
+            gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.05);
         }
 
-        canvas.addEventListener('mousedown', handlePointerStart); canvas.addEventListener('mousemove', handlePointerMove); canvas.addEventListener('mouseup', handlePointerEnd);
-        canvas.addEventListener('mouseleave', () => { pointer.x = -1000; pointer.y = -1000; isDragging = false; draggedNode = null; });
-        canvas.addEventListener('touchstart', (e) => { handlePointerStart(e); }, { passive: false });
-        canvas.addEventListener('touchmove', (e) => { handlePointerMove(e); }, { passive: false });
-        canvas.addEventListener('touchend', handlePointerEnd);
-
-        const panelMenu = document.getElementById('panel-menu');
-        const tituloMenuText = document.getElementById('menu-title-text');
-
-        function iniciarSistema() {
-            initAudio();
-            document.getElementById('start-screen').style.opacity = '0';
-            setTimeout(() => { 
-                document.getElementById('start-screen').style.display = 'none'; 
-                document.getElementById('bg-title').classList.add('visible');
-                reproducirVozCinematica({es: "Enlace digital establecido. Explore las constelaciones.", en: "Digital link established. Explore the constellations."});
-            }, 2000);
-            setInterval(() => { document.getElementById('telemetry-1').innerText = (99.90 + Math.random() * 0.09).toFixed(3); }, 800);
-            dibujar();
-        }
-
-        function posicionarMenuSobreNodo(index) {
-            const node = menuNodes[index];
-            if (!node) return;
-            let screenP = worldToScreen(node.x, node.y);
-            const menuWidth = panelMenu.offsetWidth || 320, menuHeight = panelMenu.offsetHeight || 300;
+        function reproducirVoz(textoObj) {
+            if(!audioEnabled) return;
+            clearTimeout(typeTimeoutSub);
+            window.speechSynthesis.cancel();
             
-            let left, top = screenP.y - menuHeight / 2;
-            
-            if (node.baseX > w / 2) {
-                left = screenP.x - menuWidth - 35;
-                panelMenu.style.transformOrigin = "right center";
-            } else {
-                left = screenP.x + 35;
-                panelMenu.style.transformOrigin = "left center";
-            }
-            
-            if (left < 15) left = 15;
-            if (left + menuWidth > w - 15) left = w - menuWidth - 15;
-            if (top < 20) top = 20; 
-            if (top + menuHeight > h - 20) top = h - menuHeight - 20;
-            
-            panelMenu.style.left = `${Math.round(left)}px`; 
-            panelMenu.style.top = `${Math.round(top)}px`;
-        }
-
-        function animarMenuEnlaces(enlacesConfig) {
-            const contenedor = document.getElementById('menu-enlaces');
-            contenedor.innerHTML = '';
-            typingIntervals.forEach(clearTimeout); typingIntervals = [];
             const lang = getCurrentLang();
-
-            enlacesConfig.forEach((link, idx) => {
-                let div = document.createElement('div');
-                div.className = 'menu-enlace';
-                div.onclick = link.action;
-                
-                let prefix = document.createElement('span'); prefix.className = 'prefix'; prefix.innerText = '>';
-                div.appendChild(prefix);
-                
-                let textSpan = document.createElement('span'); div.appendChild(textSpan);
-                contenedor.appendChild(div);
-
-                let textToType = lang === 'es' ? link.textEs : link.textEn;
-                let startDelay = idx * 150, i = 0;
-                function teclearEnlace() {
-                    if (i < textToType.length) { textSpan.innerHTML += textToType.charAt(i); i++; typingIntervals.push(setTimeout(teclearEnlace, 20)); }
+            const texto = textoObj[lang];
+            const subtitleText = document.getElementById('subtitle-text');
+            subtitleText.innerHTML = "";
+            
+            let msg = new SpeechSynthesisUtterance(texto);
+            msg.lang = lang === 'en' ? 'en-US' : 'es-ES';
+            msg.pitch = 0.9; msg.rate = 1.1; 
+            
+            let i = 0;
+            function teclear() {
+                if (i < texto.length) {
+                    subtitleText.innerHTML += texto.charAt(i); i++;
+                    typeTimeoutSub = setTimeout(teclear, 30); 
                 }
-                typingIntervals.push(setTimeout(teclearEnlace, startDelay));
-            });
+            }
+            teclear();
+            window.speechSynthesis.speak(msg);
         }
 
-        function abrirMenu(index) {
-            playDigitalChime(true); activeMenuIndex = index;
-            const info = configuracionMenus[index]; const node = menuNodes[index];
+        function buildNav() {
+            const container = document.getElementById('nav-container');
+            const lang = getCurrentLang();
+            container.innerHTML = '';
             
-            if (node) {
-                targetCamera.x = node.x;
-                targetCamera.y = node.y;
-                targetCamera.zoom = w < 768 ? 1.2 : 1.4;
-                targetCamera.angle = (index % 2 === 0 ? 1 : -1) * 0.12;
+            navConfig.forEach(item => {
+                const data = db[item.id];
+                const btn = document.createElement('button');
+                // Si el item no es el activo, marcamos su borde para mantener el espaciado correcto
+                let borderClass = currentActiveId === item.id ? 'active' : 'border-l-2 border-transparent';
+                
+                btn.className = `nav-item flex items-center justify-center md:justify-start gap-3 p-4 md:p-5 w-full text-left font-title text-sm md:text-base tracking-widest text-gray-300 ${borderClass}`;
+                
+                // Botón clickeado -> mostramos visor y cargamos
+                btn.onclick = () => {
+                    openViewer();
+                    loadContent(item.id);
+                };
+                
+                btn.innerHTML = `
+                    <i data-lucide="${data.icon}" class="w-5 h-5 flex-shrink-0"></i>
+                    <span class="hidden md:block whitespace-nowrap">${item.label[lang]}</span>
+                `;
+                container.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        function loadContent(id) {
+            playBeep();
+            currentActiveId = id;
+            buildNav(); // update active state
+            
+            const data = db[id];
+            const lang = getCurrentLang();
+            
+            // Set Header
+            document.getElementById('content-title').innerText = data.title[lang];
+            document.getElementById('content-icon').setAttribute('data-lucide', data.icon);
+            lucide.createIcons();
+            
+            // Ocultamos título idle
+            document.getElementById('idle-title').classList.remove('visible');
+            
+            // Animamos entrada del texto
+            const body = document.getElementById('content-body');
+            body.innerHTML = '';
+            setTimeout(() => {
+                body.innerHTML = data.content[lang];
+            }, 50); // Ligero delay para repintar
+            
+            
+            // Voice & Subtitles
+            if (data.voice) reproducirVoz(data.voice);
+        }
+
+        function openViewer() {
+            const viewer = document.getElementById('main-viewer');
+            viewer.classList.remove('viewer-hidden');
+            viewer.classList.add('viewer-visible');
+            
+            // Ocultar el título de fondo
+            document.getElementById('idle-title').classList.remove('visible');
+        }
+
+        function closeViewer() {
+            playBeep();
+            currentActiveId = null;
+            buildNav(); // quita seleccionados
+            
+            // Ocultar cristal principal
+            const viewer = document.getElementById('main-viewer');
+            viewer.classList.remove('viewer-visible');
+            viewer.classList.add('viewer-hidden');
+            
+            // Mostrar título de fondo
+            document.getElementById('idle-title').classList.add('visible');
+            
+            // Reset voz
+            window.speechSynthesis.cancel();
+            document.getElementById('subtitle-text').innerHTML = "";
+            clearTimeout(typeTimeoutSub);
+        }
+
+        function bootSystem() {
+            if(audioEnabled) {
+                bgAudioElement.play().catch(e => console.log("Audio play blocked"));
+                playBeep();
             }
             
-            tituloMenuText.innerText = info.nombre[getCurrentLang()];
-            animarMenuEnlaces(info.links);
-            posicionarMenuSobreNodo(index); panelMenu.classList.add('active');
-            reproducirVozCinematica(info.voz);
-        }
+            // Iniciar canvas
+            resize();
+            drawSpace();
 
-        function cerrarMenu() {
-            playDigitalChime(false); activeMenuIndex = -1; panelMenu.classList.remove('active');
-            
-            targetCamera.x = w / 2; 
-            targetCamera.y = h / 2; 
-            targetCamera.zoom = 1; 
-            targetCamera.angle = 0;
-            
-            typingIntervals.forEach(clearTimeout); typingIntervals = [];
-            window.speechSynthesis.cancel(); clearTimeout(typeTimeoutSub);
-            document.getElementById('subtitle-container').style.opacity = 0;
-        }
+            document.getElementById('start-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('start-screen').style.display = 'none';
+                document.getElementById('ui-layer').classList.remove('opacity-0');
+                
+                // Mostrar título estilo Prometheus flotando en el fondo
+                document.getElementById('idle-title').classList.add('visible');
+                
+                buildNav();
+                reproducirVoz({es: "Enlace digital establecido. Seleccione módulo en la barra de navegación.", en: "Digital link established. Select module in the navigation bar."});
+            }, 1500);
 
+            // Fake telemetry
+            setInterval(() => { 
+                document.getElementById('telemetry-sys').innerText = (99.90 + Math.random() * 0.09).toFixed(3); 
+            }, 800);
+        }
     </script>
 </body>
 </html>
