@@ -143,6 +143,7 @@
             background: #000000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 2s ease-in-out;
+            padding: 1rem; /* Añadir padding para evitar que toque los bordes */
         }
 
         .btn-boot {
@@ -166,22 +167,31 @@
         .prometheus-style {
             font-family: 'Montserrat', sans-serif;
             font-weight: 100;
-            letter-spacing: 0.65em;
+            /* Usar clamp para tamaño fluido: min, preferido, max */
+            font-size: clamp(2.5rem, 8vw, 6rem); 
+            /* Reducir el espaciado en móviles para que quepa mejor */
+            letter-spacing: clamp(0.2em, 2vw, 0.65em);
             text-transform: uppercase;
             text-shadow: 0 0 20px rgba(0, 243, 255, 0.8), 0 0 40px rgba(0, 102, 255, 0.6), 0 0 80px rgba(0, 243, 255, 0.4);
-            margin-right: -0.65em; /* Compensar letter spacing al centro */
+            /* Compensar letter spacing al centro dinámicamente usando calc */
+            margin-right: calc(-1 * clamp(0.2em, 2vw, 0.65em)); 
+            line-height: 1.1; /* Asegurar un interlineado ajustado */
         }
 
         /* Fondo de Prometheus (Flotante) */
         #idle-title {
             position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 5; /* Detrás de la UI, delante del canvas */
             pointer-events: none;
             text-align: center;
             transition: opacity 1.5s ease-in-out;
             opacity: 0; /* Oculto hasta que arranca el sistema */
+            width: 100%; /* Asegurar que no exceda el ancho */
+            padding: 0 1rem; /* Margen de seguridad */
         }
         
         #idle-title.visible { opacity: 1; }
@@ -229,15 +239,11 @@
     <canvas id="space-canvas"></canvas>
     <div class="scanlines"></div>
     
-    <!-- Título flotante estilo Prometheus (Estado inactivo) -->
-    <div id="idle-title">
-        <h2 class="prometheus-style text-5xl md:text-[6rem] text-white/80 leading-[1.1]">SLOT<br>SOFTWARE</h2>
-    </div>
-
     <!-- Splash Screen -->
     <div id="start-screen" class="clickable">
-        <h1 class="prometheus-style text-5xl md:text-[5rem] mb-12 text-white text-center leading-[1.1]">SLOT<br>SOFTWARE</h1>
-        <p class="font-body text-cyan-400 mb-12 tracking-[0.3em] text-sm text-center">COSMIC IMMERSION SYSTEM V2.0</p>
+        <!-- Eliminadas las clases de tamaño fijas de Tailwind para usar .prometheus-style -->
+        <h1 class="prometheus-style mb-8 text-white text-center">SLOT<br>SOFTWARE</h1>
+        <p class="font-body text-cyan-400 mb-12 tracking-[0.3em] text-xs md:text-sm text-center">COSMIC IMMERSION SYSTEM V2.0</p>
         <button class="btn-boot rounded-sm animate-pulse-slow" onclick="bootSystem()">
             <span class="lang-es">INICIAR ENLACE DIGITAL</span>
             <span class="lang-en">INITIATE DIGITAL LINK</span>
@@ -275,12 +281,20 @@
                     <h3 class="font-title text-sm tracking-widest text-gray-400"><span class="lang-es">MÓDULOS</span><span class="lang-en">MODULES</span></h3>
                 </div>
                 <div class="flex flex-row md:flex-col w-full min-w-max md:min-w-0" id="nav-container">
-                    <!-- Nav items injected via JS -->
-                </div>
-            </nav>
+                <!-- Nav items injected via JS -->
+            </div>
+        </nav>
+
+        <!-- Contenedor Derecho (Para Visor y Título Inactivo) -->
+        <div class="flex-1 flex flex-col relative order-1 md:order-2 min-h-0 z-10">
+            
+            <!-- Título flotante estilo Prometheus (Estado inactivo) -->
+            <div id="idle-title">
+                <h2 class="prometheus-style text-white/80">SLOT<br>SOFTWARE</h2>
+            </div>
 
             <!-- Content Display Area (Inicialmente oculto) -->
-            <section id="main-viewer" class="clickable flex-1 glass-panel rounded-sm flex flex-col order-1 md:order-2 overflow-hidden relative z-10 viewer-hidden">
+            <section id="main-viewer" class="clickable flex-1 glass-panel rounded-sm flex flex-col overflow-hidden relative z-20 viewer-hidden">
                 
                 <!-- Content Header -->
                 <div class="p-4 md:p-6 border-b border-cyan-400/30 bg-space-dark/80 flex justify-between items-center">
@@ -677,11 +691,12 @@
         // Canvas Setup (Galaxy & Suns Original Logic)
         const canvas = document.getElementById('space-canvas');
         const ctx = canvas.getContext('2d');
-        let w, h;
+        let w = window.innerWidth, h = window.innerHeight;
         
         let backgroundStars = [];
         let distantSuns = []; 
         let galaxyParticles = [];
+        let shootingStars = []; // Array para las estrellas fugaces
         let galaxyCenter = {x: 0, y: 0}, galaxyRadius = 0;
         let globalTime = 0;
         
@@ -691,13 +706,29 @@
         function resize() {
             w = canvas.width = window.innerWidth;
             h = canvas.height = window.innerHeight;
+            updateGalaxyCenter();
             iniciarUniversoProfundo();
         }
 
-        function iniciarUniversoProfundo() {
-            backgroundStars = []; distantSuns = []; galaxyParticles = [];
-            
+        // NUEVA FUNCIÓN: Calcula el centro del espacio vacío a la derecha
+        function updateGalaxyCenter() {
+            const rightContainer = document.querySelector('.flex-1.flex-col.relative.z-10');
+            if (rightContainer && w > 0) {
+                const rect = rightContainer.getBoundingClientRect();
+                // Si el contenedor es visible y tiene ancho, centramos ahí
+                if (rect.width > 50) {
+                    galaxyCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                    return;
+                }
+            }
+            // Fallback (centro de la pantalla)
             galaxyCenter = { x: w / 2, y: h / 2 };
+        }
+
+        function iniciarUniversoProfundo() {
+            backgroundStars = []; distantSuns = []; galaxyParticles = []; shootingStars = [];
+            
+            updateGalaxyCenter();
             galaxyRadius = Math.max(w, h) * 0.65;
             const gCount = w < 768 ? 1500 : 4000;
             let coreR = galaxyRadius * 0.15;
@@ -831,6 +862,20 @@
             mouseX += (targetMouseX - mouseX) * 0.03;
             mouseY += (targetMouseY - mouseY) * 0.03;
 
+            // Generar estrellas fugaces aleatorias
+            if (Math.random() < 0.015) {
+                let startX = Math.random() * (w * 1.5) - w * 0.25;
+                let startY = Math.random() * (h * 0.5) - h * 0.2;
+                let angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2;
+                let speed = Math.random() * 8 + 12;
+                shootingStars.push({
+                    x: startX, y: startY,
+                    vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+                    length: Math.random() * 80 + 100,
+                    alpha: 1.0, decay: Math.random() * 0.015 + 0.01
+                });
+            }
+
             // 1. Dibujar Soles
             distantSuns.forEach(sun => {
                 // Parallax sutil basado en ratón
@@ -856,6 +901,28 @@
                 ctx.fillStyle = `rgba(180, 230, 255, ${star.alpha})`; 
                 ctx.fill();
             });
+
+            // 2.5 Dibujar Estrellas Fugaces
+            for (let i = shootingStars.length - 1; i >= 0; i--) {
+                let ss = shootingStars[i];
+                ss.x += ss.vx; ss.y += ss.vy; ss.alpha -= ss.decay;
+                if (ss.alpha <= 0) { shootingStars.splice(i, 1); continue; }
+                
+                let tailX = ss.x - (ss.vx / 10) * ss.length;
+                let tailY = ss.y - (ss.vy / 10) * ss.length;
+                
+                let gradSS = ctx.createLinearGradient(ss.x, ss.y, tailX, tailY);
+                gradSS.addColorStop(0, `rgba(255, 255, 255, ${ss.alpha})`);
+                gradSS.addColorStop(0.3, `rgba(0, 243, 255, ${ss.alpha * 0.7})`);
+                gradSS.addColorStop(1, 'transparent');
+                
+                ctx.beginPath();
+                ctx.moveTo(ss.x, ss.y);
+                ctx.lineTo(tailX, tailY);
+                ctx.strokeStyle = gradSS;
+                ctx.lineWidth = 2.0;
+                ctx.stroke();
+            }
 
             // 3. Dibujar Galaxia Central
             ctx.save();
@@ -903,8 +970,10 @@
 
         window.addEventListener('resize', resize);
         window.addEventListener('mousemove', (e) => {
-            targetMouseX = (e.clientX / w) * 2 - 1;
-            targetMouseY = (e.clientY / h) * 2 - 1;
+            if (w && h) {
+                targetMouseX = (e.clientX / w) * 2 - 1;
+                targetMouseY = (e.clientY / h) * 2 - 1;
+            }
         });
 
         function toggleLanguage() {
