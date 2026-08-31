@@ -226,10 +226,39 @@
 
         /* Mobile Adjustments */
         @media (max-width: 768px) {
-            .nav-item { border-left: none; border-bottom: 2px solid transparent; flex: 1; display: flex; justify-content: center; padding: 0.5rem; }
+            .nav-item { 
+                border-left: none; 
+                border-bottom: 2px solid transparent; 
+                flex: 1; /* Permite que los botones crezcan para llenar el grid */
+                display: flex; 
+                flex-direction: column; 
+                align-items: center; 
+                justify-content: center; 
+                padding: 0.4rem 0.2rem; /* Menos padding para que quepan */
+                gap: 0.15rem; 
+                font-size: 0.55rem; /* Texto muy pequeñito para móvil */
+                text-align: center;
+                line-height: 1.1;
+            }
+            .nav-item i {
+                width: 1rem; /* Icono más pequeño */
+                height: 1rem;
+            }
             .nav-item.active { border-left: none; border-bottom: 2px solid var(--cyan); box-shadow: inset 0 -15px 15px -15px rgba(0, 243, 255, 0.5); }
             .nav-item:hover:not(.active) { border-left: none; border-bottom: 2px solid rgba(0, 243, 255, 0.5); }
-            .hide-scroll-mobile::-webkit-scrollbar { display: none; }
+            
+            /* Convertimos la barra inferior en un grid para pantallas móviles */
+            nav.w-full {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr); /* 3 columnas iguales */
+                grid-auto-rows: minmax(auto, 1fr);
+                overflow: hidden !important; /* Desactivar scroll */
+                gap: 2px; /* Un poco de separación entre botones */
+                background-color: rgba(3, 11, 20, 0.9); /* Fondo un poco más sólido */
+            }
+            #nav-container {
+                display: contents; /* Hace que los items directos formen parte del grid del padre */
+            }
         }
     </style>
 </head>
@@ -273,11 +302,11 @@
         </header>
 
         <!-- Main Layout -->
-        <main class="flex-1 flex flex-col md:flex-row overflow-hidden pb-4 md:pb-6 px-4 md:px-6 gap-4 md:gap-6">
+        <main class="flex-1 flex flex-col md:flex-row overflow-hidden pb-0 md:pb-6 px-0 md:px-6 gap-0 md:gap-6">
             
             <!-- Navigation Sidebar (Desktop) / Bottom Nav (Mobile) -->
-            <nav class="clickable w-full md:w-64 flex-shrink-0 glass-panel rounded-sm flex flex-row md:flex-col order-2 md:order-1 overflow-x-auto md:overflow-y-auto hide-scroll-mobile z-20">
-                <div class="p-4 border-b border-cyan-400/20 hidden md:block">
+            <nav class="clickable w-full md:w-64 flex-shrink-0 glass-panel md:rounded-sm flex flex-row md:flex-col order-2 md:order-1 overflow-x-auto md:overflow-y-auto z-20">
+                <div class="p-4 border-b border-cyan-400/20 hidden md:block col-span-3">
                     <h3 class="font-title text-sm tracking-widest text-gray-400"><span class="lang-es">MÓDULOS</span><span class="lang-en">MODULES</span></h3>
                 </div>
                 <div class="flex flex-row md:flex-col w-full min-w-max md:min-w-0" id="nav-container">
@@ -1054,7 +1083,9 @@
                 // Si el item no es el activo, marcamos su borde para mantener el espaciado correcto
                 let borderClass = currentActiveId === item.id ? 'active' : 'border-l-2 border-transparent';
                 
-                btn.className = `nav-item flex items-center justify-center md:justify-start gap-3 p-4 md:p-5 w-full text-left font-title text-sm md:text-base tracking-widest text-gray-300 ${borderClass}`;
+                // En móvil las clases de Tailwind se sobrescribirán con el Grid CSS, 
+                // pero las mantenemos para Desktop
+                btn.className = `nav-item flex items-center justify-center md:justify-start gap-2 md:gap-3 p-3 md:p-5 w-full text-left font-title text-[0.65rem] md:text-base tracking-widest text-gray-300 ${borderClass}`;
                 
                 // Botón clickeado -> mostramos visor y cargamos
                 btn.onclick = () => {
@@ -1063,8 +1094,8 @@
                 };
                 
                 btn.innerHTML = `
-                    <i data-lucide="${data.icon}" class="w-5 h-5 flex-shrink-0"></i>
-                    <span class="hidden md:block whitespace-nowrap">${item.label[lang]}</span>
+                    <i data-lucide="${data.icon}" class="w-5 h-5 md:w-5 md:h-5 flex-shrink-0"></i>
+                    <span class="whitespace-nowrap mt-1 md:mt-0">${item.label[lang]}</span>
                 `;
                 container.appendChild(btn);
             });
