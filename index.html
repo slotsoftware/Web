@@ -226,38 +226,52 @@
 
         /* Mobile Adjustments */
         @media (max-width: 768px) {
-            .nav-item { 
-                border-left: none; 
-                border-bottom: 2px solid transparent; 
-                flex: 1; /* Permite que los botones crezcan para llenar el grid */
-                display: flex; 
-                flex-direction: column; 
-                align-items: center; 
-                justify-content: center; 
-                padding: 0.4rem 0.2rem; /* Menos padding para que quepan */
-                gap: 0.15rem; 
-                font-size: 0.55rem; /* Texto muy pequeñito para móvil */
-                text-align: center;
-                line-height: 1.1;
-            }
-            .nav-item i {
-                width: 1rem; /* Icono más pequeño */
-                height: 1rem;
-            }
-            .nav-item.active { border-left: none; border-bottom: 2px solid var(--cyan); box-shadow: inset 0 -15px 15px -15px rgba(0, 243, 255, 0.5); }
-            .nav-item:hover:not(.active) { border-left: none; border-bottom: 2px solid rgba(0, 243, 255, 0.5); }
-            
-            /* Convertimos la barra inferior en un grid para pantallas móviles */
             nav.w-full {
-                display: grid !important;
-                grid-template-columns: repeat(3, 1fr); /* 3 columnas iguales */
-                grid-auto-rows: minmax(auto, 1fr);
-                overflow: hidden !important; /* Desactivar scroll */
-                gap: 2px; /* Un poco de separación entre botones */
-                background-color: rgba(3, 11, 20, 0.9); /* Fondo un poco más sólido */
+                overflow-x: hidden !important; /* Bloqueo absoluto del scroll horizontal */
+                display: flex !important;
+                background-color: rgba(3, 11, 20, 1) !important;
+                border-top: 1px solid rgba(0, 243, 255, 0.3) !important;
             }
             #nav-container {
-                display: contents; /* Hace que los items directos formen parte del grid del padre */
+                display: flex !important;
+                flex-direction: row !important;
+                width: 100% !important; /* Obliga a ocupar solo la pantalla, nunca más */
+                justify-content: space-between !important;
+            }
+            .nav-item { 
+                border-left: none !important; 
+                border-bottom: 2px solid transparent !important; 
+                flex: 1 1 0% !important; /* Fuerza a repartir el espacio en 6 partes exactas */
+                min-width: 0 !important; /* Permite aplastar el contenido si es necesario */
+                display: flex !important; 
+                flex-direction: column !important; /* Icono arriba, texto abajo */
+                align-items: center !important; 
+                justify-content: center !important; 
+                padding: 0.5rem 0.1rem !important; /* Quita el padding lateral */
+                gap: 0.2rem !important; 
+            }
+            .nav-item i {
+                width: 1.2rem !important;
+                height: 1.2rem !important;
+                margin: 0 !important;
+            }
+            .nav-item span {
+                font-size: 0.5rem !important; /* Texto en formato 'etiqueta' muy pequeña */
+                display: block !important;
+                width: 100% !important;
+                text-align: center !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important; /* Puntos suspensivos si la palabra es enorme */
+                white-space: nowrap !important;
+            }
+            .nav-item.active { 
+                border-bottom: 2px solid var(--cyan) !important; 
+                background: rgba(0, 243, 255, 0.1) !important;
+                box-shadow: inset 0 -10px 10px -10px rgba(0, 243, 255, 0.5) !important; 
+            }
+            .nav-item:hover:not(.active) { 
+                border-bottom: 2px solid rgba(0, 243, 255, 0.5) !important; 
+                background: rgba(255, 255, 255, 0.05) !important;
             }
         }
     </style>
@@ -362,57 +376,57 @@
                 voice: { es: "Accediendo al catálogo de módulos. Listando aplicaciones.", en: "Accessing module catalog. Listing applications." },
                 content: {
                     es: `
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-up">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
                         <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
-                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
-                                <img src="4.jpeg" alt="Krono Personal" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=KRONO+PER'">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[9/16]">
+                                <img src="4.jpeg" alt="Krono Personal" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/450x800/030b14/00f3ff?text=KRONO+PER'">
                             </div>
                             <h4 class="font-title font-bold text-cyan-400 mb-2">> KRONO PERSONAL V.4.0</h4>
-                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">El gestor de tiempos ideal para entrenamientos personales. Sin instalación, compatible con Android, IOS, Windows y Linux.</p>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">El gestor de tiempos ideal para entrenamientos personales y puesta a punto. Esta aplicación transforma la cámara de tu dispositivo en un fotodetector avanzado sin necesidad de hardware adicional. Disfruta de telemetría en tiempo real, deltas de tiempo, velocidad por sectores y asistencia por voz de ingeniero. No requiere instalación y es 100% compatible multiplataforma (Android, iOS, Windows y Linux).</p>
                             <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EJECUTAR</a>
                         </div>
                         <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
-                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
-                                <img src="5.jpeg" alt="Krono Dual" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=KRONO+DUAL'">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[9/16]">
+                                <img src="5.jpeg" alt="Krono Dual" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/450x800/030b14/00f3ff?text=KRONO+DUAL'">
                             </div>
                             <h4 class="font-title font-bold text-cyan-400 mb-2">> KRONO DUAL V.4.0</h4>
-                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Sistema para competiciones con detectores de cámara para dos coches y máxima precisión. Compatible multiplataforma.</p>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">El sistema definitivo diseñado para la alta competición. Sus detectores de cámara controlan de forma independiente dos coches, garantizando una precisión milimétrica en cada pasada a 30fps. Registra consistencia, récords y gestiona carreras complejas con avisos por voz, banderas amarillas y anti-rebotes inteligente. Conecta cualquier Smart TV para mostrar el panel de tiempos en directo.</p>
                             <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EJECUTAR</a>
                         </div>
                         <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
-                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
-                                <img src="core.jpg" alt="Tracks Telemetry" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=TRACKS'">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[9/16]">
+                                <img src="core.jpg" alt="Tracks Telemetry" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/450x800/030b14/00f3ff?text=TRACKS'">
                             </div>
                             <h4 class="font-title font-bold text-cyan-400 mb-2">> TRACKS TELEMETRY</h4>
-                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Análisis de pista avanzado, diseño 2D a 8 carriles y motor potente en 3D. Control total de setup y comunidad integrada.</p>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Lleva el análisis y diseño de tu circuito a límites increíbles. Pasa de un potente editor de trazados 2D (hasta 8 carriles) a una simulación gráfica en 3D de alta fidelidad. Mantén el control total del setup de tus vehículos ajustando parámetros como motores, neumáticos, piñones, peso magnético y voltaje en pista. Únete a una vibrante comunidad web integrada para compartir setups y récords.</p>
                             <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EJECUTAR</a>
                         </div>
                     </div>
                     `,
                     en: `
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-up">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
                         <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
-                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
-                                <img src="4.jpeg" alt="Krono Personal" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=KRONO+PER'">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[9/16]">
+                                <img src="4.jpeg" alt="Krono Personal" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/450x800/030b14/00f3ff?text=KRONO+PER'">
                             </div>
                             <h4 class="font-title font-bold text-cyan-400 mb-2">> KRONO PERSONAL V.4.0</h4>
-                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Ideal time manager for personal training. No installation required, compatible with Android, iOS, Windows and Linux.</p>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">The ideal time manager for personal training and car setup. This application transforms your device's camera into an advanced photodetector without the need for additional hardware. Enjoy real-time telemetry, time deltas, sector speeds, and engineer voice assistance. No installation required and 100% cross-platform compatible (Android, iOS, Windows, and Linux).</p>
                             <a href="https://slotsoftware.github.io/KronoPerTV/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EXECUTE</a>
                         </div>
                         <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
-                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
-                                <img src="5.jpeg" alt="Krono Dual" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=KRONO+DUAL'">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[9/16]">
+                                <img src="5.jpeg" alt="Krono Dual" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/450x800/030b14/00f3ff?text=KRONO+DUAL'">
                             </div>
                             <h4 class="font-title font-bold text-cyan-400 mb-2">> KRONO DUAL V.4.0</h4>
-                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Competition system with camera detectors for two cars and maximum precision. Cross-platform compatible.</p>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">The definitive system designed for high competition. Its camera detectors independently monitor two cars, ensuring pinpoint accuracy on every pass at 30fps. Record consistency, lap records, and manage complex races with voice prompts, yellow flags, and smart anti-bounce logic. Connect any Smart TV to display the live timing panel.</p>
                             <a href="https://slotsoftware.github.io/KronoDual-TV/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EXECUTE</a>
                         </div>
                         <div class="bg-white/5 border border-white/10 p-5 rounded-sm flex flex-col hover:border-cyan-400/50 transition-colors">
-                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[4/3]">
-                                <img src="core.jpg" alt="Tracks Telemetry" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x300/030b14/00f3ff?text=TRACKS'">
+                            <div class="sci-fi-img-container rounded-sm mb-4 aspect-[9/16]">
+                                <img src="core.jpg" alt="Tracks Telemetry" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/450x800/030b14/00f3ff?text=TRACKS'">
                             </div>
                             <h4 class="font-title font-bold text-cyan-400 mb-2">> TRACKS TELEMETRY</h4>
-                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Advanced track analysis, 2D to 8-lane design and powerful 3D engine. Full setup control and integrated community.</p>
+                            <p class="text-gray-300 text-sm mb-6 flex-grow font-body">Take your circuit design and analysis to incredible limits. Go from a powerful 2D track editor (up to 8 lanes) to a high-fidelity 3D graphic simulation. Maintain total control of your vehicles' setup by adjusting parameters such as motors, tires, pinions, magnetic weight, and track voltage. Join a vibrant integrated web community to share setups and records.</p>
                             <a href="https://slotsoftware.github.io/Telemetria/" target="_blank" class="text-center bg-cyan-400/10 border border-cyan-400 text-cyan-400 py-2 font-title text-sm tracking-widest hover:bg-cyan-400 hover:text-space-dark transition-all">EXECUTE</a>
                         </div>
                     </div>
@@ -726,6 +740,8 @@
         let distantSuns = []; 
         let galaxyParticles = [];
         let shootingStars = []; // Array para las estrellas fugaces
+        let warpStars = []; // NUEVO: Estrellas 3D que vienen hacia ti
+        let nebulas = []; // NUEVO: Galaxias/Nebulosas lejanas de fondo
         let galaxyCenter = {x: 0, y: 0}, galaxyRadius = 0;
         let globalTime = 0;
         
@@ -744,25 +760,46 @@
             const rightContainer = document.querySelector('.flex-1.flex-col.relative.z-10');
             if (rightContainer && w > 0) {
                 const rect = rightContainer.getBoundingClientRect();
-                // Si el contenedor es visible y tiene ancho, centramos ahí
                 if (rect.width > 50) {
                     galaxyCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
                     return;
                 }
             }
-            // Fallback (centro de la pantalla)
             galaxyCenter = { x: w / 2, y: h / 2 };
         }
 
         function iniciarUniversoProfundo() {
-            backgroundStars = []; distantSuns = []; galaxyParticles = []; shootingStars = [];
+            backgroundStars = []; distantSuns = []; galaxyParticles = []; shootingStars = []; warpStars = []; nebulas = [];
             
             updateGalaxyCenter();
-            galaxyRadius = Math.max(w, h) * 0.65;
-            const gCount = w < 768 ? 1500 : 4000;
+            galaxyRadius = Math.max(w, h) * 0.95; // Galaxia aún más grande
+            const gCount = w < 768 ? 2500 : 6000; // Muchísima más densidad
             let coreR = galaxyRadius * 0.15;
             
-            // 1. Crear partículas de la galaxia (Espirales)
+            // 0. Crear Nebulosas de fondo (Galaxias y nubes de gas lejanas)
+            const numNebulas = w < 768 ? 4 : 8;
+            const nebColors = ['rgba(90, 0, 255, 0.04)', 'rgba(0, 243, 255, 0.03)', 'rgba(255, 0, 100, 0.02)', 'rgba(0, 80, 255, 0.05)'];
+            for(let i=0; i<numNebulas; i++) {
+                nebulas.push({
+                    x: Math.random() * w * 1.5 - w*0.25,
+                    y: Math.random() * h * 1.5 - h*0.25,
+                    r: Math.random() * (w*0.8) + 300,
+                    color: nebColors[Math.floor(Math.random() * nebColors.length)]
+                });
+            }
+
+            // 1. Estrellas 3D (Efecto Avance / Warp Speed)
+            const numWarpStars = w < 768 ? 200 : 450;
+            for(let i=0; i<numWarpStars; i++) {
+                warpStars.push({
+                    x: Math.random() * w * 4 - w * 2,
+                    y: Math.random() * h * 4 - h * 2,
+                    z: Math.random() * 2000 + 100, // Profundidad Z
+                    speed: Math.random() * 5 + 2
+                });
+            }
+
+            // 2. Crear partículas de la galaxia (Espirales)
             for (let i = 0; i < gCount; i++) {
                 let r, angle, color, size, alpha;
                 let speedMult = 1;
@@ -777,22 +814,23 @@
                     let y = Math.sin(angle) * r * 0.7;
                     r = Math.hypot(x, y);
                     angle = Math.atan2(y, x);
-                    let coreColors = ['#ffffff', '#fff3e0', '#ffe0b2', '#ffcc80'];
+                    let coreColors = ['#ffffff', '#fff3e0', '#ffd54f', '#ffb300', '#ff8f00'];
                     color = coreColors[Math.floor(Math.random() * coreColors.length)];
-                    size = (Math.random() * 1.5 + 0.5) * 0.6; // Más pequeñas
-                    alpha = Math.random() * 0.8 + 0.2;
+                    size = (Math.random() * 2.5 + 0.5) * 0.8; 
+                    alpha = Math.random() * 0.9 + 0.3;
                     speedMult = 1.0;
                 } else if (i < gCount * 0.55) {
                     // Halo disperso
                     r = Math.random() * galaxyRadius;
                     r = r * Math.random();
                     angle = Math.random() * Math.PI * 2;
-                    color = Math.random() > 0.5 ? '#00e5ff' : '#0066ff';
-                    size = (Math.random() * 0.8 + 0.2) * 0.6; // Más pequeñas
-                    alpha = Math.random() * 0.3 + 0.1;
+                    let haloColors = ['#00e5ff', '#0066ff', '#7c4dff', '#b388ff'];
+                    color = haloColors[Math.floor(Math.random() * haloColors.length)];
+                    size = (Math.random() * 1.5 + 0.2) * 0.7; 
+                    alpha = Math.random() * 0.5 + 0.1;
                     speedMult = 0.4;
                 } else {
-                    // Brazos espirales
+                    // Brazos espirales ultra coloridos
                     let numArms = 2;
                     let arm = i % numArms;
                     let armOffset = (Math.PI * 2 / numArms) * arm;
@@ -810,47 +848,47 @@
                     by += Math.sin(scatterPhase) * scatterAmp * gauss;
                     r = Math.hypot(bx, by);
                     angle = Math.atan2(by, bx);
-                    let armColors = ['#ffffff', '#00e5ff', '#84ffff', '#0066ff', '#ff4081'];
-                    if(Math.random() < 0.03) color = '#ff4081'; 
-                    else color = armColors[Math.floor(Math.random() * 4)];
-                    size = (Math.random() * 1.5 + 0.3) * 0.6; // Más pequeñas
-                    alpha = Math.random() * 0.9 + 0.1;
+                    let armColors = ['#ffffff', '#00e5ff', '#00b0ff', '#2979ff', '#d500f9', '#ffea00'];
+                    if(Math.random() < 0.05) color = '#ff1744'; 
+                    else color = armColors[Math.floor(Math.random() * armColors.length)];
+                    size = (Math.random() * 2.0 + 0.5) * 0.7; 
+                    alpha = Math.random() * 0.9 + 0.3;
                     speedMult = 0.8;
                 }
 
                 galaxyParticles.push({
-                    r: r,
-                    angle: angle,
-                    // Reducimos enormemente la velocidad
-                    speed: 0.00015 * speedMult * (coreR / Math.max(r, coreR * 0.3)), 
-                    size: size,
-                    alpha: alpha,
-                    color: color
+                    r: r, angle: angle, speed: 0.00015 * speedMult * (coreR / Math.max(r, coreR * 0.3)), 
+                    size: size, alpha: alpha, color: color
                 });
             }
 
-            // 2. Estrellas de fondo parpadeantes (Más pequeñas)
-            for (let i = 0; i < (w < 768 ? 200 : 400); i++) {
+            // 3. Estrellas de fondo parpadeantes (Triplicadas en cantidad)
+            const numBgStars = w < 768 ? 500 : 1200;
+            for (let i = 0; i < numBgStars; i++) {
                 backgroundStars.push({ 
-                    x: Math.random() * w, y: Math.random() * h, 
-                    r: (Math.random() * 0.6 + 0.1), // Mucho más pequeñas
-                    alpha: Math.random() * 0.7 + 0.1, 
-                    pulseSpeed: Math.random() * 0.015 + 0.002 // Pulsación más lenta
+                    x: Math.random() * (w * 1.5) - w * 0.25, y: Math.random() * (h * 1.5) - h * 0.25, 
+                    r: (Math.random() * 1.2 + 0.1), alpha: Math.random() * 0.8 + 0.1, pulseSpeed: Math.random() * 0.03 + 0.005 
                 });
             }
 
-            // 3. Soles Distantes (Menos y más pequeños)
-            const numSuns = w < 768 ? 2 : 3;
+            // 4. Soles Distantes (Más cantidad y brillo)
+            const numSuns = w < 768 ? 6 : 12;
+            const sunColorPalettes = [
+                { inner: 'rgba(0, 240, 255, ', outer: 'rgba(0, 102, 255, ' },   // Cyan/Blue
+                { inner: 'rgba(255, 200, 100, ', outer: 'rgba(255, 100, 0, ' },  // Yellow/Orange
+                { inner: 'rgba(255, 100, 255, ', outer: 'rgba(150, 0, 255, ' },  // Pink/Purple
+                { inner: 'rgba(100, 255, 150, ', outer: 'rgba(0, 200, 100, ' },   // Mint/Green
+                { inner: 'rgba(255, 255, 255, ', outer: 'rgba(100, 200, 255, ' } // Supernova
+            ];
+
             for (let i = 0; i < numSuns; i++) {
+                let palette = sunColorPalettes[Math.floor(Math.random() * sunColorPalettes.length)];
                 distantSuns.push({
-                    x: (i + 0.5) * (w / numSuns) + (Math.random() - 0.5) * 80, 
-                    y: Math.random() * h,
-                    radius: (Math.random() * 4 + 8) * (w < 768 ? 0.8 : 1.0), // Radio reducido
-                    colorInner: i % 2 === 0 ? 'rgba(0, 240, 255, ' : 'rgba(120, 215, 255, ',
-                    colorOuter: i % 2 === 0 ? 'rgba(0, 102, 255, ' : 'rgba(150, 0, 255, ',
-                    pulse: Math.random() * Math.PI, 
-                    raysAngle: Math.random() * Math.PI, 
-                    flareSpeed: Math.random() * 0.001 + 0.001 // Destellos más lentos
+                    x: (Math.random() * w * 2) - (w * 0.5), 
+                    y: Math.random() * h * 1.5 - h * 0.25,
+                    radius: (Math.random() * 8 + 8) * (w < 768 ? 0.7 : 1.0),
+                    colorInner: palette.inner, colorOuter: palette.outer,
+                    pulse: Math.random() * Math.PI, raysAngle: Math.random() * Math.PI, flareSpeed: Math.random() * 0.002 + 0.001 
                 });
             }
         }
@@ -891,8 +929,82 @@
             mouseX += (targetMouseX - mouseX) * 0.03;
             mouseY += (targetMouseY - mouseY) * 0.03;
 
-            // Generar estrellas fugaces aleatorias
-            if (Math.random() < 0.015) {
+            // 1. Dibujar Nebulosas de Fondo (Parallax muy lento)
+            nebulas.forEach(neb => {
+                let px = neb.x + (mouseX * 10); // Poco movimiento = mucha profundidad
+                let py = neb.y + (mouseY * 10);
+                let grd = ctx.createRadialGradient(px, py, 0, px, py, neb.r);
+                grd.addColorStop(0, neb.color);
+                grd.addColorStop(1, 'transparent');
+                ctx.beginPath();
+                ctx.arc(px, py, neb.r, 0, Math.PI*2);
+                ctx.fillStyle = grd;
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.fill();
+                ctx.globalCompositeOperation = 'source-over';
+            });
+
+            // 2. Estrellas de Fondo (Parallax medio)
+            backgroundStars.forEach(star => {
+                star.alpha += Math.sin(globalTime * star.pulseSpeed) * 0.01;
+                if (star.alpha < 0.1) star.alpha = 0.1; if (star.alpha > 1.0) star.alpha = 1.0;
+                
+                let px = star.x + (mouseX * 30 * star.r); 
+                let py = star.y + (mouseY * 30 * star.r);
+                
+                ctx.beginPath(); 
+                ctx.arc(px, py, star.r, 0, Math.PI * 2); 
+                ctx.fillStyle = `rgba(200, 240, 255, ${star.alpha})`; 
+                ctx.fill();
+            });
+
+            // 3. Estrellas 3D (Efecto Warp de viaje en el tiempo)
+            // Calculamos la proyección 3D a 2D para que salgan del centro
+            let cxWarp = galaxyCenter.x + mouseX * 25;
+            let cyWarp = galaxyCenter.y + mouseY * 25;
+            
+            warpStars.forEach(star => {
+                star.z -= star.speed; // Mover hacia la cámara
+                if (star.z <= 0) { // Si pasa la cámara, reiniciamos al fondo
+                    star.z = 2000;
+                    star.x = Math.random() * w * 4 - w * 2;
+                    star.y = Math.random() * h * 4 - h * 2;
+                }
+                
+                let fov = 300; // Campo de visión
+                let scale = fov / (fov + star.z);
+                let px = cxWarp + (star.x * scale);
+                let py = cyWarp + (star.y * scale);
+                
+                // Dibujamos una línea desde la posición anterior para crear una estela de movimiento
+                let prevZ = star.z + star.speed * 2.5; 
+                let prevScale = fov / (fov + prevZ);
+                let prevPx = cxWarp + (star.x * prevScale);
+                let prevPy = cyWarp + (star.y * prevScale);
+                
+                if (px >= 0 && px <= w && py >= 0 && py <= h) {
+                    let brightness = 1 - (star.z / 2000); // Más brillantes cuanto más cerca
+                    ctx.beginPath();
+                    ctx.moveTo(prevPx, prevPy);
+                    ctx.lineTo(px, py);
+                    ctx.strokeStyle = `rgba(0, 243, 255, ${brightness})`;
+                    ctx.lineWidth = scale * 1.5;
+                    ctx.stroke();
+                }
+            });
+
+            // 4. Dibujar Soles Distantes (Parallax fuerte = más cerca de ti)
+            distantSuns.forEach(sun => {
+                let sx = sun.x + (mouseX * 50); 
+                let sy = sun.y + (mouseY * 50);
+                let ox = sun.x; let oy = sun.y;
+                sun.x = sx; sun.y = sy;
+                drawDetailedSun(ctx, sun);
+                sun.x = ox; sun.y = oy;
+            });
+
+            // Generar estrellas fugaces ultra-rápidas cruzando todo
+            if (Math.random() < 0.02) {
                 let startX = Math.random() * (w * 1.5) - w * 0.25;
                 let startY = Math.random() * (h * 0.5) - h * 0.2;
                 let angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2;
@@ -905,33 +1017,7 @@
                 });
             }
 
-            // 1. Dibujar Soles
-            distantSuns.forEach(sun => {
-                // Parallax sutil basado en ratón
-                let sx = sun.x + (mouseX * 10);
-                let sy = sun.y + (mouseY * 10);
-                // Guardar original temporalmente
-                let ox = sun.x; let oy = sun.y;
-                sun.x = sx; sun.y = sy;
-                drawDetailedSun(ctx, sun);
-                sun.x = ox; sun.y = oy;
-            });
-
-            // 2. Dibujar Estrellas de Fondo
-            backgroundStars.forEach(star => {
-                star.alpha += Math.sin(globalTime * star.pulseSpeed) * 0.01;
-                if (star.alpha < 0.1) star.alpha = 0.1; if (star.alpha > 0.8) star.alpha = 0.8;
-                
-                let px = star.x + (mouseX * 20 * star.r); // Parallax según tamaño
-                let py = star.y + (mouseY * 20 * star.r);
-                
-                ctx.beginPath(); 
-                ctx.arc(px, py, star.r, 0, Math.PI * 2); 
-                ctx.fillStyle = `rgba(180, 230, 255, ${star.alpha})`; 
-                ctx.fill();
-            });
-
-            // 2.5 Dibujar Estrellas Fugaces
+            // 5. Dibujar Estrellas Fugaces
             for (let i = shootingStars.length - 1; i >= 0; i--) {
                 let ss = shootingStars[i];
                 ss.x += ss.vx; ss.y += ss.vy; ss.alpha -= ss.decay;
@@ -942,7 +1028,7 @@
                 
                 let gradSS = ctx.createLinearGradient(ss.x, ss.y, tailX, tailY);
                 gradSS.addColorStop(0, `rgba(255, 255, 255, ${ss.alpha})`);
-                gradSS.addColorStop(0.3, `rgba(0, 243, 255, ${ss.alpha * 0.7})`);
+                gradSS.addColorStop(0.3, `rgba(0, 243, 255, ${ss.alpha * 0.8})`);
                 gradSS.addColorStop(1, 'transparent');
                 
                 ctx.beginPath();
@@ -953,24 +1039,24 @@
                 ctx.stroke();
             }
 
-            // 3. Dibujar Galaxia Central
+            // 6. Dibujar Galaxia Central (Capa Principal)
             ctx.save();
-            // El centro se mueve ligeramente con el ratón
-            let cx = galaxyCenter.x + (mouseX * 15);
-            let cy = galaxyCenter.y + (mouseY * 15);
+            let cx = galaxyCenter.x + (mouseX * 25); // Parallax medio
+            let cy = galaxyCenter.y + (mouseY * 25);
             
             ctx.translate(cx, cy);
-            ctx.rotate(0.3); // Inclinación estática
-            ctx.scale(1, 0.45); // Forma elíptica de galaxia
+            ctx.rotate(0.35); // Inclinación ligeramente ajustada
+            ctx.scale(1, 0.45); 
             
             ctx.globalCompositeOperation = 'lighter';
             
-            // Resplandor del núcleo galáctico
-            let haloR = galaxyRadius * 0.4;
+            // Resplandor del núcleo galáctico ultra-denso
+            let haloR = galaxyRadius * 0.65;
             let coreGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, haloR);
-            coreGrad.addColorStop(0, 'rgba(255, 240, 220, 0.25)');
-            coreGrad.addColorStop(0.2, 'rgba(255, 180, 100, 0.1)');
-            coreGrad.addColorStop(0.5, 'rgba(0, 150, 255, 0.03)');
+            coreGrad.addColorStop(0, 'rgba(255, 240, 200, 0.55)');
+            coreGrad.addColorStop(0.15, 'rgba(255, 150, 50, 0.3)');
+            coreGrad.addColorStop(0.4, 'rgba(100, 0, 255, 0.12)'); // Tono púrpura profundo
+            coreGrad.addColorStop(0.7, 'rgba(0, 150, 255, 0.04)');
             coreGrad.addColorStop(1, 'transparent');
             
             ctx.fillStyle = coreGrad;
@@ -980,7 +1066,7 @@
 
             // Partículas de la espiral
             galaxyParticles.forEach(p => {
-                p.angle += p.speed; // Rotación super lenta
+                p.angle += p.speed; 
                 let x = Math.cos(p.angle) * p.r; 
                 let y = Math.sin(p.angle) * p.r; 
                 let distFade = Math.max(0, 1 - (p.r / (galaxyRadius * 1.1))); 
