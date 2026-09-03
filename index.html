@@ -112,6 +112,12 @@
     <header class="relative bg-white pt-32 pb-10 lg:pt-40 lg:pb-20 overflow-hidden flex flex-col items-center text-center">
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col items-center">
             
+            <!-- Banner de mantenimiento -->
+            <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-5 py-2.5 rounded-full mb-8 text-sm font-medium flex items-center gap-2.5 shadow-sm animate-pulse">
+                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <span data-i18n="maintenanceMsg">Sitio web en mantenimiento. Disculpa las molestias.</span>
+            </div>
+
             <span class="text-slot-red font-semibold text-xs tracking-[0.2em] uppercase mb-4" data-i18n="heroSubtitle">Ingeniería de Competición</span>
             
             <h1 class="title-prometheus text-4xl sm:text-5xl md:text-7xl lg:text-8xl mb-6">
@@ -367,6 +373,7 @@
         const i18nData = {
             es: {
                 navSoftware: "Software", navPhilosophy: "Filosofía", navWsp: "Wsp SlotSoftware", navCatalog: "Ver Catálogo",
+                maintenanceMsg: "Sitio web en mantenimiento. Disculpa las molestias.",
                 heroSubtitle: "Ingeniería de Competición",
                 heroDesc: "El ecosistema definitivo. Diseña tu circuito con precisión milimétrica y gestiona la telemetría en tiempo real.",
                 heroBtnExplore: "Explorar Software", heroBtnTech: "Descubrir la tecnología",
@@ -388,6 +395,7 @@
             },
             en: {
                 navSoftware: "Software", navPhilosophy: "Philosophy", navWsp: "Wsp SlotSoftware", navCatalog: "View Catalog",
+                maintenanceMsg: "Website under maintenance. Sorry for the inconvenience.",
                 heroSubtitle: "Racing Engineering",
                 heroDesc: "The ultimate ecosystem. Design your track with millimeter precision and manage real-time telemetry.",
                 heroBtnExplore: "Explore Software", heroBtnTech: "Discover the technology",
@@ -409,9 +417,9 @@
             },
             fr: {
                 navSoftware: "Logiciel", navPhilosophy: "Philosophie", navWsp: "Wsp SlotSoftware", navCatalog: "Voir le Catalogue",
+                maintenanceMsg: "Site web en maintenance. Désolé pour le dérangement.",
                 heroSubtitle: "Ingénierie de Compétition",
-                heroDesc: "L'écosystème ultime. Concevez votre circuit avec une précision millimétrique et gérez la télémétrie en temps réel.",
-                heroBtnExplore: "Explorer le Logiciel", heroBtnTech: "Découvrir la technologie",
+                heroDesc: "L'écosystème ultime. Concevez votre circuit avec une précision millimétrica et gérez la télémétrie en temps réel.",
                 catalogTitle: "Choisissez votre outil.", catalogSub: "Cliquez sur n'importe quelle application pour ouvrir sa galerie interactive complète avec 30 captures réelles.",
                 philTitle: "Ingénierie Pure Slot.", philDesc: "Technologie de pointe conçue spécifiquement pour le modélisme automobile. Vision artificielle photométrique, simulation physique tridimensionnelle et synchronisation cloud en temps réel.",
                 phil1Title: "Vision Artificielle & IA Photométrique", phil1Desc: "Les séries Krono Personal and Dual transforment n'importe quelle webcam en système de chronométrage professionnel à 30 FPS. Grâce à des ROI ajustables et des filtres d'éclairage intelligents, elles détectent le passage millimétrique des bolides et gèrent les faux départs.",
@@ -430,6 +438,7 @@
             },
             it: {
                 navSoftware: "Software", navPhilosophy: "Filosofia", navWsp: "Wsp SlotSoftware", navCatalog: "Vedi Catalogo",
+                maintenanceMsg: "Sito web in manutenzione. Ci scusiamo per il disagio.",
                 heroSubtitle: "Ingegneria di Competizione",
                 heroDesc: "L'ecosistema definitivo. Progetta il tuo circuito con precisione millimetrica e gestisci la telemetria in tempo reale.",
                 heroBtnExplore: "Esplora Software", heroBtnTech: "Scopri la tecnologia",
