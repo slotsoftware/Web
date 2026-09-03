@@ -811,14 +811,24 @@
                     summaryHTML = `<p class="text-apple-gray text-sm font-light mb-6 flex-grow">${prog.shortDesc}</p>`;
                 }
 
-                const acqLink = programLinks[prog.id] || "https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY?s=cl&p=a&mlu=4&ilr=4";
+                // Definimos los enlaces específicos por ID del programa
+                const progLinks = {
+                    'krono-personal-v3': 'https://slotsoftware.github.io/TiemposPersonal/',
+                    'krono-dual-v3': 'https://slotsoftware.github.io/TiemposDual/',
+                    'tracks-telemetry-v2': 'https://slotsoftware.github.io/Telemetria/',
+                    'krono-personal-tv': 'https://slotsoftware.github.io/KronoPerTV/',
+                    'krono-dual-tv': 'https://slotsoftware.github.io/KronoDual-TV/',
+                    'sector-time-v1': 'https://slotsoftware.github.io/Web/canal.html'
+                };
+                
+                const acqLink = progLinks[prog.id] || "https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY?s=cl&p=a&mlu=4&ilr=4";
 
                 card.innerHTML = `
-                    <div onclick="openModal('${prog.id}')" class="software-img-container h-56 relative bg-gray-100 flex items-center justify-center border border-dashed border-gray-300 cursor-pointer">
+                    <div onclick="openModal('${prog.id}')" class="relative mx-auto mt-7 mb-2 w-[70%] max-w-[220px] aspect-[9/16] bg-gray-50 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center cursor-pointer overflow-hidden group">
                         <span class="text-gray-400 font-semibold text-sm z-0 text-center px-4">${t.placeholder} ${prog.img}</span>
-                        <img src="${prog.img}" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 bg-white z-10" alt="${prog.name}" onerror="this.style.display='none';">
+                        <img src="${prog.img}" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 z-10" alt="${prog.name}" onerror="this.style.display='none';">
                     </div>
-                    <div class="px-8 pb-8 flex flex-col flex-grow">
+                    <div class="px-8 pt-4 pb-8 flex flex-col flex-grow">
                         <h3 onclick="openModal('${prog.id}')" class="text-xl font-sans font-semibold text-apple-text mb-2 cursor-pointer hover:text-apple-blue transition-colors">${prog.name}</h3>
                         ${summaryHTML}
                         <div class="mt-auto flex flex-col gap-3">
