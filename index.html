@@ -255,7 +255,8 @@
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
         <div class="relative w-full h-full flex flex-col items-center justify-center p-4 cursor-pointer" onclick="if(event.target === this) closeLightbox()">
-            <img id="lightbox-img" src="" alt="Vista ampliada" class="max-w-full max-h-[85vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default">
+            <img id="lightbox-img" src="" alt="Vista ampliada" class="hidden max-w-full max-h-[85vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default">
+            <video id="lightbox-video" src="" controls class="hidden max-w-full max-h-[85vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default"></video>
         </div>
     </div>
 
@@ -920,9 +921,9 @@
                 const item = document.createElement('div');
                 item.className = 'masonry-item group border border-gray-200 bg-white p-1 transition-colors';
                 
-                if (!isSectorTime && !isVideo) {
+                if (!isSectorTime) {
                     item.classList.add('cursor-pointer', 'hover:border-slot-red');
-                    item.onclick = () => openLightbox(mediaUrl);
+                    item.onclick = () => openLightbox(mediaUrl, isVideo);
                 } else {
                     item.classList.add('cursor-default');
                 }
@@ -968,10 +969,15 @@
                     imageContent = `
                         <div class="absolute inset-0 loading-skeleton" id="skel-${prog.id}-${i}"></div>
                         <span class="text-xs font-semibold text-slot-red hidden z-0 text-center px-2" id="err-${prog.id}-${i}">Error 404:<br/>${t.errorMissing} ${mediaUrl}</span>
-                        <video src="${mediaUrl}" class="absolute inset-0 w-full h-full object-cover z-10 rounded-xl" controls playsinline preload="metadata"
-                             onloadeddata="document.getElementById('skel-${prog.id}-${i}').style.display='none';" 
+                        <video src="${mediaUrl}#t=0.1" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 z-10 rounded-xl" muted playsinline preload="metadata"
+                             onloadeddata="this.style.opacity=1; document.getElementById('skel-${prog.id}-${i}').style.display='none';" 
                              onerror="this.style.display='none'; document.getElementById('skel-${prog.id}-${i}').style.display='none'; document.getElementById('err-${prog.id}-${i}').classList.remove('hidden');">
                         </video>
+                        <div class="absolute inset-0 bg-slot-dark/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20 rounded-xl">
+                            <span class="text-white font-bold text-xs uppercase tracking-widest border-2 border-white px-4 py-2 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Play
+                            </span>
+                        </div>
                     `;
                 } else {
                     imageContent = `
@@ -1014,18 +1020,53 @@
             setTimeout(() => { m.classList.add('hidden'); document.body.style.overflow = ''; }, 300);
         }
 
-        function openLightbox(imgUrl) {
-            const lb = document.getElementById('lightbox'); const imgEl = document.getElementById('lightbox-img');
-            imgEl.src = imgUrl; imgEl.classList.remove('scale-100'); imgEl.classList.add('scale-90');
+        function openLightbox(mediaUrl, isVideo = false) {
+            const lb = document.getElementById('lightbox'); 
+            const imgEl = document.getElementById('lightbox-img');
+            const vidEl = document.getElementById('lightbox-video');
+            
+            if (isVideo) {
+                imgEl.classList.add('hidden');
+                vidEl.classList.remove('hidden');
+                vidEl.src = mediaUrl; 
+                vidEl.classList.remove('scale-100'); vidEl.classList.add('scale-90');
+            } else {
+                vidEl.classList.add('hidden');
+                vidEl.pause();
+                vidEl.src = '';
+                imgEl.classList.remove('hidden');
+                imgEl.src = mediaUrl; 
+                imgEl.classList.remove('scale-100'); imgEl.classList.add('scale-90');
+            }
+            
             lb.classList.remove('hidden'); void lb.offsetWidth;
             lb.classList.remove('opacity-0');
-            setTimeout(() => { imgEl.classList.remove('scale-90'); imgEl.classList.add('scale-100'); }, 10);
+            
+            setTimeout(() => { 
+                if(isVideo) {
+                    vidEl.classList.remove('scale-90'); vidEl.classList.add('scale-100');
+                    vidEl.play().catch(e => console.log('Autoplay prevented:', e));
+                } else {
+                    imgEl.classList.remove('scale-90'); imgEl.classList.add('scale-100'); 
+                }
+            }, 10);
         }
 
         function closeLightbox() {
-            const lb = document.getElementById('lightbox'); const imgEl = document.getElementById('lightbox-img');
-            lb.classList.add('opacity-0'); imgEl.classList.remove('scale-100'); imgEl.classList.add('scale-90');
-            setTimeout(() => lb.classList.add('hidden'), 300);
+            const lb = document.getElementById('lightbox'); 
+            const imgEl = document.getElementById('lightbox-img');
+            const vidEl = document.getElementById('lightbox-video');
+            
+            lb.classList.add('opacity-0'); 
+            imgEl.classList.remove('scale-100'); imgEl.classList.add('scale-90');
+            vidEl.classList.remove('scale-100'); vidEl.classList.add('scale-90');
+            
+            setTimeout(() => { 
+                lb.classList.add('hidden');
+                vidEl.pause();
+                vidEl.src = '';
+                imgEl.src = '';
+            }, 300);
         }
 
         function openCookieSettings() {
