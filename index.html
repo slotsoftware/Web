@@ -44,23 +44,26 @@
         .link-apple { color: #0066CC; transition: all 0.3s ease; }
         .link-apple:hover { text-decoration: underline; }
         .kerb-border { height: 2px; background: linear-gradient(90deg, transparent 0%, #E60000 50%, transparent 100%); opacity: 0.5; }
-        .software-card { background: #F5F5F7; border-radius: 24px; transition: all 0.4s ease; overflow: hidden; }
+        .software-card { background: #F5F5F7; border-radius: 24px; transition: all 0.4s ease; overflow: hidden; cursor: pointer; }
         .software-card:hover { transform: scale(1.01); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); }
         .software-img-container { border-radius: 20px; overflow: hidden; margin: 16px; }
         
         .masonry { column-count: 2; column-gap: 1rem; }
         @media (min-width: 768px) { .masonry { column-count: 3; } }
         @media (min-width: 1024px) { .masonry { column-count: 4; } }
-        .masonry-item { break-inside: avoid; margin-bottom: 1rem; border-radius: 12px; overflow: hidden; position: relative; background: #F5F5F7; }
+        .masonry-item { break-inside: avoid; margin-bottom: 1rem; border-radius: 12px; overflow: hidden; position: relative; background: #F5F5F7; cursor: pointer; }
         
-        .loading-skeleton { background: linear-gradient(90deg, #F5F5F7 25%, #E5E5EA 50%, #F5F5F7 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
-        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .glass-nav { background: rgba(255, 255, 255, 0.7); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
     </style>
 </head>
 <body class="antialiased">
 
-    <nav class="fixed top-0 w-full z-40 glass-nav border-b border-gray-100 transition-all duration-300" id="navbar">
+    <!-- Barra de Admin (Oculta por defecto) -->
+    <div id="admin-bar" class="hidden fixed top-0 left-0 w-full bg-slot-red text-white text-center py-1 text-xs font-bold uppercase tracking-widest z-[100] shadow-md">
+        Modo Administrador Activo - Edición de Textos en la Nube
+    </div>
+
+    <nav class="fixed top-0 w-full z-40 glass-nav border-b border-gray-100 transition-all duration-300 mt-[env(safe-area-inset-top)]" id="navbar">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div class="flex items-center justify-between h-16">
                 
@@ -112,8 +115,7 @@
     <header class="relative bg-white pt-32 pb-10 lg:pt-40 lg:pb-20 overflow-hidden flex flex-col items-center text-center">
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col items-center">
             
-            <!-- Banner de mantenimiento -->
-            <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-5 py-2.5 rounded-full mb-8 text-sm font-medium flex items-center gap-2.5 shadow-sm animate-pulse">
+            <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-5 py-2.5 rounded-full mb-8 text-sm font-medium flex items-center gap-2.5 shadow-sm animate-pulse mt-4">
                 <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 <span data-i18n="maintenanceMsg">Sitio web en mantenimiento. Disculpa las molestias.</span>
             </div>
@@ -129,34 +131,37 @@
             </p>
             
             <div class="flex flex-col sm:flex-row gap-6 items-center justify-center">
-                <a href="#programas" class="btn-apple bg-apple-text text-white px-8 py-3 text-lg" data-i18n="heroBtnExplore">
-                    Explorar Software
-                </a>
+                <a href="#programas" class="btn-apple bg-apple-text text-white px-8 py-3 text-lg" data-i18n="heroBtnExplore">Explorar Software</a>
                 <a href="#filosofia" class="link-apple text-lg font-medium flex items-center gap-1">
                     <span data-i18n="heroBtnTech">Descubrir la tecnología</span> <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
             </div>
-
-            <!-- CONTENEDOR DE IMÁGENES HERO -->
+            
+            <!-- CONTENEDOR DE IMÁGENES HERO (5 Imágenes Restauradas) -->
             <div class="relative w-full max-w-6xl mx-auto h-[450px] sm:h-[600px] md:h-[750px] mt-16 md:mt-24">
+                <!-- Imagen 1 (Central Principal) -->
                 <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[45%] md:w-[32%] h-[85%] md:h-[90%] bg-gray-100 rounded-[100px] md:rounded-[200px] shadow-apple-lg z-30 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0">Poner 1.jpg</span>
+                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 1.jpg</span>
                     <img src="1.jpg" alt="Hero 1" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
+                <!-- Imagen 2 (Arriba Izquierda) -->
                 <div class="absolute left-[5%] md:left-[12%] top-[10%] md:top-[15%] w-[40%] md:w-[26%] aspect-square bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0">Poner 2.jpg</span>
+                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 2.jpg</span>
                     <img src="2.jpg" alt="Hero 2" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
+                <!-- Imagen 3 (Arriba Derecha) -->
                 <div class="absolute right-[5%] md:right-[10%] top-[5%] md:top-[8%] w-[42%] md:w-[30%] aspect-[4/3] bg-gray-100 rounded-[2rem] md:rounded-[3rem] shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0">Poner 3.jpg</span>
+                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 3.jpg</span>
                     <img src="3.jpg" alt="Hero 3" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
-                <div class="absolute left-[10%] bottom-[15%] md:bottom-[5%] w-[40%] md:w-[30%] h-[35%] md:h-[40%] bg-gray-100 rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-xl rounded-bl-xl shadow-apple-lg z-20 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0">Poner 4.jpg</span>
+                <!-- Imagen 4 (Abajo Izquierda) -->
+                <div class="absolute left-[10%] bottom-[15%] md:bottom-[5%] w-[40%] md:w-[30%] h-[35%] md:h-[40%] bg-gray-100 rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-xl rounded-bl-xl shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
+                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 4.jpg</span>
                     <img src="4.jpg" alt="Hero 4" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
-                <div class="absolute right-[8%] bottom-[5%] md:bottom-[15%] w-[45%] md:w-[35%] h-[25%] md:h-[30%] bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0">Poner 5.jpg</span>
+                <!-- Imagen 5 (Abajo Derecha) -->
+                <div class="absolute right-[8%] bottom-[5%] md:bottom-[15%] w-[45%] md:w-[35%] h-[25%] md:h-[30%] bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
+                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 5.jpg</span>
                     <img src="5.jpg" alt="Hero 5" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
             </div>
@@ -168,9 +173,8 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
                     <h2 class="font-sans font-semibold text-3xl md:text-5xl text-apple-text mb-4" data-i18n="catalogTitle">Elige tu herramienta.</h2>
-                    <p class="text-apple-gray max-w-2xl mx-auto text-lg" data-i18n="catalogSub">Haz clic en cualquier aplicación para abrir su galería completa interactiva con 30 capturas reales.</p>
+                    <p class="text-apple-gray max-w-2xl mx-auto text-lg" data-i18n="catalogSub">Haz clic en cualquier aplicación para abrir su galería completa interactiva con capturas reales.</p>
                 </div>
-                <!-- El grid donde se inyectan las tarjetas por JS -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="programs-grid"></div>
             </div>
         </section>
@@ -181,7 +185,6 @@
                     <h2 class="font-sans font-semibold text-3xl md:text-5xl text-apple-text mb-4" data-i18n="philTitle">Pura Ingeniería Slot.</h2>
                     <p class="text-apple-gray max-w-2xl mx-auto text-lg" data-i18n="philDesc">Tecnología de vanguardia diseñada específicamente para el automodelismo. Visión artificial fotométrica, simulación física tridimensional y sincronización cloud en tiempo real.</p>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
                     <div class="text-center">
                         <div class="w-20 h-20 mx-auto bg-white rounded-2xl shadow-apple flex items-center justify-center mb-6 text-slot-red">
@@ -209,15 +212,14 @@
         </section>
     </main>
 
-    <!-- Program Modal (Galería) -->
+    <!-- Modal de la Galería de la Herramienta -->
     <div id="program-modal" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-0 md:p-6">
         <div class="fixed inset-0 bg-slot-dark/95 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
-        
         <div class="bg-white w-full md:max-w-6xl h-[100dvh] md:h-[90vh] flex flex-col relative z-10 md:rounded-2xl shadow-2xl overflow-hidden transform transition-all">
             <div class="bg-white/90 backdrop-blur-md px-4 md:px-6 py-4 flex justify-between items-center border-b border-gray-100 z-30">
                 <div>
                     <h3 class="font-sans font-semibold text-2xl text-apple-text" id="modal-title">Programa</h3>
-                    <span class="text-xs font-sans text-apple-gray mt-1 block" id="modal-subtitle" data-i18n="modalSubtitle">Galería Completa - 30 Imágenes</span>
+                    <span class="text-xs font-sans text-apple-gray mt-1 block" id="modal-subtitle">Galería Completa</span>
                 </div>
                 <button type="button" onclick="closeModal()" class="bg-apple-bg text-apple-text hover:bg-gray-200 transition-colors p-2 rounded-full cursor-pointer">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -237,6 +239,42 @@
         </div>
     </div>
 
+    <!-- Lightbox Fullscreen (Imagen y Vídeo gigante) -->
+    <div id="lightbox" class="fixed inset-0 z-[60] hidden flex flex-col items-center justify-center bg-slot-dark/95 backdrop-blur-md opacity-0 transition-opacity duration-300">
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 md:top-6 md:right-6 text-white hover:text-slot-red transition-colors z-50 bg-white/10 hover:bg-white/20 backdrop-blur-lg p-3 rounded-full cursor-pointer">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        
+        <div class="relative w-full h-full flex flex-col items-center justify-center p-4" onclick="if(event.target === this) closeLightbox()">
+            <img id="lightbox-img" src="" alt="Vista ampliada" class="hidden max-w-full max-h-[75vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default">
+            <video id="lightbox-video" src="" class="hidden max-w-full max-h-[75vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default" controls playsinline></video>
+            
+            <div id="lightbox-caption-container" class="mt-6 text-center w-full max-w-2xl px-4">
+                <!-- Texto Normal para Visitantes -->
+                <p id="lightbox-caption-text" class="text-white text-lg font-medium tracking-wide drop-shadow-md"></p>
+                
+                <!-- Sistema Administrador: Editor de Textos -->
+                <div id="admin-edit-container" class="hidden mt-3 flex-col sm:flex-row gap-2 w-full">
+                    <input type="text" id="admin-edit-input" class="w-full px-4 py-2.5 rounded-lg text-black font-medium border-2 border-transparent focus:border-slot-red outline-none" placeholder="Escribe el texto de esta imagen...">
+                    <button onclick="saveAdminText()" class="bg-slot-red text-white px-6 py-2.5 rounded-lg font-bold uppercase tracking-wider hover:bg-red-700 transition-colors flex-shrink-0">Guardar Textos</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="fixed inset-0 z-[70] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-slot-dark/90 backdrop-blur-sm transition-opacity" onclick="closeAdminLogin()"></div>
+        <div class="bg-white relative z-10 w-full max-w-sm overflow-hidden rounded-2xl shadow-2xl p-8 text-center">
+            <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4 text-slot-dark">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <h3 class="font-bold text-xl text-slot-dark uppercase tracking-widest mb-6">Acceso Restringido</h3>
+            <input type="password" id="admin-pwd" class="w-full text-center px-4 py-3 rounded-lg border border-gray-300 mb-4 focus:ring-2 focus:ring-slot-red focus:border-transparent outline-none" placeholder="Contraseña">
+            <button onclick="checkAdminPassword()" class="w-full bg-slot-dark text-white font-bold py-3 rounded-lg hover:bg-slot-red transition-colors uppercase tracking-wider">Entrar</button>
+        </div>
+    </div>
+
     <!-- Cookie Banner -->
     <div id="cookie-banner" class="fixed bottom-6 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-[600px] z-[100] transform translate-y-[200%] transition-transform duration-700 bg-white/90 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-apple-lg p-6 flex flex-col md:flex-row items-center gap-6">
         <div class="flex-1">
@@ -249,22 +287,11 @@
         </div>
     </div>
 
-    <!-- Lightbox Fullscreen -->
-    <div id="lightbox" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-slot-dark/95 backdrop-blur-md opacity-0 transition-opacity duration-300">
-        <button onclick="closeLightbox()" class="absolute top-4 right-4 md:top-6 md:right-6 text-white hover:text-slot-red transition-colors z-50 bg-white/10 hover:bg-white/20 backdrop-blur-lg p-3 rounded-full cursor-pointer">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-        <div class="relative w-full h-full flex flex-col items-center justify-center p-4 cursor-pointer" onclick="if(event.target === this) closeLightbox()">
-            <img id="lightbox-img" src="" alt="Vista ampliada" class="hidden max-w-full max-h-[85vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default">
-            <video id="lightbox-video" src="" controls class="hidden max-w-full max-h-[85vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default"></video>
-        </div>
-    </div>
-
-    <!-- Legal Modal (Textos dinámicos y Soporte Técnico extenso) -->
+    <!-- Legal Modal (Textos dinámicos y Soporte Técnico) -->
     <div id="legal-modal" class="fixed inset-0 z-[70] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
         <div class="fixed inset-0 bg-slot-dark/80 backdrop-blur-sm transition-opacity" onclick="closeLegalModal()"></div>
         <div class="bg-white relative z-10 w-full max-w-3xl max-h-[80vh] overflow-hidden flex flex-col rounded-xl shadow-2xl">
-            <div class="p-6 border-b border-gray-200 bg-slot-light flex justify-between items-center">
+            <div class="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
                 <h3 id="legal-title" class="font-prometheus font-bold text-xl text-slot-dark uppercase tracking-widest" data-i18n="legalDefaultTitle">Documento Legal</h3>
                 <button onclick="closeLegalModal()" class="text-gray-400 hover:text-slot-red p-2 cursor-pointer"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
@@ -276,7 +303,7 @@
     <div id="cookie-settings-modal" class="fixed inset-0 z-[70] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
         <div class="fixed inset-0 bg-slot-dark/80 backdrop-blur-sm transition-opacity" onclick="closeCookieSettings()"></div>
         <div class="bg-white relative z-10 w-full max-w-lg overflow-hidden rounded-xl shadow-2xl">
-            <div class="p-6 border-b border-gray-200 bg-slot-light"><h3 class="font-prometheus font-bold text-xl text-slot-dark uppercase tracking-widest" data-i18n="cookieModalTitle">Ajustes de Privacidad</h3></div>
+            <div class="p-6 border-b border-gray-200 bg-gray-50"><h3 class="font-prometheus font-bold text-xl text-slot-dark uppercase tracking-widest" data-i18n="cookieModalTitle">Ajustes de Privacidad</h3></div>
             <div class="p-6 space-y-6">
                 <div class="flex items-center justify-between border-b border-gray-100 pb-4">
                     <div>
@@ -297,12 +324,14 @@
         </div>
     </div>
 
-    <footer class="bg-slot-dark pt-20 pb-10 relative">
-        <div class="kerb-border w-full h-[4px] absolute -mt-20"></div>
+    <!-- Pie de página (Footer con Logo de Admin) -->
+    <footer class="bg-slot-dark pt-20 pb-10 relative mt-20">
+        <div class="kerb-border w-full h-[4px] absolute top-0 -mt-1"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                 <div>
-                    <div class="flex items-center gap-2 mb-4 group cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <!-- LOGO CON PUERTA SECRETA DE ADMINISTRADOR -->
+                    <div class="flex items-center gap-2 mb-4 group cursor-pointer" onclick="handleSecretAdminClick()">
                         <svg class="w-8 h-8 text-white transform group-hover:scale-105 transition-transform duration-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 0C22.8 0 24 1.2 24 12C24 22.8 22.8 24 12 24C1.2 24 0 22.8 0 12C0 1.2 1.2 0 12 0Z" fill="currentColor"/>
                             <path d="M5 14 L10 9 H14 L19 4" stroke="#1D1D1F" stroke-opacity="0.3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -329,775 +358,533 @@
                         <li><button onclick="openLegal('terms')" class="text-gray-400 hover:text-slot-red transition-colors cursor-pointer" data-i18n="footerTerms">Términos de Servicio</button></li>
                         <li><button onclick="openLegal('privacy')" class="text-gray-400 hover:text-slot-red transition-colors cursor-pointer" data-i18n="footerPrivacy">Política de Privacidad</button></li>
                         <li><button onclick="openCookieSettings()" class="text-gray-400 hover:text-slot-red transition-colors cursor-pointer" data-i18n="footerCookies">Ajustes de Cookies</button></li>
-                        <li><a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY?s=cl&p=a&mlu=4&ilr=4" target="_blank" class="text-gray-400 hover:text-slot-red transition-colors" data-i18n="footerWsp">Wsp SlotSoftware</a></li>
-                        <li><a href="mailto:slotcarhome@gmail.com" class="text-gray-400 hover:text-slot-red transition-colors">slotcarhome@gmail.com</a></li>
+                        <li><a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY?s=cl&p=a&mlu=4&ilr=4" target="_blank" class="text-gray-400 hover:text-slot-red transition-colors">WhatsApp Group</a></li>
                     </ul>
                 </div>
             </div>
-            <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-gray-500 text-xs uppercase tracking-widest" data-i18n="footerCopy">&copy; 2026 SlotSoftware. Todos los derechos reservados. Desarrollado 100% con tecnología web y totalmente compatible con Android, iOS, Windows, macOS, Linux, Unix y Smart TV.</p>
+            <div class="pt-8 border-t border-gray-800 text-center md:text-left">
+                <p class="text-gray-500 text-xs font-light" data-i18n="footerCopy">&copy; 2026 SlotSoftware. Todos los derechos reservados. Desarrollado 100% con tecnología web y totalmente compatible con Android, iOS, Windows, macOS, Linux, Unix y Smart TV.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Botón Flotante Wsp -->
-    <a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY?s=cl&p=a&mlu=4&ilr=4" target="_blank" aria-label="Wsp SlotSoftware" class="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 bg-[#25D366] hover:bg-[#20ba5a] text-white p-4 rounded-full shadow-apple-lg transition-all duration-300 hover:scale-110 flex items-center justify-center group animate-bounce hover:animate-none">
-        <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-        </svg>
+    <!-- Botón Flotante de WhatsApp -->
+    <a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY?s=cl&p=a&mlu=4&ilr=4" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center">
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
     </a>
 
     <script>
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const iconOpen = document.getElementById('menu-icon-open');
-            const iconClose = document.getElementById('menu-icon-close');
-            
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                iconOpen.classList.add('hidden');
-                iconOpen.classList.remove('block');
-                iconClose.classList.remove('hidden');
-                iconClose.classList.add('block');
-            } else {
-                menu.classList.add('hidden');
-                iconOpen.classList.remove('hidden');
-                iconOpen.classList.add('block');
-                iconClose.classList.add('hidden');
-                iconClose.classList.remove('block');
-            }
-        }
-
-        // Base de Datos de Traducciones completada
         const i18nData = {
             es: {
                 navSoftware: "Software", navPhilosophy: "Filosofía", navWsp: "Wsp SlotSoftware", navCatalog: "Ver Catálogo",
-                maintenanceMsg: "Sitio web en mantenimiento. Disculpa las molestias.",
-                heroSubtitle: "Ingeniería de Competición",
+                maintenanceMsg: "Sitio web en mantenimiento. Disculpa las molestias.", heroSubtitle: "Ingeniería de Competición",
                 heroDesc: "El ecosistema definitivo. Diseña tu circuito con precisión milimétrica y gestiona la telemetría en tiempo real.",
-                heroBtnExplore: "Explorar Software", heroBtnTech: "Descubrir la tecnología",
-                catalogTitle: "Elige tu herramienta.", catalogSub: "Haz clic en cualquier aplicación para abrir su galería completa interactiva con 30 capturas reales.",
-                philTitle: "Pura Ingeniería Slot.", philDesc: "Tecnología de vanguardia diseñada específicamente para el automodelismo. Visión artificial fotométrica, simulación física tridimensional y sincronización cloud en tiempo real.",
+                heroBtnExplore: "Explorar Software", heroBtnTech: "Descubrir la tecnología", catalogTitle: "Elige tu herramienta.", 
+                catalogSub: "Haz clic en cualquier aplicación para abrir su galería completa interactiva con capturas reales.",
+                catalogGalleryBtn: "VER GALERÍA", philTitle: "Pura Ingeniería Slot.", 
                 phil1Title: "Visión Artificial & IA Fotométrica", phil1Desc: "Las series Krono Personal y Dual convierten cualquier cámara web en un sistema de cronometraje profesional a 30 FPS. Mediante ROI ajustables y filtros inteligentes de iluminación, detectan el paso milimétrico de los bólidos, controlan salidas nulas y retransmiten la carrera con síntesis de voz multilingüe.",
-                phil2Title: "Motor 3D & CAD Geométrico", phil2Desc: "Tracks Telemetry fusiona un diseñador 2D con unión magnética multi-marca y un motor de renderizado Three.js hiperrealista. Incluye garaje interactivo con setup físico de motores y reportes PDF.",
-                phil3Title: "Cloud & Smart TV Dashboard", phil3Desc: "Proyecta la competición a lo grande con los paneles modulares flotantes y reorganizables de Krono TV. Con sincronización de salas en la nube a través de Firebase, control remoto multidispositivo y cronometraje sectorial avanzado.",
-                modalFeatures: "Características", modalGalleryBtn: "Ver Galería",
-                cookieTitle: "Privacidad y Cookies", cookieDesc: "Usamos cookies técnicas y analíticas para mejorar tu experiencia en la plataforma.", cookieSettings: "Ajustes", cookieAccept: "Aceptar",
-                cookieModalTitle: "Ajustes de Privacidad", cookieReq: "Técnicas (Obligatorias)", cookieReqDesc: "Necesarias para que la plataforma funcione correctamente.", cookieOpt: "Analíticas (Opcionales)", cookieOptDesc: "Nos ayudan a mejorar el rendimiento y estabilidad de las apps.", cookieSave: "Guardar Preferencias",
+                phil2Title: "Motor 3D & CAD Geométrico", phil2Desc: "Tracks Telemetry fusiona un diseñador 2D con unión magnética multi-marca (Ninco, Scalextric, Carrera, etc.) y un motor de renderizado Three.js hiperrealista. Incluye garaje interactivo con setup físico de motores, compuestos de neumáticos, báscula digital de pesos y reportes técnicos exportables en PDF.",
+                phil3Title: "Cloud & Smart TV Dashboard", phil3Desc: "Proyecta la competición a lo grande con los paneles modulares flotantes y reorganizables de Krono TV. Con sincronización de salas en la nube a través de Firebase, control remoto multidispositivo, gestión de bólidos e inventario personal, y cronometraje sectorial avanzado.",
+                btnAcquire: "Adquisición", modalSubtitle15: "Galería Completa - 15 Imágenes", modalSubtitleVid14: "Galería Completa - 14 Imágenes + 1 Vídeo", 
+                modalSubtitleVid29: "Galería Completa - 29 Imágenes + 1 Vídeo", errorMissing: "Falta", placeholder: "Poner", imgCaption: "IMG", imgNotAvailable: "Imagen no disponible",
                 footerDesc: "El ecosistema de software líder para diseño de circuitos y sistemas de telemetría de automodelismo.",
                 footerExplore: "Explorar", footerCat: "Catálogo de Software", footerPhil: "Nuestra Filosofía", footerSupport: "Soporte Técnico",
                 footerLegal: "Legal & Contacto", footerTerms: "Términos de Servicio", footerPrivacy: "Política de Privacidad", footerCookies: "Ajustes de Cookies",
-                footerWsp: "Wsp SlotSoftware",
                 footerCopy: "&copy; 2026 SlotSoftware. Todos los derechos reservados. Desarrollado 100% con tecnología web y totalmente compatible con Android, iOS, Windows, macOS, Linux, Unix y Smart TV.",
-                btnAcquire: "Adquisición", modalSubtitle: "Galería Completa - 30 Imágenes", modalExpand: "Ampliar",
-                errorMissing: "Falta", placeholder: "Poner", legalDefaultTitle: "Documento Legal", imgCaption: "IMG"
+                cookieTitle: "Privacidad y Cookies", cookieDesc: "Usamos cookies técnicas y analíticas para mejorar tu experiencia en la plataforma.", cookieSettings: "Ajustes", cookieAccept: "Aceptar",
+                cookieModalTitle: "Ajustes de Privacidad", cookieReq: "Técnicas (Obligatorias)", cookieReqDesc: "Necesarias para que la plataforma funcione correctamente.", cookieOpt: "Analíticas (Opcionales)", cookieOptDesc: "Nos ayudan a mejorar el rendimiento y estabilidad de las apps.", cookieSave: "Guardar Preferencias",
+                legalDefaultTitle: "Documento Legal",
+                legalSupportTitle: "Soporte Técnico",
+                legalSupportContent: `<div class="space-y-6"><h4 class="font-bold text-slot-dark text-lg">Canales de Asistencia</h4><p>Para dudas, reportes de errores o asistencia con la configuración de tu software, utiliza nuestros canales oficiales:</p><ul class="list-disc pl-5 space-y-2 text-apple-blue"><li><strong>Grupo Oficial de WhatsApp:</strong> Acceso directo mediante el botón flotante de la web para consultas rápidas y comunidad.</li><li><strong>Correo Electrónico:</strong> support@slotsoftware.com para casos que requieran adjuntar archivos o registros detallados.</li></ul><h4 class="font-bold text-slot-dark text-lg mt-8">Solución de Problemas Frecuentes (FAQ)</h4><div class="space-y-4"><div><h5 class="font-semibold">Visión Artificial (Krono Personal/Dual)</h5><p class="text-sm">Asegúrate de tener <strong>buena iluminación constante</strong> sobre la pista. Evita sombras proyectadas o luces parpadeantes (fluorescentes antiguos) que puedan afectar a la detección fotométrica. Calibra el ROI (Región de Interés) en la configuración antes de cada carrera.</p></div><div><h5 class="font-semibold">Renderizado 3D (Tracks Telemetry)</h5><p class="text-sm">Si notas lentitud en la vista 3D, verifica que tu navegador tenga activada la <strong>aceleración por hardware</strong> en la configuración. Recomendamos usar Chrome, Firefox o Edge actualizados a la última versión.</p></div><div><h5 class="font-semibold">Sincronización Cloud (Krono TV)</h5><p class="text-sm">La latencia en la sincronización depende de tu conexión a internet. Para la mejor experiencia en tiempo real, utiliza una conexión <strong>Wi-Fi estable de 5Ghz o cable Ethernet</strong> en el dispositivo principal que gestiona la carrera.</p></div></div></div>`,
+                legalTermsTitle: "Términos de Servicio",
+                legalTermsContent: `<div class="space-y-6"><p>Última actualización: Agosto 2026</p><p>Al acceder y utilizar el ecosistema de aplicaciones de SlotSoftware (Krono Personal, Krono Dual, Tracks Telemetry y sus variantes TV), usted acepta estar sujeto a los siguientes términos y condiciones.</p><h4 class="font-bold text-slot-dark">1. Naturaleza del Servicio</h4><p>SlotSoftware proporciona un conjunto de herramientas web avanzadas (SaaS) para el hobby del automodelismo (Slot). Estas herramientas incluyen cronometraje basado en visión artificial, diseño de circuitos en 3D y paneles de telemetría.</p><h4 class="font-bold text-slot-dark">2. Uso del Hardware y Responsabilidad</h4><p>Nuestras aplicaciones de cronometraje utilizan la cámara web de su dispositivo para analizar el video en tiempo real. Usted es responsable de proporcionar el hardware adecuado y un entorno con iluminación estable.</p><h4 class="font-bold text-slot-dark">3. Propiedad Intelectual</h4><p>Todo el código fuente, algoritmos, diseños de interfaz, modelos 3D y marcas registradas son propiedad exclusiva de sus desarrolladores.</p></div>`,
+                legalPrivacyTitle: "Política de Privacidad",
+                legalPrivacyContent: `<div class="space-y-6"><p>En SlotSoftware, nos tomamos muy en serio su privacidad. Esta política describe cómo manejamos la información cuando utiliza nuestras aplicaciones web.</p><h4 class="font-bold text-slot-dark">1. Procesamiento de Video Local</h4><p>Para las aplicaciones Krono, nuestro software accede a su cámara web exclusivamente para realizar el análisis fotométrico del paso de los coches. <strong>El flujo de video se procesa al 100% de forma local en la memoria de su navegador.</strong> Ninguna imagen o video se graba o transmite por internet.</p><h4 class="font-bold text-slot-dark">2. Datos de Sincronización en la Nube</h4><p>Si utiliza Krono TV, cierta información no personal de la carrera (tiempos de vuelta, posiciones) se transmite de forma efímera a través de servidores seguros (Firebase). Estos datos no se almacenan de forma permanente.</p><h4 class="font-bold text-slot-dark">3. Almacenamiento Local</h4><p>Nuestras aplicaciones utilizan el almacenamiento local de su navegador para guardar sus preferencias de configuración y circuitos guardados localmente.</p></div>`
             },
             en: {
                 navSoftware: "Software", navPhilosophy: "Philosophy", navWsp: "Wsp SlotSoftware", navCatalog: "View Catalog",
-                maintenanceMsg: "Website under maintenance. Sorry for the inconvenience.",
-                heroSubtitle: "Racing Engineering",
+                maintenanceMsg: "Website under maintenance. Sorry for the inconvenience.", heroSubtitle: "Racing Engineering",
                 heroDesc: "The ultimate ecosystem. Design your track with millimeter precision and manage real-time telemetry.",
-                heroBtnExplore: "Explore Software", heroBtnTech: "Discover the technology",
-                catalogTitle: "Choose your tool.", catalogSub: "Click on any application to open its complete interactive gallery with 30 real screenshots.",
-                philTitle: "Pure Slot Engineering.", philDesc: "Cutting-edge technology designed specifically for slot racing. Photometric computer vision, 3D physical simulation, and real-time cloud synchronization.",
-                phil1Title: "Computer Vision & Photometric AI", phil1Desc: "Krono Personal and Dual series turn any webcam into a professional 30 FPS timing system. Using adjustable ROIs and intelligent lighting filters, they detect millimeter passing, control false starts, and broadcast races with multilingual voice synthesis.",
-                phil2Title: "3D Engine & Geometric CAD", phil2Desc: "Tracks Telemetry merges a 2D designer with multi-brand magnetic snapping and a hyper-realistic Three.js rendering engine. Includes interactive garage with physical motor setups and PDF reports.",
-                phil3Title: "Cloud & Smart TV Dashboard", phil3Desc: "Project the competition in style with Krono TV's floating, modular, and reorganizable panels. Featuring real-time cloud room synchronization via Firebase, multi-device remote control, and advanced sector timing.",
-                modalFeatures: "Features", modalGalleryBtn: "View Gallery",
-                cookieTitle: "Privacy and Cookies", cookieDesc: "We use technical and analytical cookies to improve your experience on the platform.", cookieSettings: "Settings", cookieAccept: "Accept",
-                cookieModalTitle: "Privacy Settings", cookieReq: "Technical (Required)", cookieReqDesc: "Necessary for the platform to function properly.", cookieOpt: "Analytical (Optional)", cookieOptDesc: "Help us improve app performance and stability.", cookieSave: "Save Preferences",
-                footerDesc: "The leading software ecosystem for track design and slot car telemetry systems.",
+                heroBtnExplore: "Explore Software", heroBtnTech: "Discover the technology", catalogTitle: "Choose your tool.", 
+                catalogSub: "Click on any application to open its full interactive gallery with real screenshots.",
+                catalogGalleryBtn: "VIEW GALLERY", philTitle: "Pure Slot Engineering.", 
+                phil1Title: "Artificial Vision & Photometric AI", phil1Desc: "The Krono series turns any webcam into a professional 30 FPS timing system.",
+                phil2Title: "3D Engine & Geometric CAD", phil2Desc: "Tracks Telemetry merges a 2D designer with multi-brand magnetic joining and a 3D rendering engine.",
+                phil3Title: "Cloud & Smart TV Dashboard", phil3Desc: "Project the competition extensively with Krono TV's floating modular panels.",
+                btnAcquire: "Acquire", modalSubtitle15: "Complete Gallery - 15 Images", modalSubtitleVid14: "Complete Gallery - 14 Images + 1 Video", 
+                modalSubtitleVid29: "Complete Gallery - 29 Images + 1 Video", errorMissing: "Missing", placeholder: "Insert", imgCaption: "PIC", imgNotAvailable: "Not available",
+                footerDesc: "The leading software ecosystem for slot car track design and telemetry systems.",
                 footerExplore: "Explore", footerCat: "Software Catalog", footerPhil: "Our Philosophy", footerSupport: "Technical Support",
                 footerLegal: "Legal & Contact", footerTerms: "Terms of Service", footerPrivacy: "Privacy Policy", footerCookies: "Cookie Settings",
-                footerWsp: "Wsp SlotSoftware",
-                footerCopy: "&copy; 2026 SlotSoftware. All rights reserved. Built 100% with web technology and fully compatible with Android, iOS, Windows, macOS, Linux, Unix, and Smart TV.",
-                btnAcquire: "Acquire", modalSubtitle: "Complete Gallery - 30 Images", modalExpand: "Expand",
-                errorMissing: "Missing", placeholder: "Insert", legalDefaultTitle: "Legal Document", imgCaption: "PIC"
+                footerCopy: "&copy; 2026 SlotSoftware. All rights reserved.",
+                cookieTitle: "Privacy & Cookies", cookieDesc: "We use technical and analytical cookies to improve your experience on the platform.", cookieSettings: "Settings", cookieAccept: "Accept",
+                cookieModalTitle: "Privacy Settings", cookieReq: "Technical (Required)", cookieReqDesc: "Necessary for the platform to function correctly.", cookieOpt: "Analytical (Optional)", cookieOptDesc: "Help us improve the performance of the apps.", cookieSave: "Save Preferences",
+                legalDefaultTitle: "Legal Document", legalSupportTitle: "Technical Support", legalSupportContent: "<p>Support content in English.</p>",
+                legalTermsTitle: "Terms of Service", legalTermsContent: "<p>Terms of service in English.</p>",
+                legalPrivacyTitle: "Privacy Policy", legalPrivacyContent: "<p>Privacy policy in English.</p>"
             },
             fr: {
                 navSoftware: "Logiciel", navPhilosophy: "Philosophie", navWsp: "Wsp SlotSoftware", navCatalog: "Voir le Catalogue",
-                maintenanceMsg: "Site web en maintenance. Désolé pour le dérangement.",
-                heroSubtitle: "Ingénierie de Compétition",
-                heroDesc: "L'écosystème ultime. Concevez votre circuit avec une précision millimétrique et gérez la télémétrie en temps réel.",
-                heroBtnExplore: "Explorer le Logiciel", heroBtnTech: "Découvrir la technologie",
-                catalogTitle: "Choisissez votre outil.", catalogSub: "Cliquez sur n'importe quelle application pour ouvrir sa galerie interactive complète avec 30 captures réelles.",
-                philTitle: "Ingénierie Pure Slot.", philDesc: "Technologie de pointe conçue spécifiquement pour le modélisme automobile. Vision artificielle photométrique, simulation physique tridimensionnelle et synchronisation cloud en temps réel.",
-                phil1Title: "Vision Artificielle & IA Photométrique", phil1Desc: "Les séries Krono Personal and Dual transforment n'importe quelle webcam en système de chronométrage professionnel à 30 FPS. Grâce à des ROI ajustables et des filtres d'éclairage intelligents, elles détectent le passage millimétrique des bolides.",
-                phil2Title: "Moteur 3D & CAO Géométrique", phil2Desc: "Tracks Telemetry fusionne un concepteur 2D avec raccord magnétique multi-marques et un moteur de rendu Three.js hyperréaliste. Inclut un garage interactif et rapports techniques PDF.",
-                phil3Title: "Cloud & Tableau de Bord Smart TV", phil3Desc: "Projetez la compétition en grand avec les panneaux modulaires de Krono TV. Synchronisation cloud en temps réel via Firebase, contrôle à distance multi-appareils et chronométrage sectoriel avancé.",
-                modalFeatures: "Caractéristiques", modalGalleryBtn: "Voir la Galerie",
-                cookieTitle: "Confidentialité et Cookies", cookieDesc: "Nous utilisons des cookies techniques et analytiques pour améliorer votre expérience.", cookieSettings: "Paramètres", cookieAccept: "Accepter",
-                cookieModalTitle: "Paramètres de Confidentialité", cookieReq: "Techniques (Obligatoires)", cookieReqDesc: "Nécessaires au bon fonctionnement de la plateforme.", cookieOpt: "Analytiques (Optionnels)", cookieOptDesc: "Aident à améliorer les performances des applications.", cookieSave: "Enregistrer",
-                footerDesc: "L'écosystème logiciel leader pour la conception de circuits et les systèmes de télémétrie de slot car.",
-                footerExplore: "Explorer", footerCat: "Catalogue Logiciel", footerPhil: "Notre Philosophie", footerSupport: "Support Technique",
+                maintenanceMsg: "Site web en maintenance.", heroSubtitle: "Ingénierie de Compétition",
+                heroDesc: "L'écosystème ultime. Concevez votre circuit avec une précision millimétrique et gérez la télémétrie.",
+                heroBtnExplore: "Explorer le Logiciel", heroBtnTech: "Découvrir la technologie", catalogTitle: "Choisissez votre outil.", 
+                catalogSub: "Cliquez sur n'importe quelle application pour ouvrir sa galerie interactive complète.",
+                catalogGalleryBtn: "VOIR GALERIE", philTitle: "Pure Ingénierie Slot.", 
+                phil1Title: "Vision Artificielle", phil1Desc: "Chronométrage professionnel.",
+                phil2Title: "Moteur 3D", phil2Desc: "Concepteur 2D et 3D.",
+                phil3Title: "Cloud & TV", phil3Desc: "Panneaux flottants.",
+                btnAcquire: "Acquérir", modalSubtitle15: "Galerie Complète - 15 Images", modalSubtitleVid14: "Galerie Complète - 14 Images + 1 Vidéo", 
+                modalSubtitleVid29: "Galerie Complète - 29 Images + 1 Vidéo", errorMissing: "Manquant", placeholder: "Insérer", imgCaption: "IMG", imgNotAvailable: "Indisponible",
+                footerDesc: "L'écosystème logiciel leader pour la conception de circuits.",
+                footerExplore: "Explorer", footerCat: "Catalogue", footerPhil: "Philosophie", footerSupport: "Support Technique",
                 footerLegal: "Légal & Contact", footerTerms: "Conditions d'Utilisation", footerPrivacy: "Politique de Confidentialité", footerCookies: "Paramètres des Cookies",
-                footerWsp: "Wsp SlotSoftware",
-                footerCopy: "&copy; 2026 SlotSoftware. Tous droits réservés. Développé 100% avec la technologie web et entièrement compatible avec Android, iOS, Windows, macOS, Linux, Unix et Smart TV.",
-                btnAcquire: "Acquérir", modalSubtitle: "Galerie Complète - 30 Images", modalExpand: "Agrandir",
-                errorMissing: "Manquant", placeholder: "Insérer", legalDefaultTitle: "Document Légal", imgCaption: "IMG"
+                footerCopy: "&copy; 2026 SlotSoftware. Tous droits réservés.",
+                cookieTitle: "Confidentialité et Cookies", cookieDesc: "Nous utilisons des cookies techniques.", cookieSettings: "Paramètres", cookieAccept: "Accepter",
+                cookieModalTitle: "Paramètres", cookieReq: "Techniques", cookieReqDesc: "Obligatoires.", cookieOpt: "Analytiques", cookieOptDesc: "Optionnels.", cookieSave: "Enregistrer",
+                legalDefaultTitle: "Document Légal", legalSupportTitle: "Support", legalSupportContent: "<p>Support fr</p>", legalTermsTitle: "Conditions", legalTermsContent: "<p>Conditions fr</p>", legalPrivacyTitle: "Confidentialité", legalPrivacyContent: "<p>Confidentialité fr</p>"
             },
             it: {
                 navSoftware: "Software", navPhilosophy: "Filosofia", navWsp: "Wsp SlotSoftware", navCatalog: "Vedi Catalogo",
-                maintenanceMsg: "Sito web in manutenzione. Ci scusiamo per il disagio.",
-                heroSubtitle: "Ingegneria di Competizione",
-                heroDesc: "L'ecosistema definitivo. Progetta il tuo circuito con precisione millimetrica e gestisci la telemetria in tempo reale.",
-                heroBtnExplore: "Esplora Software", heroBtnTech: "Scopri la tecnologia",
-                catalogTitle: "Scegli il tuo strumento.", catalogSub: "Clicca su qualsiasi applicazione per aprire la sua galleria interattiva completa con 30 vere schermate.",
-                philTitle: "Pura Ingegneria Slot.", philDesc: "Tecnologia all'avanguardia progettata specificamente per lo slot racing. Computer vision fotometrica, simulazione fisica tridimensionale e sincronizzazione cloud in tempo reale.",
-                phil1Title: "Visione Artificiale & IA Fotometrica", phil1Desc: "Le serie Krono Personal e Dual trasformano qualsiasi webcam in un sistema di cronometraggio professionale a 30 FPS. Utilizzando ROI regolabili e filtri di illuminazione intelligenti, rilevano il passaggio millimetrico, controllano le partenze anticipate e trasmettono la gara.",
-                phil2Title: "Motore 3D & CAD Geometrico", phil2Desc: "Tracks Telemetry unisce un designer 2D con aggancio magnetico multi-marca e un motore di rendering Three.js iperrealistico. Include garage interattivo con setup fisico di motori e rapporti PDF esportabili.",
-                phil3Title: "Cloud & Smart TV Dashboard", phil3Desc: "Progetta la competizione in grande con i pannelli modulari fluttuanti di Krono TV. Sincronizzazione delle stanze cloud in tempo reale tramite Firebase, controllo remoto multi-dispositivo e cronometraggio settoriale avanzato.",
-                modalFeatures: "Caratteristiche", modalGalleryBtn: "Vedi Galleria",
-                cookieTitle: "Privacy e Cookie", cookieDesc: "Usiamo cookie tecnici e analitici per migliorare la tua esperienza sulla piattaforma.", cookieSettings: "Impostazioni", cookieAccept: "Accetta",
-                cookieModalTitle: "Impostazioni della Privacy", cookieReq: "Tecnici (Obbligatori)", cookieReqDesc: "Necessari per il corretto funzionamento della piattaforma.", cookieOpt: "Analitici (Opzionali)", cookieOptDesc: "Ci aiutano a migliorare le prestazioni e la stabilità delle app.", cookieSave: "Salva Preferenze",
-                footerDesc: "L'ecosistema software leader per la progettazione di circuiti e sistemi di telemetria per slot car.",
-                footerExplore: "Esplora", footerCat: "Catalogo Software", footerPhil: "La Nostra Filosofia", footerSupport: "Supporto Tecnico",
-                footerLegal: "Legale & Contatti", footerTerms: "Termini di Servizio", footerPrivacy: "Informativa sulla Privacy", footerCookies: "Impostazioni Cookie",
-                footerWsp: "Wsp SlotSoftware",
-                footerCopy: "&copy; 2026 SlotSoftware. Tutti i diritti riservati. Sviluppato al 100% con tecnologia web e compatibile con Android, iOS, Windows, macOS, Linux, Unix e Smart TV.",
-                btnAcquire: "Acquisisci", modalSubtitle: "Galleria Completa - 30 Immagini", modalExpand: "Espandi",
-                errorMissing: "Manca", placeholder: "Inserire", legalDefaultTitle: "Documento Legale", imgCaption: "IMG"
+                maintenanceMsg: "Sito web in manutenzione.", heroSubtitle: "Ingegneria di Competizione",
+                heroDesc: "L'ecosistema definitivo. Progetta il tuo circuito con precisione millimetrica.",
+                heroBtnExplore: "Esplora Software", heroBtnTech: "Scopri la tecnologia", catalogTitle: "Scegli il tuo strumento.", 
+                catalogSub: "Clicca su qualsiasi applicazione per aprire la sua galleria interattiva completa.",
+                catalogGalleryBtn: "VEDI GALLERIA", philTitle: "Pura Ingegneria Slot.", 
+                phil1Title: "Visione Artificiale", phil1Desc: "Cronometraggio professionale.",
+                phil2Title: "Motore 3D", phil2Desc: "Progettista 2D e 3D.",
+                phil3Title: "Cloud & TV", phil3Desc: "Pannelli galleggianti.",
+                btnAcquire: "Acquisire", modalSubtitle15: "Galleria Completa - 15 Immagini", modalSubtitleVid14: "Galleria Completa - 14 Immagini + 1 Video", 
+                modalSubtitleVid29: "Galleria Completa - 29 Immagini + 1 Video", errorMissing: "Mancante", placeholder: "Inserire", imgCaption: "IMG", imgNotAvailable: "Non disponibile",
+                footerDesc: "L'ecosistema software leader per la progettazione di circuiti.",
+                footerExplore: "Esplora", footerCat: "Catalogo", footerPhil: "Filosofia", footerSupport: "Supporto Tecnico",
+                footerLegal: "Legale & Contatti", footerTerms: "Termini di Servizio", footerPrivacy: "Politica sulla Riservatezza", footerCookies: "Impostazioni Cookie",
+                footerCopy: "&copy; 2026 SlotSoftware. Tutti i diritti riservati.",
+                cookieTitle: "Privacy e Cookie", cookieDesc: "Utilizziamo cookie tecnici.", cookieSettings: "Impostazioni", cookieAccept: "Accetta",
+                cookieModalTitle: "Impostazioni Privacy", cookieReq: "Tecnici", cookieReqDesc: "Obbligatori.", cookieOpt: "Analitici", cookieOptDesc: "Opzionali.", cookieSave: "Salva Preferenze",
+                legalDefaultTitle: "Documento Legale", legalSupportTitle: "Supporto", legalSupportContent: "<p>Support it</p>", legalTermsTitle: "Termini", legalTermsContent: "<p>Termini it</p>", legalPrivacyTitle: "Riservatezza", legalPrivacyContent: "<p>Riservatezza it</p>"
             }
         };
 
-        const programsData = {
-            es: [
-                { id: 'krono-personal-v3', name: 'KRONO PERSONAL V3.0', shortDesc: 'Sistema de telemetría avanzado por visión artificial (Webcam). Convierte cualquier cámara en un cronómetro profesional.', longDesc: 'Krono Personal V3.0 es la revolución del Slot en casa. Analiza el flujo de video en tiempo real para detectar el paso de los coches, ofreciendo telemetría, tiempos por vuelta y síntesis de voz.', features: ['Visión IA con Auto-calibración', 'Ingeniero de voz multilingüe', 'Detección de Salida Nula', 'Exportación a CSV'], img: '6.jpg', imgStartId: 12 },
-                { id: 'krono-dual-v3', name: 'KRONO DUAL V3.0', shortDesc: 'Sistema de telemetría por visión artificial para 2 carriles simultáneos. Usa tu webcam como cronómetro dual de alta precisión.', longDesc: 'Krono Dual V3.0 eleva la competición permitiendo cronometrar dos carriles simultáneos con una sola cámara web (Twin ROI). Dispone de modos de Duelo (2 jugadores) y Contrarreloj.', features: ['Twin ROI (2 Carriles)', 'Cálculo de GAP en vivo', 'Bandera Amarilla (Pausa)', 'Modos Resistencia / Duelo'], img: '7.jpg', imgStartId: 42 },
-                { id: 'tracks-telemetry-v2', name: 'TRACKS TELEMETRY V2.0', shortDesc: 'Diseño CAD 2D multi-marca, motor físico 3D Three.js y telemetría en vivo. Simula circuitos con garaje interactivo.', longDesc: 'Tracks Telemetry V2.0 sintetiza un potente Diseñador 2D de circuitos con snapping magnético y un Motor de Simulación 3D hiperrealista con Three.js. Incluye garaje para motores y reportes PDF.', features: ['Diseñador 2D con Snapping', 'Motor 3D Three.js', 'Garaje Interactivo', 'Reportes PDF'], img: '8.jpg', imgStartId: 72, customSummary: ['• Diseñador CAD 2D intuitivo con unión magnética inteligente.', '• Motor de simulación física 3D en tiempo real con Three.js.', '• Garaje interactivo con setup físico real de componentes.', '• Timing Tower vertical integrada con locución por voz.', '• Generación de reportes técnicos detallados en PDF.'] },
-                { id: 'krono-personal-tv', name: 'KRONO PERSONAL TV', shortDesc: 'Dashboard de telemetría avanzado para Smart TV con IA TrueColor y Sincronización Cloud.', longDesc: 'Krono Personal TV (V4.0) es el sistema definitivo para proyectar la competición en pantallas grandes. Combina detección fotométrica de alta precisión con un dashboard flotante y cloud sync.', features: ['Dashboard TV flotante', 'Sincronización Cloud', 'Garaje Personal', 'Ranking Global'], img: '9.jpg', imgStartId: 102 },
-                { id: 'krono-dual-tv', name: 'KRONO DUAL TV', shortDesc: 'Sistema de telemetría dual (2 carriles) con TrueColor AI para Smart TV y dashboard modular.', longDesc: 'Krono Dual TV (V4.0) es la cúspide de la telemetría para competiciones de dos carriles en Smart TV. Combina detección a 30 FPS con dashboard flotante, sincronización cloud y repostaje.', features: ['Dashboard TV modular', 'Twin ROI dual', 'Sincronización Cloud', 'Repostaje virtual de combustible'], img: '10.jpg', imgStartId: 132 },
-                { id: 'sector-time-v1', name: 'SECTOR TIME V1.0 (Proximamente)', shortDesc: 'Sistema de Control de Tiempos por Diferentes Sectores de Nuestro Circuito.', longDesc: 'Sistema avanzado de control y cronometraje por sectores para maquetas de Slot. Permite fraccionar el circuito en múltiples tramos para analizar las pérdidas y ganancias de velocidad.', features: ['Fraccionamiento por sectores', 'Análisis de pérdida/ganancia', 'Timing tower sectorial', 'Optimización de trazadas'], img: '11.jpg', imgStartId: 162 }
-            ],
-            en: [
-                { id: 'krono-personal-v3', name: 'KRONO PERSONAL V3.0', shortDesc: 'Advanced CV telemetry system. Turns any webcam into a pro timer.', longDesc: 'Analyzes real-time video flow to detect car passing, offering telemetry and voice synthesis.', features: ['AI Vision', 'Voice Engineer', 'False Start Detection', 'CSV Export'], img: '6.jpg', imgStartId: 12 },
-                { id: 'krono-dual-v3', name: 'KRONO DUAL V3.0', shortDesc: 'Dual lane CV telemetry system. High precision for duels.', longDesc: 'Time two lanes with a single webcam (Twin ROI). Features Duel and Time Trial modes.', features: ['Twin ROI', 'Live GAP', 'Yellow Flag', 'Endurance Mode'], img: '7.jpg', imgStartId: 42 },
-                { id: 'tracks-telemetry-v2', name: 'TRACKS TELEMETRY V2.0', shortDesc: '2D CAD design, 3D physics engine and live telemetry.', longDesc: '2D Track Designer with magnetic snapping and 3D Simulation Engine. Includes interactive garage.', features: ['2D Designer', '3D Engine', 'Interactive Garage', 'PDF Reports'], img: '8.jpg', imgStartId: 72, customSummary: ['• 2D CAD Designer with snapping.', '• 3D physical simulation engine.', '• Interactive physical garage.', '• Vertical Timing Tower with voice.', '• PDF technical reports.'] },
-                { id: 'krono-personal-tv', name: 'KRONO PERSONAL TV', shortDesc: 'Smart TV telemetry dashboard with TrueColor AI.', longDesc: 'Project competition onto large screens. Modular floating dashboard with cloud room sync.', features: ['Floating Dashboard', 'Cloud Sync', 'Personal Garage', 'Global Ranking'], img: '9.jpg', imgStartId: 102 },
-                { id: 'krono-dual-tv', name: 'KRONO DUAL TV', shortDesc: 'Dual AI telemetry system for Smart TV (2 lanes).', longDesc: 'Pinnacle telemetry for two-lane competitions. Firebase cloud room sync and virtual pit stop.', features: ['Floating Dashboard', 'Twin ROI', 'Cloud Sync', 'Virtual Pit Stop'], img: '10.jpg', imgStartId: 132 },
-                { id: 'sector-time-v1', name: 'SECTOR TIME V1.0 (Coming Soon)', shortDesc: 'Circuit Sector Timing Control System.', longDesc: 'Split the track into sections to analyze speed gains and losses.', features: ['Sector splitting', 'Loss analysis', 'Sector tower', 'Optimization'], img: '11.jpg', imgStartId: 162 }
-            ],
-            fr: [
-                { id: 'krono-personal-v3', name: 'KRONO PERSONAL V3.0', shortDesc: 'Système de télémétrie par vision artificielle. Transforme une webcam en chronomètre pro.', longDesc: 'Analyse la vidéo en temps réel pour détecter les voitures et offre une synthèse vocale.', features: ['Vision IA', 'Ingénieur vocal', 'Faux départ', 'Export CSV'], img: '6.jpg', imgStartId: 12 },
-                { id: 'krono-dual-v3', name: 'KRONO DUAL V3.0', shortDesc: 'Système pour 2 voies simultanées. Chronomètre double haute précision.', longDesc: 'Chronométrez deux voies avec une seule webcam (Twin ROI). Calcule le GAP en direct.', features: ['Twin ROI', 'GAP en direct', 'Drapeau Jaune', 'Modes Endurance / Duel'], img: '7.jpg', imgStartId: 42 },
-                { id: 'tracks-telemetry-v2', name: 'TRACKS TELEMETRY V2.0', shortDesc: 'Conception 2D, moteur 3D Three.js et télémétrie en direct.', longDesc: 'Concepteur 2D avec raccord magnétique et moteur de simulation 3D. Inclut garage interactif.', features: ['Concepteur 2D', 'Moteur 3D Three.js', 'Garage Interactif', 'Rapports PDF'], img: '8.jpg', imgStartId: 72, customSummary: ['• Concepteur 2D avec raccord.', '• Moteur 3D en temps réel.', '• Garage interactif physique.', '• Timing Tower avec voix.', '• Rapports techniques PDF.'] },
-                { id: 'krono-personal-tv', name: 'KRONO PERSONAL TV', shortDesc: 'Dashboard télémétrie Smart TV avec TrueColor AI et Cloud.', longDesc: 'Système ultime pour grand écran avec détection photométrique et cloud.', features: ['Dashboard flottant', 'Sync Cloud', 'Garage personnel', 'Classement global'], img: '9.jpg', imgStartId: 102 },
-                { id: 'krono-dual-tv', name: 'KRONO DUAL TV', shortDesc: 'Système double IA pour Smart TV avec dashboard modulaire (2 voies).', longDesc: 'Le summum pour deux voies sur Smart TV. Cloud Firebase et ravitaillement virtuel.', features: ['Dashboard modulaire', 'Twin ROI', 'Sync Cloud', 'Ravitaillement virtuel'], img: '10.jpg', imgStartId: 132 },
-                { id: 'sector-time-v1', name: 'SECTOR TIME V1.0 (Prochainement)', shortDesc: 'Contrôle des Temps par Secteurs.', longDesc: 'Permet de fractionner le circuit pour analyser les pertes et gains de vitesse.', features: ['Fractionnement', 'Analyse perte/gain', 'Timing tower', 'Optimisation'], img: '11.jpg', imgStartId: 162 }
-            ],
-            it: [
-                { id: 'krono-personal-v3', name: 'KRONO PERSONAL V3.0', shortDesc: 'Sistema di telemetria tramite visione artificiale. Converte la webcam in cronometro pro.', longDesc: 'Analizza il video in tempo reale per rilevare le auto, offrendo telemetria e sintesi vocale.', features: ['Visione IA', 'Ingegnere vocale', 'Partenza Anticipata', 'Esportazione CSV'], img: '6.jpg', imgStartId: 12 },
-                { id: 'krono-dual-v3', name: 'KRONO DUAL V3.0', shortDesc: 'Sistema di telemetria per 2 corsie simultanee.', longDesc: 'Cronometra due corsie con una singola webcam (Twin ROI). Calcola il GAP in tempo reale.', features: ['Twin ROI', 'Calcolo GAP', 'Bandiera Gialla', 'Resistenza / Duello'], img: '7.jpg', imgStartId: 42 },
-                { id: 'tracks-telemetry-v2', name: 'TRACKS TELEMETRY V2.0', shortDesc: 'Design CAD 2D, motore 3D e telemetria in tempo reale.', longDesc: 'Unisce Designer 2D con aggancio magnetico e motore di simulazione 3D. Include garage interattivo.', features: ['Designer 2D', 'Motore 3D', 'Garage Interattivo', 'Report PDF'], img: '8.jpg', imgStartId: 72, customSummary: ['• Designer 2D con aggancio.', '• Motore 3D in tempo reale.', '• Garage interattivo fisico.', '• Timing Tower verticale con voce.', '• Report tecnici in PDF.'] },
-                { id: 'krono-personal-tv', name: 'KRONO PERSONAL TV', shortDesc: 'Dashboard di telemetria per Smart TV con TrueColor AI.', longDesc: 'Sistema definitivo per schermi grandi. Dashboard fluttuante e sincronizzazione cloud.', features: ['Dashboard fluttuante', 'Cloud Sync', 'Garage personale', 'Classifica globale'], img: '9.jpg', imgStartId: 102 },
-                { id: 'krono-dual-tv', name: 'KRONO DUAL TV', shortDesc: 'Sistema duale per Smart TV con dashboard modulare (2 corsie).', longDesc: 'Telemetria avanzata per due corsie. Cloud Firebase e rifornimento virtuale.', features: ['Dashboard modulare', 'Twin ROI', 'Cloud Sync', 'Rifornimento virtuale'], img: '10.jpg', imgStartId: 132 },
-                { id: 'sector-time-v1', name: 'SECTOR TIME V1.0 (Prossimamente)', shortDesc: 'Controllo dei Tempi per Settori.', longDesc: 'Fraziona il circuito per analizzare in tempo reale guadagni e perdite di velocità.', features: ['Frazionamento', 'Analisi perdita/guadagno', 'Timing tower', 'Ottimizzazione'], img: '11.jpg', imgStartId: 162 }
-            ]
-        };
-
-        const legalTexts = {
-            es: { 
-                privacyTitle: "Política de Privacidad", 
-                privacyContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">En SlotSoftware, la privacidad y seguridad de nuestros usuarios es una prioridad absoluta, especialmente al tratar con datos de cámaras web y telemetría en la nube.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Procesamiento Local de Video (Cámaras)</h4>
-                            <p class="mb-2">Todas nuestras aplicaciones de la serie Krono que utilizan visión artificial procesan el flujo de video <strong>estrictamente de forma local en tu navegador</strong>. Ningún fotograma, imagen o grabación de tu cámara web es enviado, almacenado ni transmitido a nuestros servidores o a terceros. El algoritmo de IA analiza la imagen en la memoria RAM de tu dispositivo y la descarta instantáneamente.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Sincronización en la Nube (Firebase)</h4>
-                            <p class="mb-3">Para las aplicaciones compatibles con Smart TV (Krono TV), utilizamos Google Firebase para sincronizar los tiempos por vuelta y el estado de la carrera en tiempo real. Los datos transmitidos son puramente numéricos (tiempos, identificadores de carril) y temporales. No vinculamos estos datos a identidades personales reales sin el consentimiento explícito del usuario en su perfil.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Uso de Cookies y Almacenamiento Local</h4>
-                            <p class="mb-3">Utilizamos el almacenamiento local de tu navegador (Local Storage) para guardar tus configuraciones (idioma preferido, ROIs de las cámaras, inventario de garaje en Tracks Telemetry). También empleamos cookies analíticas anónimas (opcionales) exclusivamente para detectar errores de rendimiento en la plataforma.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">4. Derechos del Usuario</h4>
-                            <p>Al no requerir un registro de cuenta tradicional para las versiones base, tienes el control total de tus datos. Puedes eliminar permanentemente toda tu información de configuración, circuitos guardados y garaje simplemente borrando los datos de navegación y caché de tu navegador web.</p>
-                        </div>
-                    </div>
-                `, 
-                termsTitle: "Términos de Servicio", 
-                termsContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">Al acceder y utilizar el ecosistema de aplicaciones de SlotSoftware, aceptas quedar vinculado por los siguientes términos y condiciones.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Naturaleza del Servicio y Uso</h4>
-                            <p class="mb-2">SlotSoftware proporciona herramientas web de simulación, diseño CAD 2D/3D y telemetría por visión artificial para automodelismo. El usuario es el único responsable de la correcta instalación física de su pista, iluminación y conexión de hardware (cámaras web, pantallas).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Precisión y Exención de Responsabilidad</h4>
-                            <p class="mb-3">El software se proporciona "tal cual" (As is). Aunque nuestros algoritmos de IA Fotométrica son altamente precisos, <strong>no garantizamos una precisión absoluta del 100%</strong> en el cronometraje, ya que esto depende en gran medida de factores externos (calidad de la cámara, reflejos, FPS de su dispositivo). SlotSoftware no se hace responsable de daños a vehículos o maquetas derivados del uso o interpretación de la telemetría.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Propiedad Intelectual y Licencia</h4>
-                            <p class="mb-3">Todo el código fuente, diseño de interfaces, algoritmos de visión, modelos 3D y la marca comercial son propiedad exclusiva de SlotSoftware. Queda estrictamente prohibida la ingeniería inversa, clonación, extracción de assets o distribución comercial sin autorización expresa.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">4. Servicios Cloud y Disponibilidad</h4>
-                            <p>El sistema utiliza servicios en la nube (Firebase) para la sincronización de paneles de TV en tiempo real. Nos reservamos el derecho de modificar, actualizar, limitar o interrumpir parcial o totalmente la conectividad de la plataforma por motivos de mantenimiento sin previo aviso.</p>
-                        </div>
-                    </div>
-                `, 
-                supportTitle: "Soporte Técnico", 
-                supportContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">En SlotSoftware, nuestro compromiso es ofrecerte la mejor experiencia en el ecosistema del automodelismo. Si encuentras algún inconveniente, nuestro equipo técnico y nuestra comunidad están listos para ayudarte.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Canales de Atención Directa</h4>
-                            <p class="mb-2"><strong>Comunidad Oficial de WhatsApp:</strong> Únete a nuestro grupo activo donde cientos de pilotos e ingenieros comparten configuraciones, resuelven dudas en tiempo real y debaten sobre telemetría. <a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY" target="_blank" class="text-apple-blue font-semibold hover:underline">Haz clic aquí para unirte al grupo</a>.</p>
-                            <p><strong>Correo Electrónico:</strong> Para consultas complejas o reporte de bugs, escríbenos a <strong>slotcarhome@gmail.com</strong>. Nuestro tiempo de respuesta habitual es de 24 a 48 horas laborables.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Solución de Problemas Frecuentes (FAQ)</h4>
-                            <p class="mb-3"><strong>Detección por Cámara (Serie Krono):</strong> Asegúrate de que tu circuito cuenta con iluminación uniforme. Los destellos directos pueden generar falsos positivos. Revisa la calibración de la zona de paso (ROI) y asegúrate de que tu webcam graba a 30 FPS estables.</p>
-                            <p class="mb-3"><strong>Rendimiento del Motor 3D (Tracks Telemetry):</strong> Si la simulación visual funciona con lentitud, verifica que la "Aceleración por Hardware" esté activada en tu navegador. Es fundamental contar con controladores gráficos actualizados para WebGL.</p>
-                            <p><strong>Desincronización en Smart TV:</strong> Si los paneles de tu TV no se sincronizan en tiempo real, verifica tu red WiFi. El sistema usa Firebase para sincronización Cloud, por lo que una alta latencia retrasará los tiempos.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Actualizaciones y Mantenimiento</h4>
-                            <p>Desplegamos actualizaciones invisibles de forma continua. Te recomendamos presionar <strong class="bg-gray-100 px-2 py-1 rounded border">Ctrl + F5</strong> regularmente en tu navegador para purgar la caché y cargar la última versión.</p>
-                        </div>
-                    </div>
-                ` 
+        const programs = [
+            {
+                id: 'krono-personal-v3', img: '6.jpg', imgStartId: 12, link: 'https://slotsoftware.com/krono-personal-v3',
+                title: { es: "Krono Personal V3.0", en: "Krono Personal V3.0", fr: "Krono Personal V3.0", it: "Krono Personal V3.0" },
+                desc: { es: "Cronometraje profesional para un solo carril mediante visión artificial.", en: "Professional single-lane timing via artificial vision.", fr: "Chronométrage professionnel par vision artificielle.", it: "Cronometraggio professionale tramite visione artificiale." },
+                descLong: { es: "La solución definitiva para el piloto solitario que busca la perfección. Krono Personal V3.0 transforma tu webcam en un juez de línea implacable.", en: "The ultimate solution for the solo racer.", fr: "La solution ultime pour le pilote solitaire.", it: "La soluzione definitiva per il pilota solitario." },
+                features: { es: ["Detección por Visión Artificial", "Precisión de Milésimas", "Historial de Vueltas Detallado", "Síntesis de Voz en Español"], en: ["Artificial Vision Detection", "Thousandths Precision", "Detailed Lap History", "Speech Synthesis"], fr: ["Détection par Vision Artificielle", "Précision Milliseconde", "Historique", "Synthèse Vocale"], it: ["Rilevamento Visione Artificiale", "Precisione Millesimi", "Cronologia", "Sintesi Vocale"] },
+                galleryTexts: { es: { "krono-personal.mp4": "Vídeo Presentación Krono Personal V3.0" } }
             },
-            en: { 
-                privacyTitle: "Privacy Policy", 
-                privacyContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">At SlotSoftware, user privacy and security are our top priorities, especially when dealing with webcam feeds and cloud telemetry.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Local Video Processing (Cameras)</h4>
-                            <p class="mb-2">All our Krono series applications using computer vision process the video feed <strong>strictly locally in your browser</strong>. No frames, images, or recordings from your webcam are ever sent, stored, or transmitted to our servers or third parties. The AI algorithm analyzes the image in your device's RAM and instantly discards it.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Cloud Synchronization (Firebase)</h4>
-                            <p class="mb-3">For Smart TV compatible apps (Krono TV), we use Google Firebase to synchronize lap times and race status in real-time. The data transmitted is purely numerical (times, lane IDs) and temporary. We do not link this data to real personal identities without the user's explicit consent in their profile.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Cookies and Local Storage</h4>
-                            <p class="mb-3">We use your browser's local storage to save your settings (preferred language, camera ROIs, garage inventory in Tracks Telemetry). We also use anonymous analytical cookies (optional) exclusively to detect performance errors on the platform.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">4. User Rights</h4>
-                            <p>Since a traditional account registration is not required for the base versions, you have full control over your data. You can permanently delete all your configuration information, saved tracks, and garage data simply by clearing your web browser's cache and site data.</p>
-                        </div>
-                    </div>
-                `, 
-                termsTitle: "Terms of Service", 
-                termsContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">By accessing and using the SlotSoftware application ecosystem, you agree to be bound by the following terms and conditions.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Nature of the Service</h4>
-                            <p class="mb-2">SlotSoftware provides web tools for simulation, 2D/3D CAD design, and computer vision telemetry for slot cars. The user is solely responsible for the proper physical installation of their track, lighting, and hardware setup (webcams, screens).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Accuracy and Disclaimer</h4>
-                            <p class="mb-3">The software is provided "as is". While our Photometric AI algorithms are highly accurate, <strong>we do not guarantee 100% absolute precision</strong> in timing, as this heavily depends on external factors (camera quality, glare, device FPS). SlotSoftware is not liable for any physical damage to vehicles or tracks resulting from the use or interpretation of the telemetry.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Intellectual Property</h4>
-                            <p class="mb-3">All source code, UI design, vision algorithms, 3D models, and trademarks are the exclusive property of SlotSoftware. Reverse engineering, cloning, asset extraction, or unauthorized commercial distribution is strictly prohibited.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">4. Cloud Services & Availability</h4>
-                            <p>The system uses cloud services (Firebase) for real-time TV panel synchronization. We reserve the right to modify, update, limit, or interrupt the platform's connectivity entirely or partially for maintenance purposes without prior notice.</p>
-                        </div>
-                    </div>
-                `, 
-                supportTitle: "Technical Support", 
-                supportContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">At SlotSoftware, we are committed to providing the best experience. If you encounter any issues, our tech team and community are ready to help you.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Direct Support Channels</h4>
-                            <p class="mb-2"><strong>WhatsApp Community:</strong> Join our active group where hundreds of drivers share setups and solve doubts in real-time. <a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY" target="_blank" class="text-apple-blue font-semibold hover:underline">Click here to join</a>.</p>
-                            <p><strong>Email Address:</strong> For complex inquiries or bug reports, write to <strong>slotcarhome@gmail.com</strong>. Standard response time is 24-48 business hours.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Quick Troubleshooting (FAQ)</h4>
-                            <p class="mb-3"><strong>Camera Detection (Krono Series):</strong> Ensure uniform lighting without harsh shadows. Direct glare causes false positives. Check your pass-zone calibration (ROI) and use a stable 30 FPS webcam.</p>
-                            <p class="mb-3"><strong>3D Engine Performance:</strong> If visual simulation runs slowly, verify "Hardware Acceleration" is enabled in browser settings. Up-to-date graphics drivers are essential.</p>
-                            <p><strong>Smart TV Desync:</strong> If TV panels lag, check WiFi stability. High internet latency will delay Firebase cloud sync.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Updates and Maintenance</h4>
-                            <p>We continuously deploy invisible updates. Press <strong class="bg-gray-100 px-2 py-1 rounded border">Ctrl + F5</strong> regularly in your browser to clear cache and load the latest version.</p>
-                        </div>
-                    </div>
-                ` 
+            {
+                id: 'krono-dual-v3', img: '7.jpg', imgStartId: 42, link: 'https://slotsoftware.com/krono-dual-v3',
+                title: { es: "Krono Dual V3.0", en: "Krono Dual V3.0", fr: "Krono Dual V3.0", it: "Krono Dual V3.0" },
+                desc: { es: "El sistema definitivo para piques 1vs1. Controla dos carriles simultáneamente.", en: "The ultimate system for 1vs1 duels.", fr: "Le système ultime pour les duels 1vs1.", it: "Il sistema definitivo per i duelli 1vs1." },
+                descLong: { es: "Lleva la emoción de la competición a tu hogar. Krono Dual V3.0 está diseñado específicamente para duelos intensos.", en: "Bring excitement to your home.", fr: "Apportez l'excitation chez vous.", it: "Porta l'emozione a casa tua." },
+                features: { es: ["Cronometraje de 2 Carriles", "Control de Falsas Salidas", "Semáforo Visual y Sonoro", "Narración de Carrera"], en: ["2-Lane Timing", "False Start Control", "Visual/Audio Lights", "Race Narration"], fr: ["Chronométrage 2 Voies", "Contrôle Faux Départs", "Feux", "Narration"], it: ["Cronometraggio 2 Corsie", "Controllo False Partenze", "Semaforo", "Narrazione"] },
+                galleryTexts: { es: { "krono-dual.mp4": "Vídeo Presentación Krono Dual V3.0" } }
             },
-            fr: { 
-                privacyTitle: "Confidentialité", 
-                privacyContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">Chez SlotSoftware, la confidentialité et la sécurité de nos utilisateurs sont une priorité absolue, notamment lors du traitement des flux de webcams et de la télémétrie cloud.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Traitement Vidéo Local (Caméras)</h4>
-                            <p class="mb-2">Toutes nos applications de la série Krono utilisant la vision artificielle traitent le flux vidéo <strong>strictement localement dans votre navigateur</strong>. Aucune image, aucun cadre ou enregistrement de votre webcam n'est envoyé, stocké ou transmis à nos serveurs ou à des tiers. L'algorithme d'IA analyse l'image dans la mémoire RAM de votre appareil et la rejette instantanément.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Synchronisation Cloud (Firebase)</h4>
-                            <p class="mb-3">Pour les applications compatibles Smart TV (Krono TV), nous utilisons Google Firebase pour synchroniser les temps au tour et l'état de la course en temps réel. Les données transmises sont purement numériques (temps, identifiants de voie) et temporaires. Nous ne lions pas ces données à des identités personnelles réelles sans le consentement explicite de l'utilisateur.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Cookies et Stockage Local</h4>
-                            <p class="mb-3">Nous utilisons le stockage local de votre navigateur pour enregistrer vos paramètres (langue préférée, ROI des caméras, inventaire du garage). Nous utilisons également des cookies analytiques anonymes (optionnels) exclusivement pour détecter les erreurs de performance sur la plateforme.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">4. Droits des Utilisateurs</h4>
-                            <p>Puisqu'une inscription de compte traditionnelle n'est pas requise pour les versions de base, vous avez un contrôle total sur vos données. Vous pouvez supprimer définitivement toutes vos informations de configuration en effaçant simplement le cache de votre navigateur web.</p>
-                        </div>
-                    </div>
-                `, 
-                termsTitle: "Conditions d'Utilisation", 
-                termsContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">En accédant et en utilisant l'écosystème d'applications SlotSoftware, vous acceptez d'être lié par les présentes conditions générales.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Nature du Service</h4>
-                            <p class="mb-2">SlotSoftware fournit des outils web de simulation, de conception CAO 2D/3D et de télémétrie par vision artificielle. L'utilisateur est seul responsable de l'installation physique de son circuit, de l'éclairage et de son matériel (webcams, écrans).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Précision et Non-responsabilité</h4>
-                            <p class="mb-3">Le logiciel est fourni "tel quel". Bien que nos algorithmes soient précis, <strong>nous ne garantissons pas une précision absolue à 100%</strong>, car cela dépend de facteurs externes (qualité de la caméra, reflets, FPS de l'appareil). SlotSoftware n'est pas responsable des dommages physiques aux véhicules ou aux pistes.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Propriété Intellectuelle</h4>
-                            <p class="mb-3">L'ensemble du code source, du design, des algorithmes, des modèles 3D et des marques sont la propriété exclusive de SlotSoftware. L'ingénierie inverse, la copie ou la distribution commerciale non autorisée sont strictement interdites.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">4. Services Cloud et Disponibilité</h4>
-                            <p>Le système utilise des services cloud (Firebase) pour la synchronisation en temps réel. Nous nous réservons le droit de modifier, limiter ou interrompre la connectivité pour la maintenance sans préavis.</p>
-                        </div>
-                    </div>
-                `, 
-                supportTitle: "Support Technique", 
-                supportContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">Chez SlotSoftware, notre engagement est de vous offrir la meilleure expérience. Si vous rencontrez un problème, notre équipe technique est là pour vous aider.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Canaux d'Assistance Directe</h4>
-                            <p class="mb-2"><strong>Communauté WhatsApp :</strong> Rejoignez notre groupe actif pour partager des configurations et résoudre les doutes en temps réel. <a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY" target="_blank" class="text-apple-blue font-semibold hover:underline">Rejoindre le groupe</a>.</p>
-                            <p><strong>Courrier Électronique :</strong> Pour des requêtes complexes, écrivez à <strong>slotcarhome@gmail.com</strong>. Temps de réponse : 24-48h ouvrables.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Dépannage Rapide (FAQ)</h4>
-                            <p class="mb-3"><strong>Détection Caméra (Série Krono) :</strong> Assurez un éclairage uniforme. Les reflets causent de faux positifs. Calibrez bien la zone de passage (ROI).</p>
-                            <p class="mb-3"><strong>Performance 3D :</strong> En cas de lenteur, vérifiez que l'"Accélération matérielle" est activée dans votre navigateur.</p>
-                            <p><strong>Désynchronisation TV :</strong> Si les panneaux TV sont en retard, vérifiez la stabilité WiFi. Une latence élevée retarde le Firebase Cloud.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Mises à jour et Cache</h4>
-                            <p>Nous déployons des améliorations en continu. Appuyez sur <strong class="bg-gray-100 px-2 py-1 rounded border">Ctrl + F5</strong> pour purger le cache et utiliser la dernière version.</p>
-                        </div>
-                    </div>
-                ` 
+            {
+                id: 'tracks-telemetry-v2', img: '8.jpg', imgStartId: 72, link: 'https://slotsoftware.com/tracks-telemetry-v2',
+                title: { es: "Tracks Telemetry V2.0", en: "Tracks Telemetry V2.0", fr: "Tracks Telemetry V2.0", it: "Tracks Telemetry V2.0" },
+                desc: { es: "Suite completa de ingeniería. Diseña circuitos en 2D y visualízalos en 3D.", en: "Complete engineering suite.", fr: "Suite d'ingénierie complète.", it: "Suite di ingegneria completa." },
+                descLong: { es: "Tracks Telemetry V2.0 es el sueño de cualquier diseñador de pistas.", en: "The dream of any track designer.", fr: "Le rêve de tout concepteur de piste.", it: "Il sogno di ogni progettista di piste." },
+                features: { es: ["Diseñador 2D Multi-Marca", "Visualizador 3D Hiperrealista", "Garaje Interactivo", "Generación de Fichas en PDF"], en: ["Multi-Brand 2D Designer", "3D Viewer", "Interactive Garage", "PDF Generation"], fr: ["Concepteur 2D Multi-Marques", "Visualiseur 3D", "Garage Interactif", "PDF"], it: ["Progettista 2D Multi-Marca", "Visualizzatore 3D", "Garage Interattivo", "PDF"] },
+                galleryTexts: { es: {} }
             },
-            it: { 
-                privacyTitle: "Informativa sulla Privacy", 
-                privacyContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">In SlotSoftware, la privacy e la sicurezza degli utenti sono una priorità assoluta, specialmente quando si gestiscono flussi webcam e telemetria cloud.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Elaborazione Video Locale (Telecamere)</h4>
-                            <p class="mb-2">Tutte le nostre applicazioni della serie Krono che utilizzano la visione artificiale elaborano il flusso video <strong>rigorosamente in locale nel tuo browser</strong>. Nessun fotogramma, immagine o registrazione della tua webcam viene mai inviato, memorizzato o trasmesso ai nostri server o a terze parti. L'algoritmo di intelligenza artificiale analizza l'immagine nella RAM del tuo dispositivo e la scarta all'istante.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Sincronizzazione Cloud (Firebase)</h4>
-                            <p class="mb-3">Per le app compatibili con Smart TV (Krono TV), utilizziamo Google Firebase per sincronizzare i tempi sul giro e lo stato della gara in tempo reale. I dati trasmessi sono puramente numerici (tempi, ID corsia) e temporanei. Non colleghiamo questi dati a identità personali reali senza il consenso esplicito dell'utente nel proprio profilo.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Cookie e Archiviazione Locale</h4>
-                            <p class="mb-3">Utilizziamo l'archiviazione locale del tuo browser per salvare le tue impostazioni (lingua preferita, ROI della telecamera, inventario del garage in Tracks Telemetry). Utilizziamo inoltre cookie analitici anonimi (facoltativi) esclusivamente per rilevare errori di prestazioni sulla piattaforma.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">4. Diritti dell'Utente</h4>
-                            <p>Poiché non è richiesta una registrazione tradizionale dell'account per le versioni base, hai il pieno controllo sui tuoi dati. Puoi eliminare definitivamente tutte le informazioni di configurazione, le piste salvate e i dati del garage semplicemente cancellando la cache del tuo browser web.</p>
-                        </div>
-                    </div>
-                `, 
-                termsTitle: "Termini di Servizio", 
-                termsContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">Accedendo e utilizzando l'ecosistema di app SlotSoftware, accetti di essere vincolato dai seguenti termini e condizioni.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Natura del Servizio</h4>
-                            <p class="mb-2">SlotSoftware fornisce strumenti web per la simulazione, il design CAD e la telemetria. L'utente è l'unico responsabile per l'installazione fisica della pista, l'illuminazione e l'hardware (webcam, schermi).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Precisione ed Esonero di Responsabilità</h4>
-                            <p class="mb-3">Il software è fornito "così com'è". Sebbene i nostri algoritmi IA siano precisi, <strong>non garantiamo una precisione assoluta del 100%</strong> nel cronometraggio, poiché dipende da fattori esterni (qualità della telecamera, riflessi, FPS del dispositivo). Non siamo responsabili per danni fisici a veicoli o piste.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Proprietà Intellettuale</h4>
-                            <p class="mb-3">Tutto il codice sorgente, il design, gli algoritmi di visione, i modelli 3D e i marchi sono di proprietà esclusiva di SlotSoftware. È severamente vietato il reverse engineering, la copia o la distribuzione commerciale non autorizzata.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">4. Servizi Cloud e Disponibilità</h4>
-                            <p>Il sistema utilizza servizi cloud (Firebase) per la sincronizzazione in tempo reale. Ci riserviamo il diritto di modificare, limitare o interrompere la connettività della piattaforma per manutenzione senza preavviso.</p>
-                        </div>
-                    </div>
-                `, 
-                supportTitle: "Supporto Tecnico", 
-                supportContent: `
-                    <div class="space-y-6 text-gray-700">
-                        <p class="text-base text-slot-dark font-medium border-b pb-4">In SlotSoftware, ci impegniamo ad offrirti la migliore esperienza. In caso di problemi, il nostro team è pronto ad aiutarti.</p>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">1. Canali di Supporto Diretto</h4>
-                            <p class="mb-2"><strong>Community WhatsApp:</strong> Unisciti al nostro gruppo dove piloti e ingegneri condividono setup in tempo reale. <a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY" target="_blank" class="text-apple-blue font-semibold hover:underline">Clicca qui per unirti</a>.</p>
-                            <p><strong>E-mail:</strong> Per richieste complesse, scrivici a <strong>slotcarhome@gmail.com</strong>. Risposta in 24-48 ore lavorative.</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">2. Risoluzione dei Problemi (FAQ)</h4>
-                            <p class="mb-3"><strong>Rilevamento Telecamera:</strong> Assicurati che l'illuminazione sia uniforme. I riflessi causano falsi positivi. Calibra accuratamente la ROI.</p>
-                            <p class="mb-3"><strong>Prestazioni 3D:</strong> In caso di rallentamenti, verifica che l'"Accelerazione Hardware" sia abilitata nel browser.</p>
-                            <p><strong>Desincronizzazione TV:</strong> Se la dashboard ritarda, controlla la stabilità del WiFi (sincronizzazione Cloud Firebase).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-slot-red text-lg mb-2">3. Aggiornamenti e Manutenzione</h4>
-                            <p>Rilasciamo continui miglioramenti. Premi <strong class="bg-gray-100 px-2 py-1 rounded border">Ctrl + F5</strong> nel tuo browser per svuotare la cache e caricare l'ultima versione.</p>
-                        </div>
-                    </div>
-                ` 
+            {
+                id: 'krono-personal-tv', img: '9.jpg', imgStartId: 102, link: 'https://slotsoftware.com/krono-personal-tv',
+                title: { es: "Krono Personal TV", en: "Krono Personal TV", fr: "Krono Personal TV", it: "Krono Personal TV" },
+                desc: { es: "Versión Big Screen del cronómetro personal con paneles modulares.", en: "Big Screen version of the personal timer.", fr: "Version Grand Écran du chronomètre personnel.", it: "Versione Grande Schermo del timer personale." },
+                descLong: { es: "Transforma tu salón en un paddock profesional con Krono Personal TV.", en: "Transform your living room into a paddock.", fr: "Transformez votre salon en paddock.", it: "Trasforma il tuo soggiorno in un paddock." },
+                features: { es: ["Interfaz Smart TV", "Paneles Flotantes Modulares", "Sincronización Cloud", "Control Remoto desde Móvil"], en: ["Smart TV Interface", "Floating Panels", "Cloud Sync", "Mobile Remote"], fr: ["Interface Smart TV", "Panneaux Flottants", "Cloud Sync", "Télécommande"], it: ["Interfaccia Smart TV", "Pannelli Galleggianti", "Cloud Sync", "Telecomando"] },
+                galleryTexts: { es: { "krono-personal-tv.mp4": "Demo Krono Personal TV" } }
+            },
+            {
+                id: 'krono-dual-tv', img: '10.jpg', imgStartId: 132, link: 'https://slotsoftware.com/krono-dual-tv',
+                title: { es: "Krono Dual TV", en: "Krono Dual TV", fr: "Krono Dual TV", it: "Krono Dual TV" },
+                desc: { es: "Experiencia competitiva en pantalla gigante con telemetría en vivo.", en: "Competitive experience on the big screen.", fr: "Expérience compétitive sur grand écran.", it: "Esperienza competitiva sul grande schermo." },
+                descLong: { es: "Diseñado para ser el centro de atención en competiciones serias.", en: "Designed for serious competitions.", fr: "Conçu pour les compétitions sérieuses.", it: "Progettato per competizioni serie." },
+                features: { es: ["Telemetría Comparativa 1vs1", "Repeticiones Simulación", "Gestión de Torneos", "Director de Carrera Remoto"], en: ["Live 1vs1 Telemetry", "Replays", "Tournaments", "Remote Director"], fr: ["Télémétrie 1vs1", "Ralentis", "Tournois", "Directeur"], it: ["Telemetria 1vs1", "Replay", "Tornei", "Direttore"] },
+                galleryTexts: { es: { "krono-dual-tv.mp4": "Demo Krono Dual TV" } }
+            },
+            {
+                id: 'sector-time-v1', img: '11.jpg', imgStartId: 162, link: 'https://slotsoftware.com/sector-time-v1',
+                title: { es: "Sector Time V1.0", en: "Sector Time V1.0", fr: "Sector Time V1.0", it: "Sector Time V1.0" },
+                desc: { es: "Herramienta de análisis sectorial. Requiere sensores adicionales.", en: "Sector analysis tool. Requires sensors.", fr: "Outil d'analyse sectorielle. Nécessite capteurs.", it: "Strumento di analisi settoriale. Richiede sensori." },
+                descLong: { es: "Para los ingenieros de pista más exigentes. Divide y analiza.", en: "For demanding track engineers.", fr: "Pour les ingénieurs exigeants.", it: "Per ingegneri esigenti." },
+                features: { es: ["Cronometraje por Sectores", "Análisis de Velocidad", "Gráficos Ganancia/Pérdida", "Integración Krono V3"], en: ["Sector Timing", "Speed Analysis", "Charts", "Krono Integration"], fr: ["Chronométrage Secteurs", "Analyse Vitesse", "Graphiques", "Intégration"], it: ["Cronometraggio Settori", "Analisi Velocità", "Grafici", "Integrazione"] },
+                galleryTexts: { es: {} }
             }
-        };
-
-        const programLinks = {
-            'krono-personal-v3': 'https://slotsoftware.github.io/TiemposPersonal/',
-            'krono-dual-v3': 'https://slotsoftware.github.io/TiemposDual/',
-            'tracks-telemetry-v2': 'https://slotsoftware.github.io/Telemetria/',
-            'krono-personal-tv': 'https://slotsoftware.github.io/KronoPerTV/',
-            'krono-dual-tv': 'https://slotsoftware.github.io/KronoDual-TV/',
-            'sector-time-v1': 'https://slotsoftware.github.io/Web/canal.html'
-        };
+        ];
 
         let currentLang = 'es';
+        let adminClickCount = 0;
+        let isAdmin = false;
+        let savedCloudTexts = JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
+        let currentLightboxMediaId = null;
+        let currentProgramId = null;
 
         function changeLanguage(lang) {
             currentLang = lang;
-            const t = i18nData[lang] || i18nData['es'];
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (t[key]) {
-                    if (el.tagName === 'INPUT' && el.type === 'placeholder') el.placeholder = t[key];
-                    else el.innerHTML = t[key];
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute('data-i18n');
+                if (i18nData[lang] && i18nData[lang][key]) {
+                    if (key.includes('Content')) {
+                        elem.innerHTML = i18nData[lang][key];
+                    } else {
+                        elem.innerText = i18nData[lang][key];
+                    }
                 }
             });
-            const sel = document.getElementById('global-lang-select');
-            if (sel) sel.value = lang;
-            localStorage.setItem('slot_lang', lang);
-            renderProgramsGrid(); // Re-renderizar tarjetas para actualizar textos internos
+            renderPrograms();
         }
 
-        function renderProgramsGrid() {
+        // TRIGGER SECRETO: 3 clics en el logo del footer (Arreglado para que no salte arriba)
+        function handleSecretAdminClick() {
+            adminClickCount++;
+            if (adminClickCount >= 3) {
+                adminClickCount = 0;
+                const modal = document.getElementById('admin-login-modal');
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            }
+            // Reset contador si tardas mucho
+            setTimeout(() => { adminClickCount = 0; }, 1500);
+        }
+
+        function closeAdminLogin() {
+            const modal = document.getElementById('admin-login-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function checkAdminPassword() {
+            const pwd = document.getElementById('admin-pwd').value;
+            if (pwd === 'slot2026') {
+                isAdmin = true;
+                closeAdminLogin();
+                document.getElementById('admin-bar').classList.remove('hidden');
+                document.getElementById('admin-pwd').value = '';
+            } else {
+                alert("Contraseña incorrecta.");
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const openIcon = document.getElementById('menu-icon-open');
+            const closeIcon = document.getElementById('menu-icon-close');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                openIcon.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+                openIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+            }
+        }
+
+        function renderPrograms() {
             const grid = document.getElementById('programs-grid');
-            if(!grid) return;
             grid.innerHTML = '';
-            const pList = programsData[currentLang] || programsData['es'];
-            const t = i18nData[currentLang] || i18nData['es'];
-            
-            pList.forEach((prog) => {
+            programs.forEach(prog => {
+                const imgAspectClass = 'aspect-[9/16] w-[70%] max-w-[220px]';
+                
                 const card = document.createElement('div');
-                card.className = `software-card group relative flex flex-col h-full`;
-                
-                let summaryHTML = '';
-                if (prog.customSummary && Array.isArray(prog.customSummary)) {
-                    summaryHTML = `<ul class="space-y-1.5 text-xs text-apple-gray font-light mb-6 flex-grow">` + 
-                        prog.customSummary.map(line => `<li>${line}</li>`).join('') + `</ul>`;
-                } else {
-                    summaryHTML = `<p class="text-apple-gray text-sm font-light mb-6 flex-grow">${prog.shortDesc}</p>`;
-                }
-
-                // Definimos los enlaces específicos por ID del programa
-                const progLinks = {
-                    'krono-personal-v3': 'https://slotsoftware.github.io/TiemposPersonal/',
-                    'krono-dual-v3': 'https://slotsoftware.github.io/TiemposDual/',
-                    'tracks-telemetry-v2': 'https://slotsoftware.github.io/Telemetria/',
-                    'krono-personal-tv': 'https://slotsoftware.github.io/KronoPerTV/',
-                    'krono-dual-tv': 'https://slotsoftware.github.io/KronoDual-TV/',
-                    'sector-time-v1': 'https://slotsoftware.github.io/Web/canal.html'
-                };
-                
-                const acqLink = progLinks[prog.id] || "https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY?s=cl&p=a&mlu=4&ilr=4";
-
+                card.className = 'software-card group p-6 flex flex-col h-full relative';
                 card.innerHTML = `
-                    <div onclick="openModal('${prog.id}')" class="relative mx-auto mt-7 mb-2 w-[70%] max-w-[220px] aspect-[9/16] bg-gray-50 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center cursor-pointer overflow-hidden group">
-                        <span class="text-gray-400 font-semibold text-sm z-0 text-center px-4">${t.placeholder} ${prog.img}</span>
-                        <img src="${prog.img}" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 z-10" alt="${prog.name}" onerror="this.style.display='none';">
-                    </div>
-                    <div class="px-8 pt-4 pb-8 flex flex-col flex-grow">
-                        <h3 onclick="openModal('${prog.id}')" class="text-xl font-sans font-semibold text-apple-text mb-2 cursor-pointer hover:text-apple-blue transition-colors">${prog.name}</h3>
-                        ${summaryHTML}
-                        <div class="mt-auto flex flex-col gap-4">
-                            <span onclick="openModal('${prog.id}')" class="inline-flex items-center text-apple-blue font-bold text-base uppercase tracking-wider hover:underline cursor-pointer">
-                                <span>${t.modalGalleryBtn}</span> <svg class="w-5 h-5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </span>
-                            <button onclick="window.open('${acqLink}', '_blank');" class="w-full py-2.5 bg-slot-dark hover:bg-black text-white font-medium text-sm rounded-full transition-colors flex items-center justify-center gap-2 shadow-sm">
-                                <svg class="w-4 h-4 text-white opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                <span>${t.btnAcquire} ${prog.name.split(' V')[0]}</span>
-                            </button>
+                    <div class="software-img-container mb-6 flex justify-center">
+                        <div class="${imgAspectClass} relative rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white flex items-center justify-center">
+                            <span class="text-gray-400 font-bold text-xs z-0 uppercase tracking-widest">${i18nData[currentLang].placeholder} ${prog.img}</span>
+                            <img src="${prog.img}" alt="${prog.title[currentLang]}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 z-10" onerror="this.style.display='none';">
+                            <div class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5 z-20"></div>
                         </div>
+                    </div>
+                    
+                    <div class="flex-grow flex flex-col">
+                        <h3 class="font-sans font-bold text-2xl mb-3 text-apple-text">${prog.title[currentLang]}</h3>
+                        <p class="text-apple-gray text-sm leading-relaxed mb-8 flex-grow">${prog.desc[currentLang]}</p>
+                    </div>
+                    <div class="mt-auto flex flex-col gap-3">
+                        <button onclick="openModal('${prog.id}'); event.stopPropagation();" class="w-full bg-apple-text text-white py-2.5 rounded-xl font-sans font-bold uppercase tracking-wider text-sm transition-transform hover:scale-[1.02] shadow-md flex items-center justify-center gap-2">
+                            <span>${i18nData[currentLang].catalogGalleryBtn}</span>
+                        </button>
+                        <a href="${prog.link}" target="_blank" class="w-full bg-white border-2 border-apple-text text-apple-text py-2.5 rounded-xl font-sans font-semibold text-sm transition-colors hover:bg-apple-bg flex items-center justify-center gap-2" onclick="event.stopPropagation();">
+                             <span>${i18nData[currentLang].btnAcquire}</span>
+                        </a>
                     </div>
                 `;
                 grid.appendChild(card);
             });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedLang = localStorage.getItem('slot_lang') || 'es';
-            changeLanguage(savedLang);
-
-            setTimeout(() => {
-                if(!localStorage.getItem('slotCookiesAccepted')) {
-                    const banner = document.getElementById('cookie-banner');
-                    if (banner) banner.classList.remove('translate-y-[200%]');
-                }
-            }, 1500);
-        });
-
         function openModal(progId) {
-            const pList = programsData[currentLang] || programsData['es'];
-            const prog = pList.find(p => p.id === progId);
+            currentProgramId = progId;
+            const prog = programs.find(p => p.id === progId);
             if (!prog) return;
 
-            const t = i18nData[currentLang] || i18nData['es'];
+            document.getElementById('modal-title').innerText = prog.title[currentLang];
+            document.getElementById('modal-desc').innerText = prog.descLong[currentLang];
             
-            document.getElementById('modal-title').innerText = prog.name;
-            document.getElementById('modal-desc').innerText = prog.longDesc;
+            const featuresList = document.getElementById('modal-features');
+            featuresList.innerHTML = '';
+            prog.features[currentLang].forEach(feat => {
+                const li = document.createElement('li');
+                li.className = 'flex items-start gap-2 text-sm text-apple-text';
+                li.innerHTML = `<svg class="w-5 h-5 text-slot-red mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>${feat}</span>`;
+                featuresList.appendChild(li);
+            });
+
+            const galleryGrid = document.getElementById('modal-gallery');
+            galleryGrid.innerHTML = '';
+
+            let totalImages = 30;
+            let subKey = 'Galería Completa';
+            const isVertical = prog.id === 'krono-personal-v3' || prog.id === 'krono-dual-v3';
+            const isHybrid = prog.id === 'krono-personal-tv' || prog.id === 'krono-dual-tv' || prog.id === 'sector-time-v1';
+            const isNotAvailable = prog.id === 'sector-time-v1';
+
+            if (isVertical) { totalImages = 15; subKey = i18nData[currentLang].modalSubtitleVid14; }
+            else if (prog.id === 'krono-personal-tv' || prog.id === 'krono-dual-tv') { subKey = i18nData[currentLang].modalSubtitleVid29; }
             
-            document.getElementById('modal-features').innerHTML = prog.features.map(f => `
-                <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-apple-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${f}</li>
-            `).join('');
+            document.getElementById('modal-subtitle').innerText = subKey;
 
-            const gallery = document.getElementById('modal-gallery');
-            gallery.innerHTML = '';
-
-            let currentImgId = prog.imgStartId || 12;
-
-            // Determinar formato y cantidad según el programa
-            const isStrictVertical = (prog.id === 'krono-personal-v3' || prog.id === 'krono-dual-v3');
-            const isAlternating = (prog.id === 'krono-personal-tv' || prog.id === 'krono-dual-tv' || prog.id === 'sector-time-v1');
-            const isSectorTime = (prog.id === 'sector-time-v1');
-            const hasVideoFirst = ['krono-personal-v3', 'krono-dual-v3', 'krono-personal-tv', 'krono-dual-tv'].includes(prog.id);
-            
-            const totalImages = isStrictVertical ? 15 : 30;
-
-            // Actualizar el subtítulo dinámicamente
-            const subtitleEl = document.getElementById('modal-subtitle');
-            if(subtitleEl) {
-                let baseSub = t.modalSubtitle || "Galería Completa - 30 Imágenes";
-                if (isStrictVertical) {
-                    subtitleEl.innerText = baseSub
-                        .replace('30 Imágenes', '14 Imágenes + 1 Vídeo')
-                        .replace('30 Images', '14 Images + 1 Video')
-                        .replace('30 Immagini', '14 Immagini + 1 Video');
-                } else if (prog.id === 'krono-personal-tv' || prog.id === 'krono-dual-tv') {
-                    subtitleEl.innerText = baseSub
-                        .replace('30 Imágenes', '29 Imágenes + 1 Vídeo')
-                        .replace('30 Images', '29 Images + 1 Video')
-                        .replace('30 Immagini', '29 Immagini + 1 Video');
-                } else {
-                    subtitleEl.innerText = baseSub.replace('30', totalImages);
-                }
-            }
-
-            for(let i = 0; i < totalImages; i++) {
-                const isVideo = (hasVideoFirst && i === 0);
-                
-                let mediaUrl = '';
-                if (isVideo) {
-                    if (prog.id === 'krono-personal-v3') mediaUrl = 'krono-personal.mp4';
-                    else if (prog.id === 'krono-dual-v3') mediaUrl = 'krono-dual.mp4';
-                    else if (prog.id === 'krono-personal-tv') mediaUrl = 'krono-personal-tv.mp4';
-                    else if (prog.id === 'krono-dual-tv') mediaUrl = 'krono-dual-tv.mp4';
-                } else {
-                    mediaUrl = `${currentImgId}.jpg`;
-                }
-                
+            for (let i = 0; i < totalImages; i++) {
                 const item = document.createElement('div');
-                item.className = 'masonry-item group border border-gray-200 bg-white p-1 transition-colors';
                 
-                if (!isSectorTime) {
-                    item.classList.add('cursor-pointer', 'hover:border-slot-red');
-                    item.onclick = () => openLightbox(mediaUrl, isVideo);
-                } else {
-                    item.classList.add('cursor-default');
-                }
+                let isVideoPosition = false;
+                let videoSrc = '';
                 
-                let capText = '';
-                if (isVideo) {
-                    capText = 'VIDEO';
-                } else if (hasVideoFirst) {
-                    let imgNumber = currentImgId - (prog.imgStartId || 12) + 1;
-                    let totalImgCount = totalImages - 1;
-                    capText = `${t.imgCaption} ${imgNumber} / ${totalImgCount}`;
-                } else {
-                    capText = `${t.imgCaption} ${i+1} / ${totalImages}`;
-                }
+                if (prog.id === 'krono-personal-v3' && i === 0) { isVideoPosition = true; videoSrc = 'krono-personal.mp4'; }
+                else if (prog.id === 'krono-dual-v3' && i === 0) { isVideoPosition = true; videoSrc = 'krono-dual.mp4'; }
+                else if (prog.id === 'krono-personal-tv' && i === 0) { isVideoPosition = true; videoSrc = 'krono-personal-tv.mp4'; }
+                else if (prog.id === 'krono-dual-tv' && i === 0) { isVideoPosition = true; videoSrc = 'krono-dual-tv.mp4'; }
+
+                let itemAspect = 'aspect-video';
+                if (isVertical) itemAspect = 'aspect-[9/16]';
+                else if (isHybrid && i % 2 !== 0) itemAspect = 'aspect-[9/16]';
+
+                item.className = `masonry-item group cursor-pointer w-full relative ${itemAspect}`;
                 
-                // Determinar la clase de aspecto individualmente
-                let aspectClass = 'aspect-video'; // 16:9 por defecto
-                if (isStrictVertical) {
-                    aspectClass = 'aspect-[9/16]'; // 100% Verticales
-                } else if (isAlternating) {
-                    // Intercalar: Pares horizontales (video), impares verticales (9/16)
-                    aspectClass = (i % 2 === 0) ? 'aspect-video' : 'aspect-[9/16]'; 
+                let currentMediaId = isVideoPosition ? videoSrc : `${(prog.imgStartId || 12) + i - (isVideoPosition || isVertical ? 1 : 0)}.jpg`;
+                
+                if (!isNotAvailable) {
+                    // Toda la tarjeta reacciona al click
+                    item.onclick = () => openLightbox(isVideoPosition ? videoSrc : currentMediaId, isVideoPosition ? 'video' : 'img', currentMediaId);
                 }
 
-                let imageContent = '';
-                
-                if (isSectorTime) {
-                    const notAvailText = currentLang === 'es' ? 'Imagen no disponible' :
-                                         currentLang === 'en' ? 'Image not available' :
-                                         currentLang === 'fr' ? 'Image non disponible' : 'Immagine non disponibile';
-                    const comingSoonText = currentLang === 'es' ? 'Próximamente' :
-                                           currentLang === 'en' ? 'Coming Soon' :
-                                           currentLang === 'fr' ? 'Bientôt disponible' : 'Prossimamente';
-                    
-                    imageContent = `
-                        <div class="absolute inset-0 bg-gray-50 flex flex-col items-center justify-center z-10 p-4 text-center">
-                            <svg class="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <span class="text-xs font-semibold text-gray-400">${notAvailText}</span>
-                            <span class="text-[10px] font-medium text-gray-400 mt-1 uppercase tracking-widest opacity-70">${comingSoonText}</span>
+                if (isVideoPosition) {
+                    item.innerHTML = `
+                        <div class="absolute inset-0 bg-gray-200 flex flex-col items-center justify-center text-gray-400 p-4 text-center z-0">
+                            <span class="font-bold text-sm uppercase tracking-widest">${i18nData[currentLang].errorMissing} ${videoSrc}</span>
                         </div>
-                    `;
-                } else if (isVideo) {
-                    imageContent = `
-                        <div class="absolute inset-0 loading-skeleton" id="skel-${prog.id}-${i}"></div>
-                        <span class="text-xs font-semibold text-slot-red hidden z-0 text-center px-2" id="err-${prog.id}-${i}">Error 404:<br/>${t.errorMissing} ${mediaUrl}</span>
-                        <video src="${mediaUrl}#t=0.1" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 z-10 rounded-xl" muted playsinline preload="metadata"
-                             onloadeddata="this.style.opacity=1; document.getElementById('skel-${prog.id}-${i}').style.display='none';" 
-                             onerror="this.style.display='none'; document.getElementById('skel-${prog.id}-${i}').style.display='none'; document.getElementById('err-${prog.id}-${i}').classList.remove('hidden');">
-                        </video>
-                        <div class="absolute inset-0 bg-slot-dark/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20 rounded-xl">
-                            <span class="text-white font-bold text-xs uppercase tracking-widest border-2 border-white px-4 py-2 flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Play
-                            </span>
+                        <video src="${videoSrc}" class="absolute inset-0 w-full h-full object-cover z-10" preload="metadata"></video>
+                        <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors z-20 flex items-center justify-center pointer-events-none">
+                            <div class="w-16 h-16 bg-slot-red/90 rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
+                                <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
                         </div>
                     `;
                 } else {
-                    imageContent = `
-                        <div class="absolute inset-0 loading-skeleton" id="skel-${prog.id}-${i}"></div>
-                        <span class="text-xs font-semibold text-slot-red hidden z-0 text-center px-2" id="err-${prog.id}-${i}">Error 404:<br/>${t.errorMissing} ${mediaUrl}</span>
-                        <img src="${mediaUrl}" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 z-10" 
-                             onload="this.style.opacity=1; document.getElementById('skel-${prog.id}-${i}').style.display='none';" 
-                             onerror="this.style.display='none'; document.getElementById('skel-${prog.id}-${i}').style.display='none'; document.getElementById('err-${prog.id}-${i}').classList.remove('hidden');" 
-                             alt="Screenshot ${i+1}">
-                        <div class="absolute inset-0 bg-slot-dark/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20">
-                            <span class="text-white font-bold text-xs uppercase tracking-widest border-2 border-white px-4 py-2">${t.modalExpand}</span>
+                    const errorText = isNotAvailable ? i18nData[currentLang].imgNotAvailable : `${i18nData[currentLang].errorMissing} ${currentMediaId}`;
+                    item.innerHTML = `
+                        <div class="absolute inset-0 bg-gray-200 flex flex-col items-center justify-center text-gray-400 p-4 text-center z-0">
+                            <span class="font-bold text-sm uppercase tracking-widest">${errorText}</span>
                         </div>
+                        <img src="${currentMediaId}" alt="Gallery" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none';">
+                        ${!isNotAvailable ? `<div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors z-20 pointer-events-none"></div>` : ''}
                     `;
                 }
 
-                item.innerHTML = `
-                    <div class="relative w-full ${aspectClass} rounded-xl bg-gray-100 overflow-hidden flex items-center justify-center border border-dashed border-gray-300">
-                        ${imageContent}
-                    </div>
-                    <div class="p-2 text-center bg-white"><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">${capText}</span></div>
-                `;
-                gallery.appendChild(item);
-                
-                // Si NO es video, avanzamos el contador de la imagen (de 12.jpg a 25.jpg)
-                if (!isVideo) {
-                    currentImgId++;
+                if (!isNotAvailable) {
+                    const caption = document.createElement('div');
+                    caption.className = 'absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white text-xs font-medium z-30 pointer-events-none';
+                    let imgNumber = i + 1;
+                    if (isVertical) imgNumber = i;
+                    caption.innerText = isVideoPosition ? 'VIDEO PRESENTACIÓN' : `${i18nData[currentLang].imgCaption} ${imgNumber}`;
+                    item.appendChild(caption);
                 }
+
+                galleryGrid.appendChild(item);
             }
 
-            const m = document.getElementById('program-modal');
-            m.classList.remove('hidden');
-            void m.offsetWidth; // Force reflow
-            m.classList.remove('opacity-0');
+            const modal = document.getElementById('program-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
             document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
-            const m = document.getElementById('program-modal');
-            m.classList.add('opacity-0');
-            setTimeout(() => { m.classList.add('hidden'); document.body.style.overflow = ''; }, 300);
+            const modal = document.getElementById('program-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
 
-        function openLightbox(mediaUrl, isVideo = false) {
-            const lb = document.getElementById('lightbox'); 
-            const imgEl = document.getElementById('lightbox-img');
-            const vidEl = document.getElementById('lightbox-video');
-            
-            if (isVideo) {
-                imgEl.classList.add('hidden');
-                vidEl.classList.remove('hidden');
-                vidEl.src = mediaUrl; 
-                vidEl.classList.remove('scale-100'); vidEl.classList.add('scale-90');
+        function openLightbox(src, type, mediaId) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            const video = document.getElementById('lightbox-video');
+            const captionText = document.getElementById('lightbox-caption-text');
+            const adminContainer = document.getElementById('admin-edit-container');
+            const adminInput = document.getElementById('admin-edit-input');
+
+            currentLightboxMediaId = mediaId;
+
+            img.classList.add('hidden');
+            video.classList.add('hidden');
+            video.pause();
+
+            if (type === 'video') {
+                video.src = src;
+                video.classList.remove('hidden');
+                
+                // Sistema anti-errores por si el video no existe
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.warn("Vídeo no encontrado o no puede auto-reproducirse, esperando archivo:", error);
+                    });
+                }
             } else {
-                vidEl.classList.add('hidden');
-                vidEl.pause();
-                vidEl.src = '';
-                imgEl.classList.remove('hidden');
-                imgEl.src = mediaUrl; 
-                imgEl.classList.remove('scale-100'); imgEl.classList.add('scale-90');
+                img.src = src;
+                img.classList.remove('hidden');
+            }
+
+            // Lógica de textos: Buscar primero en nube(localStorage), si no en hardcode galleryTexts, si no por defecto
+            let defaultText = `Imagen completa`;
+            const prog = programs.find(p => p.id === currentProgramId);
+            if(prog && prog.galleryTexts && prog.galleryTexts[currentLang] && prog.galleryTexts[currentLang][mediaId]) {
+                defaultText = prog.galleryTexts[currentLang][mediaId];
             }
             
-            lb.classList.remove('hidden'); void lb.offsetWidth;
-            lb.classList.remove('opacity-0');
+            const savedText = savedCloudTexts[mediaId] || defaultText;
             
-            setTimeout(() => { 
-                if(isVideo) {
-                    vidEl.classList.remove('scale-90'); vidEl.classList.add('scale-100');
-                    vidEl.play().catch(e => console.log('Autoplay prevented:', e));
-                } else {
-                    imgEl.classList.remove('scale-90'); imgEl.classList.add('scale-100'); 
-                }
+            if (isAdmin) {
+                captionText.classList.add('hidden');
+                adminContainer.classList.remove('hidden');
+                adminContainer.classList.add('flex');
+                adminInput.value = savedCloudTexts[mediaId] || ""; // mostrar solo lo guardado si hay
+                adminInput.placeholder = defaultText; // mostrar placeholder si no hay nada guardado
+            } else {
+                adminContainer.classList.add('hidden');
+                adminContainer.classList.remove('flex');
+                captionText.classList.remove('hidden');
+                captionText.innerText = savedText; 
+            }
+
+            lightbox.classList.remove('hidden');
+            setTimeout(() => {
+                lightbox.classList.remove('opacity-0');
+                if(!img.classList.contains('hidden')) img.classList.remove('scale-90');
+                if(!video.classList.contains('hidden')) video.classList.remove('scale-90');
             }, 10);
         }
 
         function closeLightbox() {
-            const lb = document.getElementById('lightbox'); 
-            const imgEl = document.getElementById('lightbox-img');
-            const vidEl = document.getElementById('lightbox-video');
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            const video = document.getElementById('lightbox-video');
             
-            lb.classList.add('opacity-0'); 
-            imgEl.classList.remove('scale-100'); imgEl.classList.add('scale-90');
-            vidEl.classList.remove('scale-100'); vidEl.classList.add('scale-90');
+            lightbox.classList.add('opacity-0');
+            img.classList.add('scale-90');
+            video.classList.add('scale-90');
             
-            setTimeout(() => { 
-                lb.classList.add('hidden');
-                vidEl.pause();
-                vidEl.src = '';
-                imgEl.src = '';
+            setTimeout(() => {
+                lightbox.classList.add('hidden');
+                video.pause();
+                video.src = "";
+                img.src = "";
+            }, 300);
+        }
+
+        function saveAdminText() {
+            const input = document.getElementById('admin-edit-input');
+            const newText = input.value;
+            
+            if (currentLightboxMediaId) {
+                if(newText.trim() === "") {
+                    delete savedCloudTexts[currentLightboxMediaId];
+                } else {
+                    savedCloudTexts[currentLightboxMediaId] = newText;
+                }
+                
+                localStorage.setItem('slot_cloud_texts', JSON.stringify(savedCloudTexts));
+                
+                const btn = input.nextElementSibling;
+                const originalText = btn.innerText;
+                btn.innerText = "¡Guardado!";
+                btn.classList.add('bg-green-600');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.remove('bg-green-600');
+                }, 1500);
+            }
+        }
+
+        function openLegal(type) {
+            const modal = document.getElementById('legal-modal');
+            const title = document.getElementById('legal-title');
+            const content = document.getElementById('legal-content');
+            
+            let titleKey = 'legalDefaultTitle';
+            let contentHtml = '';
+
+            switch(type) {
+                case 'terms': titleKey = 'legalTermsTitle'; contentHtml = i18nData[currentLang].legalTermsContent; break;
+                case 'privacy': titleKey = 'legalPrivacyTitle'; contentHtml = i18nData[currentLang].legalPrivacyContent; break;
+                case 'support': titleKey = 'legalSupportTitle'; contentHtml = i18nData[currentLang].legalSupportContent; break;
+            }
+
+            title.innerText = i18nData[currentLang][titleKey];
+            content.innerHTML = contentHtml;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLegalModal() {
+            const modal = document.getElementById('legal-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
             }, 300);
         }
 
         function openCookieSettings() {
-            const m = document.getElementById('cookie-settings-modal');
-            if(m) { m.classList.remove('hidden'); void m.offsetWidth; m.classList.remove('opacity-0'); }
-        }
-        function closeCookieSettings() {
-            const m = document.getElementById('cookie-settings-modal');
-            if(m) { m.classList.add('opacity-0'); setTimeout(() => m.classList.add('hidden'), 300); }
+            document.getElementById('cookie-banner').classList.add('translate-y-[200%]');
+            const modal = document.getElementById('cookie-settings-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            document.body.style.overflow = 'hidden';
         }
 
-        function openLegal(type) {
-            const title = document.getElementById('legal-title'); const content = document.getElementById('legal-content');
-            const lt = legalTexts[currentLang] || legalTexts['es'];
-            if(type === 'privacy') { title.innerText = lt.privacyTitle; content.innerHTML = lt.privacyContent; } 
-            else if(type === 'terms') { title.innerText = lt.termsTitle; content.innerHTML = lt.termsContent; } 
-            else { title.innerText = lt.supportTitle; content.innerHTML = lt.supportContent; }
-            const m = document.getElementById('legal-modal');
-            if(m) { m.classList.remove('hidden'); void m.offsetWidth; m.classList.remove('opacity-0'); }
-        }
-        
-        function closeLegalModal() {
-            const m = document.getElementById('legal-modal');
-            if(m) { m.classList.add('opacity-0'); setTimeout(() => m.classList.add('hidden'), 300); }
+        function closeCookieSettings() {
+            const modal = document.getElementById('cookie-settings-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
 
         function acceptCookies() {
-            localStorage.setItem('slotCookiesAccepted', 'true');
-            const b = document.getElementById('cookie-banner');
-            if(b) { b.classList.add('translate-y-[200%]'); setTimeout(() => b.remove(), 700); }
+            localStorage.setItem('cookiesAccepted', 'true');
+            document.getElementById('cookie-banner').classList.add('translate-y-[200%]');
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            changeLanguage(currentLang);
+            if (!localStorage.getItem('cookiesAccepted')) {
+                setTimeout(() => {
+                    document.getElementById('cookie-banner').classList.remove('translate-y-[200%]');
+                }, 2000);
+            }
+        });
     </script>
 </body>
 </html>
