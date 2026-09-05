@@ -44,16 +44,29 @@
         .link-apple { color: #0066CC; transition: all 0.3s ease; }
         .link-apple:hover { text-decoration: underline; }
         .kerb-border { height: 2px; background: linear-gradient(90deg, transparent 0%, #E60000 50%, transparent 100%); opacity: 0.5; }
-        .software-card { background: #F5F5F7; border-radius: 24px; transition: all 0.4s ease; overflow: hidden; cursor: pointer; }
+        .software-card { background: #F5F5F7; border-radius: 24px; transition: all 0.4s ease; overflow: hidden; }
         .software-card:hover { transform: scale(1.01); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); }
         .software-img-container { border-radius: 20px; overflow: hidden; margin: 16px; }
         
         .masonry { column-count: 2; column-gap: 1rem; }
         @media (min-width: 768px) { .masonry { column-count: 3; } }
         @media (min-width: 1024px) { .masonry { column-count: 4; } }
-        .masonry-item { break-inside: avoid; margin-bottom: 1rem; border-radius: 12px; overflow: hidden; position: relative; background: #F5F5F7; cursor: pointer; }
+        .masonry-item { break-inside: avoid; margin-bottom: 1rem; border-radius: 12px; overflow: hidden; position: relative; background: #F5F5F7; }
         
         .glass-nav { background: rgba(255, 255, 255, 0.7); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
+        
+        /* Animaciones para el Ecualizador de Música */
+        .eq-bar { width: 4px; background-color: #E60000; border-radius: 2px; transition: height 0.2s ease; }
+        .playing .eq-bar { animation: eq-bounce 0.7s infinite alternate ease-in-out; }
+        .playing .eq-bar:nth-child(1) { animation-delay: 0.1s; }
+        .playing .eq-bar:nth-child(2) { animation-delay: 0.4s; }
+        .playing .eq-bar:nth-child(3) { animation-delay: 0.2s; }
+        .playing .eq-bar:nth-child(4) { animation-delay: 0.5s; }
+        .paused .eq-bar { height: 4px !important; animation: none !important; }
+        @keyframes eq-bounce {
+            0% { height: 4px; }
+            100% { height: 20px; }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -155,12 +168,12 @@
                     <img src="3.jpg" alt="Hero 3" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
                 <!-- Imagen 4 (Abajo Izquierda) -->
-                <div class="absolute left-[10%] bottom-[15%] md:bottom-[5%] w-[40%] md:w-[30%] h-[35%] md:h-[40%] bg-gray-100 rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-xl rounded-bl-xl shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
+                <div class="absolute left-[10%] bottom-[15%] md:bottom-[5%] w-[40%] md:w-[30%] h-[35%] md:h-[40%] bg-gray-100 rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-xl rounded-bl-xl shadow-apple-lg z-20 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
                     <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 4.jpg</span>
                     <img src="4.jpg" alt="Hero 4" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
                 <!-- Imagen 5 (Abajo Derecha) -->
-                <div class="absolute right-[8%] bottom-[5%] md:bottom-[15%] w-[45%] md:w-[35%] h-[25%] md:h-[30%] bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
+                <div class="absolute right-[8%] bottom-[5%] md:bottom-[15%] w-[45%] md:w-[35%] h-[25%] md:h-[30%] bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
                     <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 5.jpg</span>
                     <img src="5.jpg" alt="Hero 5" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
@@ -332,7 +345,7 @@
                 <div>
                     <!-- LOGO CON PUERTA SECRETA DE ADMINISTRADOR -->
                     <div class="flex items-center gap-2 mb-4 group cursor-pointer" onclick="handleSecretAdminClick()">
-                        <svg class="w-8 h-8 text-white transform group-hover:scale-105 transition-transform duration-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="w-8 h-8 text-white transform group-hover:scale-105 transition-transform duration-300 pointer-events-none" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 0C22.8 0 24 1.2 24 12C24 22.8 22.8 24 12 24C1.2 24 0 22.8 0 12C0 1.2 1.2 0 12 0Z" fill="currentColor"/>
                             <path d="M5 14 L10 9 H14 L19 4" stroke="#1D1D1F" stroke-opacity="0.3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             <circle cx="5" cy="14" r="1" fill="#1D1D1F" fill-opacity="0.3"/><circle cx="19" cy="4" r="1" fill="#1D1D1F" fill-opacity="0.3"/>
@@ -340,7 +353,7 @@
                             <circle cx="5" cy="19" r="1.5" fill="#1D1D1F"/><circle cx="19" cy="9" r="1.5" fill="#1D1D1F"/><circle cx="12" cy="14" r="2" fill="#E60000"/>
                             <path d="M12 10.5 A 3.5 3.5 0 0 1 15.5 14" stroke="#E60000" stroke-width="1.5" stroke-linecap="round" fill="none"/>
                         </svg>
-                        <span class="font-sans text-2xl tracking-tight text-white"><strong class="font-bold">Slot</strong>Software</span>
+                        <span class="font-sans text-2xl tracking-tight text-white pointer-events-none"><strong class="font-bold">Slot</strong>Software</span>
                     </div>
                     <p class="text-gray-400 text-sm font-light leading-relaxed mb-6" data-i18n="footerDesc">El ecosistema de software líder para diseño de circuitos y sistemas de telemetría de automodelismo.</p>
                 </div>
@@ -368,10 +381,20 @@
         </div>
     </footer>
 
-    <!-- Botón Flotante de WhatsApp -->
+    <!-- Botones flotantes (WhatsApp y Música) -->
     <a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY?s=cl&p=a&mlu=4&ilr=4" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center">
-        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
     </a>
+
+    <div id="music-player" class="fixed bottom-6 left-6 z-50 bg-white border border-gray-100 w-14 h-14 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center cursor-pointer paused" onclick="toggleMusic()" title="Música de Fondo">
+        <div class="flex items-end justify-center gap-[3px] h-5">
+            <div class="eq-bar h-1"></div>
+            <div class="eq-bar h-1"></div>
+            <div class="eq-bar h-1"></div>
+            <div class="eq-bar h-1"></div>
+        </div>
+        <audio id="bg-music" src="1.mp3" loop preload="metadata"></audio>
+    </div>
 
     <script>
         const i18nData = {
@@ -429,7 +452,7 @@
                 heroDesc: "L'écosystème ultime. Concevez votre circuit avec une précision millimétrique et gérez la télémétrie.",
                 heroBtnExplore: "Explorer le Logiciel", heroBtnTech: "Découvrir la technologie", catalogTitle: "Choisissez votre outil.", 
                 catalogSub: "Cliquez sur n'importe quelle application pour ouvrir sa galerie interactive complète.",
-                catalogGalleryBtn: "VOIR GALERIE", philTitle: "Pure Ingénierie Slot.", 
+                catalogGalleryBtn: "VOIR GALERÍA", philTitle: "Pure Ingénierie Slot.", 
                 phil1Title: "Vision Artificielle", phil1Desc: "Chronométrage professionnel.",
                 phil2Title: "Moteur 3D", phil2Desc: "Concepteur 2D et 3D.",
                 phil3Title: "Cloud & TV", phil3Desc: "Panneaux flottants.",
@@ -472,7 +495,7 @@
                 desc: { es: "Cronometraje profesional para un solo carril mediante visión artificial.", en: "Professional single-lane timing via artificial vision.", fr: "Chronométrage professionnel par vision artificielle.", it: "Cronometraggio professionale tramite visione artificiale." },
                 descLong: { es: "La solución definitiva para el piloto solitario que busca la perfección. Krono Personal V3.0 transforma tu webcam en un juez de línea implacable.", en: "The ultimate solution for the solo racer.", fr: "La solution ultime pour le pilote solitaire.", it: "La soluzione definitiva per il pilota solitario." },
                 features: { es: ["Detección por Visión Artificial", "Precisión de Milésimas", "Historial de Vueltas Detallado", "Síntesis de Voz en Español"], en: ["Artificial Vision Detection", "Thousandths Precision", "Detailed Lap History", "Speech Synthesis"], fr: ["Détection par Vision Artificielle", "Précision Milliseconde", "Historique", "Synthèse Vocale"], it: ["Rilevamento Visione Artificiale", "Precisione Millesimi", "Cronologia", "Sintesi Vocale"] },
-                galleryTexts: { es: { "krono-personal.mp4": "Vídeo Presentación Krono Personal V3.0" } }
+                galleryTexts: { es: { "krono-personal.mp4": "Vídeo Presentación Krono Personal V3.0", "12.jpg": "Pantalla principal de entrenamiento con los mejores tiempos del piloto." } }
             },
             {
                 id: 'krono-dual-v3', img: '7.jpg', imgStartId: 42, link: 'https://slotsoftware.com/krono-dual-v3',
@@ -528,17 +551,28 @@
             document.querySelectorAll('[data-i18n]').forEach(elem => {
                 const key = elem.getAttribute('data-i18n');
                 if (i18nData[lang] && i18nData[lang][key]) {
-                    if (key.includes('Content')) {
-                        elem.innerHTML = i18nData[lang][key];
-                    } else {
-                        elem.innerText = i18nData[lang][key];
-                    }
+                    if (key.includes('Content')) elem.innerHTML = i18nData[lang][key];
+                    else elem.innerText = i18nData[lang][key];
                 }
             });
             renderPrograms();
         }
 
-        // TRIGGER SECRETO: 3 clics en el logo del footer (Arreglado para que no salte arriba)
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const openIcon = document.getElementById('menu-icon-open');
+            const closeIcon = document.getElementById('menu-icon-close');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                openIcon.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+                openIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+            }
+        }
+
         function handleSecretAdminClick() {
             adminClickCount++;
             if (adminClickCount >= 3) {
@@ -547,8 +581,7 @@
                 modal.classList.remove('hidden');
                 setTimeout(() => modal.classList.remove('opacity-0'), 10);
             }
-            // Reset contador si tardas mucho
-            setTimeout(() => { adminClickCount = 0; }, 1500);
+            setTimeout(() => { adminClickCount = 0; }, 2000); // Reset tras 2 segundos
         }
 
         function closeAdminLogin() {
@@ -569,18 +602,24 @@
             }
         }
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const openIcon = document.getElementById('menu-icon-open');
-            const closeIcon = document.getElementById('menu-icon-close');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                openIcon.classList.add('hidden');
-                closeIcon.classList.remove('hidden');
-            } else {
-                menu.classList.add('hidden');
-                openIcon.classList.remove('hidden');
-                closeIcon.classList.add('hidden');
+        function saveAdminText() {
+            const input = document.getElementById('admin-edit-input');
+            const newText = input.value;
+            
+            if (currentLightboxMediaId) {
+                if(newText.trim() === "") delete savedCloudTexts[currentLightboxMediaId];
+                else savedCloudTexts[currentLightboxMediaId] = newText;
+                
+                localStorage.setItem('slot_cloud_texts', JSON.stringify(savedCloudTexts));
+                
+                const btn = input.nextElementSibling;
+                const originalText = btn.innerText;
+                btn.innerText = "¡Guardado!";
+                btn.classList.add('bg-green-600');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.remove('bg-green-600');
+                }, 1500);
             }
         }
 
@@ -588,6 +627,7 @@
             const grid = document.getElementById('programs-grid');
             grid.innerHTML = '';
             programs.forEach(prog => {
+                // Ahora TODOS los programas tienen el formato póster/móvil (aspect-[9/16])
                 const imgAspectClass = 'aspect-[9/16] w-[70%] max-w-[220px]';
                 
                 const card = document.createElement('div');
@@ -631,7 +671,7 @@
             prog.features[currentLang].forEach(feat => {
                 const li = document.createElement('li');
                 li.className = 'flex items-start gap-2 text-sm text-apple-text';
-                li.innerHTML = `<svg class="w-5 h-5 text-slot-red mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>${feat}</span>`;
+                li.innerHTML = `<svg class="w-5 h-5 text-slot-red flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>${feat}</span>`;
                 featuresList.appendChild(li);
             });
 
@@ -664,12 +704,13 @@
                 if (isVertical) itemAspect = 'aspect-[9/16]';
                 else if (isHybrid && i % 2 !== 0) itemAspect = 'aspect-[9/16]';
 
-                item.className = `masonry-item group cursor-pointer w-full relative ${itemAspect}`;
+                // Usar min-h para que el contenedor gris no se aplaste si no hay imagen
+                item.className = `masonry-item group cursor-pointer w-full relative ${itemAspect} min-h-[150px]`;
                 
                 let currentMediaId = isVideoPosition ? videoSrc : `${(prog.imgStartId || 12) + i - (isVideoPosition || isVertical ? 1 : 0)}.jpg`;
                 
+                // Hacer clic en toda la tarjeta para abrir el Lightbox gigante
                 if (!isNotAvailable) {
-                    // Toda la tarjeta reacciona al click
                     item.onclick = () => openLightbox(isVideoPosition ? videoSrc : currentMediaId, isVideoPosition ? 'video' : 'img', currentMediaId);
                 }
 
@@ -741,7 +782,6 @@
                 video.src = src;
                 video.classList.remove('hidden');
                 
-                // Sistema anti-errores por si el video no existe
                 const playPromise = video.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(error => {
@@ -753,7 +793,6 @@
                 img.classList.remove('hidden');
             }
 
-            // Lógica de textos: Buscar primero en nube(localStorage), si no en hardcode galleryTexts, si no por defecto
             let defaultText = `Imagen completa`;
             const prog = programs.find(p => p.id === currentProgramId);
             if(prog && prog.galleryTexts && prog.galleryTexts[currentLang] && prog.galleryTexts[currentLang][mediaId]) {
@@ -766,8 +805,8 @@
                 captionText.classList.add('hidden');
                 adminContainer.classList.remove('hidden');
                 adminContainer.classList.add('flex');
-                adminInput.value = savedCloudTexts[mediaId] || ""; // mostrar solo lo guardado si hay
-                adminInput.placeholder = defaultText; // mostrar placeholder si no hay nada guardado
+                adminInput.value = savedCloudTexts[mediaId] || ""; 
+                adminInput.placeholder = defaultText; 
             } else {
                 adminContainer.classList.add('hidden');
                 adminContainer.classList.remove('flex');
@@ -798,30 +837,6 @@
                 video.src = "";
                 img.src = "";
             }, 300);
-        }
-
-        function saveAdminText() {
-            const input = document.getElementById('admin-edit-input');
-            const newText = input.value;
-            
-            if (currentLightboxMediaId) {
-                if(newText.trim() === "") {
-                    delete savedCloudTexts[currentLightboxMediaId];
-                } else {
-                    savedCloudTexts[currentLightboxMediaId] = newText;
-                }
-                
-                localStorage.setItem('slot_cloud_texts', JSON.stringify(savedCloudTexts));
-                
-                const btn = input.nextElementSibling;
-                const originalText = btn.innerText;
-                btn.innerText = "¡Guardado!";
-                btn.classList.add('bg-green-600');
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.classList.remove('bg-green-600');
-                }, 1500);
-            }
         }
 
         function openLegal(type) {
@@ -877,13 +892,45 @@
             document.getElementById('cookie-banner').classList.add('translate-y-[200%]');
         }
 
+        let isMusicPlaying = false;
+        function toggleMusic() {
+            const audio = document.getElementById('bg-music');
+            const player = document.getElementById('music-player');
+            
+            if (isMusicPlaying) {
+                audio.pause();
+                player.classList.remove('playing');
+                player.classList.add('paused');
+            } else {
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        player.classList.remove('paused');
+                        player.classList.add('playing');
+                    }).catch(error => {
+                        console.warn("Aún no se ha encontrado el archivo 1.mp3 en el servidor para reproducirlo:", error);
+                    });
+                }
+            }
+            isMusicPlaying = !isMusicPlaying;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             changeLanguage(currentLang);
+
             if (!localStorage.getItem('cookiesAccepted')) {
                 setTimeout(() => {
                     document.getElementById('cookie-banner').classList.remove('translate-y-[200%]');
                 }, 2000);
             }
+
+            document.addEventListener('click', (e) => {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const menuButton = document.querySelector('button[onclick="toggleMobileMenu()"]');
+                if (!mobileMenu.classList.contains('hidden') && !mobileMenu.contains(e.target) && !menuButton.contains(e.target)) {
+                    toggleMobileMenu();
+                }
+            });
         });
     </script>
 </body>
