@@ -396,6 +396,75 @@
         <audio id="bg-music" src="1.mp3" loop preload="metadata"></audio>
     </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'slotsoftware-app';
+        const fallbackConfig = { apiKey: "dummy", projectId: "dummy" };
+        const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : JSON.stringify(fallbackConfig);
+        const firebaseConfig = JSON.parse(configStr);
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // REGLA 1: Ruta estricta de Firestore para datos públicos (Textos de la galería)
+        const textsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_data', 'gallery_texts');
+
+        async function initFirebase() {
+            try {
+                // Autenticación obligatoria
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Escuchar cambios en la nube en tiempo real
+                onSnapshot(textsDocRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        window.savedCloudTexts = snapshot.data();
+                    } else {
+                        window.savedCloudTexts = {};
+                    }
+                    
+                    // Si un visitante está viendo la imagen, el texto cambia instantáneamente
+                    if (window.currentLightboxMediaId && !window.isAdmin) {
+                        const captionText = document.getElementById('lightbox-caption-text');
+                        if (captionText) {
+                            const savedText = window.savedCloudTexts[window.currentLightboxMediaId];
+                            if (savedText) {
+                                captionText.innerText = savedText;
+                            }
+                        }
+                    }
+                }, (error) => {
+                    console.error("Error al leer textos en la nube:", error);
+                });
+            } catch (e) {
+                console.error("Error conectando a Firebase:", e);
+            }
+        }
+        initFirebase();
+
+        // Función global para guardar en la nube
+        window.saveToCloud = async function(mediaId, text) {
+            if (!auth.currentUser) return;
+            const newTexts = { ...window.savedCloudTexts };
+            
+            if (text.trim() === "") delete newTexts[mediaId];
+            else newTexts[mediaId] = text;
+            
+            try {
+                await setDoc(textsDocRef, newTexts);
+            } catch(e) {
+                console.error("No se pudo guardar el texto en Firestore:", e);
+            }
+        };
+    </script>
+
     <script>
         const i18nData = {
             es: {
@@ -418,7 +487,7 @@
                 cookieModalTitle: "Ajustes de Privacidad", cookieReq: "Técnicas (Obligatorias)", cookieReqDesc: "Necesarias para que la plataforma funcione correctamente.", cookieOpt: "Analíticas (Opcionales)", cookieOptDesc: "Nos ayudan a mejorar el rendimiento y estabilidad de las apps.", cookieSave: "Guardar Preferencias",
                 legalDefaultTitle: "Documento Legal",
                 legalSupportTitle: "Soporte Técnico",
-                legalSupportContent: `<div class="space-y-6"><h4 class="font-bold text-slot-dark text-lg">Canales de Asistencia</h4><p>Para dudas, reportes de errores o asistencia con la configuración de tu software, utiliza nuestros canales oficiales:</p><ul class="list-disc pl-5 space-y-2 text-apple-blue"><li><strong>Grupo Oficial de WhatsApp:</strong> Acceso directo mediante el botón flotante de la web para consultas rápidas y comunidad.</li><li><strong>Correo Electrónico:</strong> support@slotsoftware.com para casos que requieran adjuntar archivos o registros detallados.</li></ul><h4 class="font-bold text-slot-dark text-lg mt-8">Solución de Problemas Frecuentes (FAQ)</h4><div class="space-y-4"><div><h5 class="font-semibold">Visión Artificial (Krono Personal/Dual)</h5><p class="text-sm">Asegúrate de tener <strong>buena iluminación constante</strong> sobre la pista. Evita sombras proyectadas o luces parpadeantes (fluorescentes antiguos) que puedan afectar a la detección fotométrica. Calibra el ROI (Región de Interés) en la configuración antes de cada carrera.</p></div><div><h5 class="font-semibold">Renderizado 3D (Tracks Telemetry)</h5><p class="text-sm">Si notas lentitud en la vista 3D, verifica que tu navegador tenga activada la <strong>aceleración por hardware</strong> en la configuración. Recomendamos usar Chrome, Firefox o Edge actualizados a la última versión.</p></div><div><h5 class="font-semibold">Sincronización Cloud (Krono TV)</h5><p class="text-sm">La latencia en la sincronización depende de tu conexión a internet. Para la mejor experiencia en tiempo real, utiliza una conexión <strong>Wi-Fi estable de 5Ghz o cable Ethernet</strong> en el dispositivo principal que gestiona la carrera.</p></div></div></div>`,
+                legalSupportContent: `<div class="space-y-6"><h4 class="font-bold text-slot-dark text-lg">Canales de Asistencia</h4><p>Para dudas, reportes de errores o asistencia con la configuración de tu software, utiliza nuestros canales oficiales:</p><ul class="list-disc pl-5 space-y-2 text-apple-blue"><li><strong>Grupo Oficial de WhatsApp:</strong> Acceso directo mediante el botón flotante de la web para consultas rápidas y comunidad.</li><li><strong>Correo Electrónico:</strong> slotcarhome@gmail.com para casos que requieran adjuntar archivos o registros detallados.</li></ul><h4 class="font-bold text-slot-dark text-lg mt-8">Solución de Problemas Frecuentes (FAQ)</h4><div class="space-y-4"><div><h5 class="font-semibold">Visión Artificial (Krono Personal/Dual)</h5><p class="text-sm">Asegúrate de tener <strong>buena iluminación constante</strong> sobre la pista. Evita sombras proyectadas o luces parpadeantes (fluorescentes antiguos) que puedan afectar a la detección fotométrica. Calibra el ROI (Región de Interés) en la configuración antes de cada carrera.</p></div><div><h5 class="font-semibold">Renderizado 3D (Tracks Telemetry)</h5><p class="text-sm">Si notas lentitud en la vista 3D, verifica que tu navegador tenga activada la <strong>aceleración por hardware</strong> en la configuración. Recomendamos usar Chrome, Firefox o Edge actualizados a la última versión.</p></div><div><h5 class="font-semibold">Sincronización Cloud (Krono TV)</h5><p class="text-sm">La latencia en la sincronización depende de tu conexión a internet. Para la mejor experiencia en tiempo real, utiliza una conexión <strong>Wi-Fi estable de 5Ghz o cable Ethernet</strong> en el dispositivo principal que gestiona la carrera.</p></div></div></div>`,
                 legalTermsTitle: "Términos de Servicio",
                 legalTermsContent: `<div class="space-y-6"><p>Última actualización: Agosto 2026</p><p>Al acceder y utilizar el ecosistema de aplicaciones de SlotSoftware (Krono Personal, Krono Dual, Tracks Telemetry y sus variantes TV), usted acepta estar sujeto a los siguientes términos y condiciones.</p><h4 class="font-bold text-slot-dark">1. Naturaleza del Servicio</h4><p>SlotSoftware proporciona un conjunto de herramientas web avanzadas (SaaS) para el hobby del automodelismo (Slot). Estas herramientas incluyen cronometraje basado en visión artificial, diseño de circuitos en 3D y paneles de telemetría.</p><h4 class="font-bold text-slot-dark">2. Uso del Hardware y Responsabilidad</h4><p>Nuestras aplicaciones de cronometraje utilizan la cámara web de su dispositivo para analizar el video en tiempo real. Usted es responsable de proporcionar el hardware adecuado y un entorno con iluminación estable.</p><h4 class="font-bold text-slot-dark">3. Propiedad Intelectual</h4><p>Todo el código fuente, algoritmos, diseños de interfaz, modelos 3D y marcas registradas son propiedad exclusiva de sus desarrolladores.</p></div>`,
                 legalPrivacyTitle: "Política de Privacidad",
@@ -541,9 +610,10 @@
 
         let currentLang = 'es';
         let adminClickCount = 0;
-        let isAdmin = false;
-        let savedCloudTexts = JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
-        let currentLightboxMediaId = null;
+        
+        window.isAdmin = false;
+        window.savedCloudTexts = JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
+        window.currentLightboxMediaId = null;
         let currentProgramId = null;
 
         function changeLanguage(lang) {
@@ -593,7 +663,7 @@
         function checkAdminPassword() {
             const pwd = document.getElementById('admin-pwd').value;
             if (pwd === 'slot2026') {
-                isAdmin = true;
+                window.isAdmin = true;
                 closeAdminLogin();
                 document.getElementById('admin-bar').classList.remove('hidden');
                 document.getElementById('admin-pwd').value = '';
@@ -606,11 +676,17 @@
             const input = document.getElementById('admin-edit-input');
             const newText = input.value;
             
-            if (currentLightboxMediaId) {
-                if(newText.trim() === "") delete savedCloudTexts[currentLightboxMediaId];
-                else savedCloudTexts[currentLightboxMediaId] = newText;
+            if (window.currentLightboxMediaId) {
+                if(newText.trim() === "") delete window.savedCloudTexts[window.currentLightboxMediaId];
+                else window.savedCloudTexts[window.currentLightboxMediaId] = newText;
                 
-                localStorage.setItem('slot_cloud_texts', JSON.stringify(savedCloudTexts));
+                // Mantenemos localStorage temporalmente por si falla la red
+                localStorage.setItem('slot_cloud_texts', JSON.stringify(window.savedCloudTexts));
+                
+                // Guardamos en Firebase Cloud
+                if (window.saveToCloud) {
+                    window.saveToCloud(window.currentLightboxMediaId, newText);
+                }
                 
                 const btn = input.nextElementSibling;
                 const originalText = btn.innerText;
@@ -772,7 +848,7 @@
             const adminContainer = document.getElementById('admin-edit-container');
             const adminInput = document.getElementById('admin-edit-input');
 
-            currentLightboxMediaId = mediaId;
+            window.currentLightboxMediaId = mediaId;
 
             img.classList.add('hidden');
             video.classList.add('hidden');
@@ -799,13 +875,13 @@
                 defaultText = prog.galleryTexts[currentLang][mediaId];
             }
             
-            const savedText = savedCloudTexts[mediaId] || defaultText;
+            const savedText = window.savedCloudTexts[mediaId] || defaultText;
             
-            if (isAdmin) {
+            if (window.isAdmin) {
                 captionText.classList.add('hidden');
                 adminContainer.classList.remove('hidden');
                 adminContainer.classList.add('flex');
-                adminInput.value = savedCloudTexts[mediaId] || ""; 
+                adminInput.value = window.savedCloudTexts[mediaId] || ""; 
                 adminInput.placeholder = defaultText; 
             } else {
                 adminContainer.classList.add('hidden');
