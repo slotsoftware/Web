@@ -71,6 +71,7 @@
 </head>
 <body class="antialiased">
 
+    <!-- Barra de Admin (Oculta por defecto) -->
     <div id="admin-bar" class="hidden fixed top-0 left-0 w-full bg-slot-red text-white text-center py-1 text-xs font-bold uppercase tracking-widest z-[100] shadow-md">
         Modo Administrador Activo - Edición de Textos en la Nube
     </div>
@@ -84,32 +85,32 @@
                         <path d="M12 0C22.8 0 24 1.2 24 12C24 22.8 22.8 24 12 24C1.2 24 0 22.8 0 12C0 1.2 1.2 0 12 0Z" fill="currentColor"/>
                         <path d="M5 14 L10 9 H14 L19 4" stroke="white" stroke-opacity="0.3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         <circle cx="5" cy="14" r="1" fill="white" fill-opacity="0.3"/><circle cx="19" cy="4" r="1" fill="white" fill-opacity="0.3"/>
-            <!-- CONTENEDOR DE IMÁGENES HERO (5 Imágenes Restauradas) -->
-            <div class="relative w-full max-w-6xl mx-auto h-[450px] sm:h-[600px] md:h-[750px] mt-16 md:mt-24">
-                <!-- Imagen 1 (Central Principal) -->
-                <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[45%] md:w-[32%] h-[85%] md:h-[90%] bg-gray-100 rounded-[100px] md:rounded-[200px] shadow-apple-lg z-30 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 1.jpg</span>
-                    <img src="1.jpg" alt="Hero 1" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.onerror=null; this.src='https://placehold.co/400x800/F5F5F7/1D1D1F?text=1.jpg';">
+                        <path d="M5 19 L10 14 H14 L19 9" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="5" cy="19" r="1.5" fill="white"/><circle cx="19" cy="9" r="1.5" fill="white"/><circle cx="12" cy="14" r="2" fill="#E60000"/>
+                        <path d="M12 10.5 A 3.5 3.5 0 0 1 15.5 14" stroke="#E60000" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                    </svg>
+                    <span class="font-sans text-xl tracking-tight text-apple-text hidden sm:inline-block"><strong class="font-bold">Slot</strong>Software</span>
                 </div>
-                <!-- Imagen 2 (Arriba Izquierda) -->
-                <div class="absolute left-[5%] md:left-[12%] top-[10%] md:top-[15%] w-[40%] md:w-[26%] aspect-square bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 2.jpg</span>
-                    <img src="2.jpg" alt="Hero 2" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.onerror=null; this.src='https://placehold.co/400x400/F5F5F7/1D1D1F?text=2.jpg';">
-                </div>
-                <!-- Imagen 3 (Arriba Derecha) -->
-                <div class="absolute right-[5%] md:right-[10%] top-[5%] md:top-[8%] w-[42%] md:w-[30%] aspect-[4/3] bg-gray-100 rounded-[2rem] md:rounded-[3rem] shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 3.jpg</span>
-                    <img src="3.jpg" alt="Hero 3" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.onerror=null; this.src='https://placehold.co/600x450/F5F5F7/1D1D1F?text=3.jpg';">
-                </div>
-                <!-- Imagen 4 (Abajo Izquierda) -->
-                <div class="absolute left-[10%] bottom-[15%] md:bottom-[5%] w-[40%] md:w-[30%] h-[35%] md:h-[40%] bg-gray-100 rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-xl rounded-bl-xl shadow-apple-lg z-20 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 4.jpg</span>
-                    <img src="4.jpg" alt="Hero 4" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.onerror=null; this.src='https://placehold.co/600x400/F5F5F7/1D1D1F?text=4.jpg';">
-                </div>
-                <!-- Imagen 5 (Abajo Derecha) -->
-                <div class="absolute right-[8%] bottom-[5%] md:bottom-[15%] w-[45%] md:w-[35%] h-[25%] md:h-[30%] bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 5.jpg</span>
-                    <img src="5.jpg" alt="Hero 5" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.onerror=null; this.src='https://placehold.co/600x300/F5F5F7/1D1D1F?text=5.jpg';">
+                
+                <div class="flex items-center gap-2 sm:gap-3 z-50">
+                    <select id="global-lang-select" onchange="changeLanguage(this.value)" class="bg-gray-100 border border-gray-300 text-apple-text text-xs font-semibold rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-apple-blue cursor-pointer">
+                        <option value="es">🇪🇸 ES</option>
+                        <option value="en">🇬🇧 EN</option>
+                        <option value="fr">🇫🇷 FR</option>
+                        <option value="it">🇮🇹 IT</option>
+                    </select>
+
+                    <div class="hidden md:flex space-x-6 items-center ml-4">
+                        <a href="#programas" class="font-sans text-sm text-apple-gray hover:text-apple-text transition-colors" data-i18n="navSoftware">Software</a>
+                        <a href="#filosofia" class="font-sans text-sm text-apple-gray hover:text-apple-text transition-colors" data-i18n="navPhilosophy">Filosofía</a>
+                        <a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY?s=cl&p=a&mlu=4&ilr=4" target="_blank" class="font-sans text-sm text-apple-gray hover:text-apple-text transition-colors flex items-center gap-1" data-i18n="navWsp">Wsp SlotSoftware</a>
+                        <a href="#programas" class="btn-apple bg-apple-text text-white px-5 py-2 text-sm" data-i18n="navCatalog">Ver Catálogo</a>
+                    </div>
+
+                    <button type="button" onclick="toggleMobileMenu()" class="md:hidden p-2 text-apple-text hover:bg-gray-100 rounded-md transition-colors" aria-label="Abrir menú">
+                        <svg id="menu-icon-open" class="w-6 h-6 block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -149,27 +150,32 @@
                 </a>
             </div>
             
-            <!-- CONTENEDOR DE IMÁGENES HERO -->
+            <!-- CONTENEDOR DE IMÁGENES HERO (5 Imágenes Restauradas) -->
             <div class="relative w-full max-w-6xl mx-auto h-[450px] sm:h-[600px] md:h-[750px] mt-16 md:mt-24">
+                <!-- Imagen 1 (Central Principal) -->
                 <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[45%] md:w-[32%] h-[85%] md:h-[90%] bg-gray-100 rounded-[100px] md:rounded-[200px] shadow-apple-lg z-30 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
                     <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 1.jpg</span>
-                    <img src="https://placehold.co/400x800/1D1D1F/FFFFFF?text=Hero+1" alt="Hero 1" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+                    <img src="1.jpg" alt="Hero 1" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
+                <!-- Imagen 2 (Arriba Izquierda) -->
                 <div class="absolute left-[5%] md:left-[12%] top-[10%] md:top-[15%] w-[40%] md:w-[26%] aspect-square bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
                     <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 2.jpg</span>
-                    <img src="https://placehold.co/400x400/E60000/FFFFFF?text=Hero+2" alt="Hero 2" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+                    <img src="2.jpg" alt="Hero 2" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
+                <!-- Imagen 3 (Arriba Derecha) -->
                 <div class="absolute right-[5%] md:right-[10%] top-[5%] md:top-[8%] w-[42%] md:w-[30%] aspect-[4/3] bg-gray-100 rounded-[2rem] md:rounded-[3rem] shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
                     <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 3.jpg</span>
-                    <img src="https://placehold.co/600x450/F5F5F7/1D1D1F?text=Hero+3" alt="Hero 3" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+                    <img src="3.jpg" alt="Hero 3" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
+                <!-- Imagen 4 (Abajo Izquierda) -->
                 <div class="absolute left-[10%] bottom-[15%] md:bottom-[5%] w-[40%] md:w-[30%] h-[35%] md:h-[40%] bg-gray-100 rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-xl rounded-bl-xl shadow-apple-lg z-20 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
                     <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 4.jpg</span>
-                    <img src="https://placehold.co/600x400/1D1D1F/FFFFFF?text=Hero+4" alt="Hero 4" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+                    <img src="4.jpg" alt="Hero 4" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
+                <!-- Imagen 5 (Abajo Derecha) -->
                 <div class="absolute right-[8%] bottom-[5%] md:bottom-[15%] w-[45%] md:w-[35%] h-[25%] md:h-[30%] bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
                     <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 5.jpg</span>
-                    <img src="https://placehold.co/600x300/E60000/FFFFFF?text=Hero+5" alt="Hero 5" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+                    <img src="5.jpg" alt="Hero 5" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
             </div>
         </div>
@@ -246,18 +252,21 @@
         </div>
     </div>
 
-    <!-- Lightbox Fullscreen -->
+    <!-- Lightbox Fullscreen (Imagen y Vídeo gigante) -->
     <div id="lightbox" class="fixed inset-0 z-[60] hidden flex flex-col items-center justify-center bg-slot-dark/95 backdrop-blur-md opacity-0 transition-opacity duration-300">
         <button onclick="closeLightbox()" class="absolute top-4 right-4 md:top-6 md:right-6 text-white hover:text-slot-red transition-colors z-50 bg-white/10 hover:bg-white/20 backdrop-blur-lg p-3 rounded-full cursor-pointer">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
         
         <div class="relative w-full h-full flex flex-col items-center justify-center p-4" onclick="if(event.target === this) closeLightbox()">
-            <img id="lightbox-img" src="" alt="Vista ampliada" class="hidden max-w-full max-h-[75vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default" onerror="this.onerror=null; this.src='https://placehold.co/1200x800/F5F5F7/1D1D1F?text=' + (this.getAttribute('data-fallback') || 'Imagen');">
+            <img id="lightbox-img" src="" alt="Vista ampliada" class="hidden max-w-full max-h-[75vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default">
             <video id="lightbox-video" src="" class="hidden max-w-full max-h-[75vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default" controls playsinline></video>
             
             <div id="lightbox-caption-container" class="mt-6 text-center w-full max-w-2xl px-4">
+                <!-- Texto Normal para Visitantes -->
                 <p id="lightbox-caption-text" class="text-white text-lg font-medium tracking-wide drop-shadow-md"></p>
+                
+                <!-- Sistema Administrador: Editor de Textos -->
                 <div id="admin-edit-container" class="hidden mt-3 flex-col sm:flex-row gap-2 w-full">
                     <input type="text" id="admin-edit-input" class="w-full px-4 py-2.5 rounded-lg text-black font-medium border-2 border-transparent focus:border-slot-red outline-none" placeholder="Escribe el texto de esta imagen...">
                     <button onclick="saveAdminText()" class="bg-slot-red text-white px-6 py-2.5 rounded-lg font-bold uppercase tracking-wider hover:bg-red-700 transition-colors flex-shrink-0">Guardar Textos</button>
@@ -291,7 +300,7 @@
         </div>
     </div>
 
-    <!-- Legal Modal -->
+    <!-- Legal Modal (Textos dinámicos y Soporte Técnico) -->
     <div id="legal-modal" class="fixed inset-0 z-[70] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
         <div class="fixed inset-0 bg-slot-dark/80 backdrop-blur-sm transition-opacity" onclick="closeLegalModal()"></div>
         <div class="bg-white relative z-10 w-full max-w-3xl max-h-[80vh] overflow-hidden flex flex-col rounded-xl shadow-2xl">
@@ -328,7 +337,7 @@
         </div>
     </div>
 
-    <!-- Pie de página -->
+    <!-- Pie de página (Footer con Logo de Admin) -->
     <footer class="bg-slot-dark pt-20 pb-10 relative mt-20">
         <div class="kerb-border w-full h-[4px] absolute top-0 -mt-1"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -372,7 +381,7 @@
         </div>
     </footer>
 
-    <!-- Botones flotantes -->
+    <!-- Botones flotantes (WhatsApp y Música) -->
     <a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY?s=cl&p=a&mlu=4&ilr=4" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center">
         <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
     </a>
@@ -386,77 +395,6 @@
         </div>
         <audio id="bg-music" src="1.mp3" loop preload="metadata"></audio>
     </div>
-
-    <!-- Firebase Cloud Storage Integration -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global initialization
-        window.savedCloudTexts = window.savedCloudTexts || {};
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'slotsoftware-default';
-        let firebaseConfig = {};
-        try {
-            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        } catch(e) {}
-
-        if (Object.keys(firebaseConfig).length > 0) {
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
-            const auth = getAuth(app);
-
-            const initAuth = async () => {
-                try {
-                    // 1. Autenticación obligatoria antes de leer la base de datos
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                    
-                    if (auth.currentUser) {
-                        // 2. Ruta estricta de documentos públicos
-                        const textsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'gallery', 'texts');
-                        
-                        // 3. Listener en tiempo real de Firebase
-                        onSnapshot(textsDocRef, (snapshot) => {
-                            if (snapshot.exists()) {
-                                window.savedCloudTexts = snapshot.data();
-                            } else {
-                                window.savedCloudTexts = {};
-                            }
-                            
-                            // Si el administrador/usuario tiene una imagen abierta, se le actualiza en vivo el texto
-                            if (typeof window.updateLightboxText === 'function') {
-                                window.updateLightboxText();
-                            }
-                        }, (error) => {
-                            console.error("Error sincronizando textos de Firebase:", error);
-                        });
-
-                        // 4. Exponemos la función de guardado a la nube para que el botón de Admin la llame
-                        window.saveCloudTextToFirebase = async (mediaId, newText) => {
-                            if (newText.trim() === "") delete window.savedCloudTexts[mediaId];
-                            else window.savedCloudTexts[mediaId] = newText;
-                            
-                            try {
-                                await setDoc(textsDocRef, window.savedCloudTexts);
-                                return true;
-                            } catch (e) {
-                                console.error("Error Guardando en Firebase:", e);
-                                return false;
-                            }
-                        };
-                    }
-                } catch (error) {
-                    console.error("Error de autenticación Firebase:", error);
-                }
-            };
-            initAuth();
-        }
-    </script>
 
     <script>
         const i18nData = {
@@ -480,7 +418,7 @@
                 cookieModalTitle: "Ajustes de Privacidad", cookieReq: "Técnicas (Obligatorias)", cookieReqDesc: "Necesarias para que la plataforma funcione correctamente.", cookieOpt: "Analíticas (Opcionales)", cookieOptDesc: "Nos ayudan a mejorar el rendimiento y estabilidad de las apps.", cookieSave: "Guardar Preferencias",
                 legalDefaultTitle: "Documento Legal",
                 legalSupportTitle: "Soporte Técnico",
-                legalSupportContent: `<div class="space-y-6"><h4 class="font-bold text-slot-dark text-lg">Canales de Asistencia</h4><p>Para dudas, reportes de errores o asistencia con la configuración de tu software, utiliza nuestros canales oficiales:</p><ul class="list-disc pl-5 space-y-2 text-apple-blue"><li><strong>Grupo Oficial de WhatsApp:</strong> Acceso directo mediante el botón flotante de la web para consultas rápidas y comunidad.</li><li><strong>Correo Electrónico:</strong> slotcarhome@gmail.com para casos que requieran adjuntar archivos o registros detallados.</li></ul><h4 class="font-bold text-slot-dark text-lg mt-8">Solución de Problemas Frecuentes (FAQ)</h4><div class="space-y-4"><div><h5 class="font-semibold">Visión Artificial (Krono Personal/Dual)</h5><p class="text-sm">Asegúrate de tener <strong>buena iluminación constante</strong> sobre la pista. Evita sombras proyectadas o luces parpadeantes (fluorescentes antiguos) que puedan afectar a la detección fotométrica. Calibra el ROI (Región de Interés) en la configuración antes de cada carrera.</p></div><div><h5 class="font-semibold">Renderizado 3D (Tracks Telemetry)</h5><p class="text-sm">Si notas lentitud en la vista 3D, verifica que tu navegador tenga activada la <strong>aceleración por hardware</strong> en la configuración. Recomendamos usar Chrome, Firefox o Edge actualizados a la última versión.</p></div><div><h5 class="font-semibold">Sincronización Cloud (Krono TV)</h5><p class="text-sm">La latencia en la sincronización depende de tu conexión a internet. Para la mejor experiencia en tiempo real, utiliza una conexión <strong>Wi-Fi estable de 5Ghz o cable Ethernet</strong> en el dispositivo principal que gestiona la carrera.</p></div></div></div>`,
+                legalSupportContent: `<div class="space-y-6"><h4 class="font-bold text-slot-dark text-lg">Canales de Asistencia</h4><p>Para dudas, reportes de errores o asistencia con la configuración de tu software, utiliza nuestros canales oficiales:</p><ul class="list-disc pl-5 space-y-2 text-apple-blue"><li><strong>Grupo Oficial de WhatsApp:</strong> Acceso directo mediante el botón flotante de la web para consultas rápidas y comunidad.</li><li><strong>Correo Electrónico:</strong> support@slotsoftware.com para casos que requieran adjuntar archivos o registros detallados.</li></ul><h4 class="font-bold text-slot-dark text-lg mt-8">Solución de Problemas Frecuentes (FAQ)</h4><div class="space-y-4"><div><h5 class="font-semibold">Visión Artificial (Krono Personal/Dual)</h5><p class="text-sm">Asegúrate de tener <strong>buena iluminación constante</strong> sobre la pista. Evita sombras proyectadas o luces parpadeantes (fluorescentes antiguos) que puedan afectar a la detección fotométrica. Calibra el ROI (Región de Interés) en la configuración antes de cada carrera.</p></div><div><h5 class="font-semibold">Renderizado 3D (Tracks Telemetry)</h5><p class="text-sm">Si notas lentitud en la vista 3D, verifica que tu navegador tenga activada la <strong>aceleración por hardware</strong> en la configuración. Recomendamos usar Chrome, Firefox o Edge actualizados a la última versión.</p></div><div><h5 class="font-semibold">Sincronización Cloud (Krono TV)</h5><p class="text-sm">La latencia en la sincronización depende de tu conexión a internet. Para la mejor experiencia en tiempo real, utiliza una conexión <strong>Wi-Fi estable de 5Ghz o cable Ethernet</strong> en el dispositivo principal que gestiona la carrera.</p></div></div></div>`,
                 legalTermsTitle: "Términos de Servicio",
                 legalTermsContent: `<div class="space-y-6"><p>Última actualización: Agosto 2026</p><p>Al acceder y utilizar el ecosistema de aplicaciones de SlotSoftware (Krono Personal, Krono Dual, Tracks Telemetry y sus variantes TV), usted acepta estar sujeto a los siguientes términos y condiciones.</p><h4 class="font-bold text-slot-dark">1. Naturaleza del Servicio</h4><p>SlotSoftware proporciona un conjunto de herramientas web avanzadas (SaaS) para el hobby del automodelismo (Slot). Estas herramientas incluyen cronometraje basado en visión artificial, diseño de circuitos en 3D y paneles de telemetría.</p><h4 class="font-bold text-slot-dark">2. Uso del Hardware y Responsabilidad</h4><p>Nuestras aplicaciones de cronometraje utilizan la cámara web de su dispositivo para analizar el video en tiempo real. Usted es responsable de proporcionar el hardware adecuado y un entorno con iluminación estable.</p><h4 class="font-bold text-slot-dark">3. Propiedad Intelectual</h4><p>Todo el código fuente, algoritmos, diseños de interfaz, modelos 3D y marcas registradas son propiedad exclusiva de sus desarrolladores.</p></div>`,
                 legalPrivacyTitle: "Política de Privacidad",
@@ -552,7 +490,7 @@
 
         const programs = [
             {
-                id: 'krono-personal-v3', img: 'https://placehold.co/220x391/1D1D1F/FFFFFF?text=Krono+Personal', imgStartId: 12, link: 'https://slotsoftware.github.io/TiemposPersonal/',
+                id: 'krono-personal-v3', img: '6.jpg', imgStartId: 12, link: 'https://slotsoftware.github.io/TiemposPersonal/',
                 title: { es: "Krono Personal V3.0", en: "Krono Personal V3.0", fr: "Krono Personal V3.0", it: "Krono Personal V3.0" },
                 desc: { es: "Cronometraje profesional para un solo carril mediante visión artificial.", en: "Professional single-lane timing via artificial vision.", fr: "Chronométrage professionnel par vision artificielle.", it: "Cronometraggio professionale tramite visione artificiale." },
                 descLong: { es: "La solución definitiva para el piloto solitario que busca la perfección. Krono Personal V3.0 transforma tu webcam en un juez de línea implacable.", en: "The ultimate solution for the solo racer.", fr: "La solution ultime pour le pilote solitaire.", it: "La soluzione definitiva per il pilota solitario." },
@@ -560,7 +498,7 @@
                 galleryTexts: { es: { "krono-personal.mp4": "Vídeo Presentación Krono Personal V3.0", "12.jpg": "Pantalla principal de entrenamiento con los mejores tiempos del piloto." } }
             },
             {
-                id: 'krono-dual-v3', img: 'https://placehold.co/220x391/E60000/FFFFFF?text=Krono+Dual', imgStartId: 42, link: 'https://slotsoftware.github.io/TiemposDual/',
+                id: 'krono-dual-v3', img: '7.jpg', imgStartId: 42, link: 'https://slotsoftware.github.io/TiemposDual/',
                 title: { es: "Krono Dual V3.0", en: "Krono Dual V3.0", fr: "Krono Dual V3.0", it: "Krono Dual V3.0" },
                 desc: { es: "El sistema definitivo para piques 1vs1. Controla dos carriles simultáneamente.", en: "The ultimate system for 1vs1 duels.", fr: "Le système ultime pour les duels 1vs1.", it: "Il sistema definitivo per i duelli 1vs1." },
                 descLong: { es: "Lleva la emoción de la competición a tu hogar. Krono Dual V3.0 está diseñado específicamente para duelos intensos.", en: "Bring excitement to your home.", fr: "Apportez l'excitation chez vous.", it: "Porta l'emozione a casa tua." },
@@ -568,7 +506,7 @@
                 galleryTexts: { es: { "krono-dual.mp4": "Vídeo Presentación Krono Dual V3.0" } }
             },
             {
-                id: 'tracks-telemetry-v2', img: 'https://placehold.co/220x391/86868B/FFFFFF?text=Tracks+Telemetry', imgStartId: 72, link: 'https://slotsoftware.github.io/Telemetria/',
+                id: 'tracks-telemetry-v2', img: '8.jpg', imgStartId: 72, link: 'https://slotsoftware.github.io/Telemetria/',
                 title: { es: "Tracks Telemetry V2.0", en: "Tracks Telemetry V2.0", fr: "Tracks Telemetry V2.0", it: "Tracks Telemetry V2.0" },
                 desc: { es: "Suite completa de ingeniería. Diseña circuitos en 2D y visualízalos en 3D.", en: "Complete engineering suite.", fr: "Suite d'ingénierie complète.", it: "Suite di ingegneria completa." },
                 descLong: { es: "Tracks Telemetry V2.0 es el sueño de cualquier diseñador de pistas.", en: "The dream of any track designer.", fr: "Le rêve de tout concepteur de piste.", it: "Il sogno di ogni progettista di piste." },
@@ -576,7 +514,7 @@
                 galleryTexts: { es: {} }
             },
             {
-                id: 'krono-personal-tv', img: 'https://placehold.co/220x391/0066CC/FFFFFF?text=Krono+TV+Personal', imgStartId: 102, link: 'https://slotsoftware.github.io/KronoPerTV/',
+                id: 'krono-personal-tv', img: '9.jpg', imgStartId: 102, link: 'https://slotsoftware.github.io/KronoPerTV/',
                 title: { es: "Krono Personal TV", en: "Krono Personal TV", fr: "Krono Personal TV", it: "Krono Personal TV" },
                 desc: { es: "Versión Big Screen del cronómetro personal con paneles modulares.", en: "Big Screen version of the personal timer.", fr: "Version Grand Écran du chronomètre personnel.", it: "Versione Grande Schermo del timer personale." },
                 descLong: { es: "Transforma tu salón en un paddock profesional con Krono Personal TV.", en: "Transform your living room into a paddock.", fr: "Transformez votre salon en paddock.", it: "Trasforma il tuo soggiorno in un paddock." },
@@ -584,7 +522,7 @@
                 galleryTexts: { es: { "krono-personal-tv.mp4": "Demo Krono Personal TV" } }
             },
             {
-                id: 'krono-dual-tv', img: 'https://placehold.co/220x391/1D1D1F/E60000?text=Krono+TV+Dual', imgStartId: 132, link: 'https://slotsoftware.github.io/KronoDual-TV/',
+                id: 'krono-dual-tv', img: '10.jpg', imgStartId: 132, link: 'https://slotsoftware.github.io/KronoDual-TV/',
                 title: { es: "Krono Dual TV", en: "Krono Dual TV", fr: "Krono Dual TV", it: "Krono Dual TV" },
                 desc: { es: "Experiencia competitiva en pantalla gigante con telemetría en vivo.", en: "Competitive experience on the big screen.", fr: "Expérience compétitive sur grand écran.", it: "Esperienza competitiva sul grande schermo." },
                 descLong: { es: "Diseñado para ser el centro de atención en competiciones serias.", en: "Designed for serious competitions.", fr: "Conçu pour les compétitions sérieuses.", it: "Progettato per competizioni serie." },
@@ -593,7 +531,7 @@
             },
             {
                 id: 'sector-time-v1', img: '11.jpg', imgStartId: 162, link: 'https://slotsoftware.github.io/Web/canal.html',
-                title: { es: "Sector Time V1.0 (Próximamente)", en: "Sector Time V1.0 (Coming Soon)", fr: "Sector Time V1.0 (Prochainement)", it: "Sector Time V1.0 (Prossimamente)" },
+                title: { es: "Sector Time V1.0", en: "Sector Time V1.0", fr: "Sector Time V1.0", it: "Sector Time V1.0" },
                 desc: { es: "Herramienta de análisis sectorial. Requiere sensores adicionales.", en: "Sector analysis tool. Requires sensors.", fr: "Outil d'analyse sectorielle. Nécessite capteurs.", it: "Strumento di analisi settoriale. Richiede sensori." },
                 descLong: { es: "Para los ingenieros de pista más exigentes. Divide y analiza.", en: "For demanding track engineers.", fr: "Pour les ingénieurs exigeants.", it: "Per ingegneri esigenti." },
                 features: { es: ["Cronometraje por Sectores", "Análisis de Velocidad", "Gráficos Ganancia/Pérdida", "Integración Krono V3"], en: ["Sector Timing", "Speed Analysis", "Charts", "Krono Integration"], fr: ["Chronométrage Secteurs", "Analyse Vitesse", "Graphiques", "Intégration"], it: ["Cronometraggio Settori", "Analisi Velocità", "Grafici", "Integrazione"] },
@@ -604,7 +542,7 @@
         let currentLang = 'es';
         let adminClickCount = 0;
         let isAdmin = false;
-        window.savedCloudTexts = window.savedCloudTexts || {};
+        let savedCloudTexts = JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
         let currentLightboxMediaId = null;
         let currentProgramId = null;
 
@@ -643,7 +581,7 @@
                 modal.classList.remove('hidden');
                 setTimeout(() => modal.classList.remove('opacity-0'), 10);
             }
-            setTimeout(() => { adminClickCount = 0; }, 2000); 
+            setTimeout(() => { adminClickCount = 0; }, 2000); // Reset tras 2 segundos
         }
 
         function closeAdminLogin() {
@@ -659,38 +597,24 @@
                 closeAdminLogin();
                 document.getElementById('admin-bar').classList.remove('hidden');
                 document.getElementById('admin-pwd').value = '';
-                // Refrescamos en caso de tener una imagen abierta al acceder
-                if (typeof window.updateLightboxText === 'function') window.updateLightboxText(true);
             } else {
-                const btn = document.querySelector('#admin-login-modal button');
-                const prev = btn.innerText;
-                btn.innerText = "INCORRECTO";
-                btn.classList.replace('bg-slot-dark', 'bg-slot-red');
-                setTimeout(() => {
-                    btn.innerText = prev;
-                    btn.classList.replace('bg-slot-red', 'bg-slot-dark');
-                }, 1500);
+                alert("Contraseña incorrecta.");
             }
         }
 
-        async function saveAdminText() {
+        function saveAdminText() {
             const input = document.getElementById('admin-edit-input');
             const newText = input.value;
             
             if (currentLightboxMediaId) {
+                if(newText.trim() === "") delete savedCloudTexts[currentLightboxMediaId];
+                else savedCloudTexts[currentLightboxMediaId] = newText;
+                
+                localStorage.setItem('slot_cloud_texts', JSON.stringify(savedCloudTexts));
+                
                 const btn = input.nextElementSibling;
                 const originalText = btn.innerText;
-                btn.innerText = "GUARDANDO...";
-                
-                // Priorizamos el guardado de Firebase, si no está activo, guarda en memoria
-                if (window.saveCloudTextToFirebase) {
-                    await window.saveCloudTextToFirebase(currentLightboxMediaId, newText);
-                } else {
-                    if(newText.trim() === "") delete window.savedCloudTexts[currentLightboxMediaId];
-                    else window.savedCloudTexts[currentLightboxMediaId] = newText;
-                }
-                
-                btn.innerText = "¡GUARDADO!";
+                btn.innerText = "¡Guardado!";
                 btn.classList.add('bg-green-600');
                 setTimeout(() => {
                     btn.innerText = originalText;
@@ -712,7 +636,7 @@
                     <div class="software-img-container mb-6 flex justify-center">
                         <div class="${imgAspectClass} relative rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white flex items-center justify-center">
                             <span class="text-gray-400 font-bold text-xs z-0 uppercase tracking-widest">${i18nData[currentLang].placeholder} ${prog.img}</span>
-                            <img src="${prog.img}" alt="${prog.title[currentLang]}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 z-10" onerror="this.onerror=null; this.src='https://placehold.co/400x700/F5F5F7/1D1D1F?text=${prog.img}';">
+                            <img src="${prog.img}" alt="${prog.title[currentLang]}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 z-10" onerror="this.style.display='none';">
                             <div class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5 z-20"></div>
                         </div>
                     </div>
@@ -780,12 +704,14 @@
                 if (isVertical) itemAspect = 'aspect-[9/16]';
                 else if (isHybrid && i % 2 !== 0) itemAspect = 'aspect-[9/16]';
 
+                // Usar min-h para que el contenedor gris no se aplaste si no hay imagen
                 item.className = `masonry-item group cursor-pointer w-full relative ${itemAspect} min-h-[150px]`;
                 
                 let currentMediaId = isVideoPosition ? videoSrc : `${(prog.imgStartId || 12) + i - (isVideoPosition || isVertical ? 1 : 0)}.jpg`;
                 
+                // Hacer clic en toda la tarjeta para abrir el Lightbox gigante
                 if (!isNotAvailable) {
-                    item.onclick = () => openLightbox(isVideoPosition ? videoSrc : `https://placehold.co/600x400/F5F5F7/1D1D1F?text=${currentMediaId}`, isVideoPosition ? 'video' : 'img', currentMediaId);
+                    item.onclick = () => openLightbox(isVideoPosition ? videoSrc : currentMediaId, isVideoPosition ? 'video' : 'img', currentMediaId);
                 }
 
                 if (isVideoPosition) {
@@ -806,7 +732,7 @@
                         <div class="absolute inset-0 bg-gray-200 flex flex-col items-center justify-center text-gray-400 p-4 text-center z-0">
                             <span class="font-bold text-sm uppercase tracking-widest">${errorText}</span>
                         </div>
-                        <img src="${currentMediaId}" alt="Gallery" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.onerror=null; this.src='https://placehold.co/600x400/F5F5F7/1D1D1F?text=${currentMediaId}';">
+                        <img src="${currentMediaId}" alt="Gallery" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none';">
                         ${!isNotAvailable ? `<div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors z-20 pointer-events-none"></div>` : ''}
                     `;
                 }
@@ -838,38 +764,13 @@
             }, 300);
         }
 
-        window.updateLightboxText = function(initInput = false) {
-            if (!currentLightboxMediaId) return;
-            const captionText = document.getElementById('lightbox-caption-text');
-            const adminContainer = document.getElementById('admin-edit-container');
-            const adminInput = document.getElementById('admin-edit-input');
-            
-            let defaultText = `Imagen completa`;
-            const prog = programs.find(p => p.id === currentProgramId);
-            if(prog && prog.galleryTexts && prog.galleryTexts[currentLang] && prog.galleryTexts[currentLang][currentLightboxMediaId]) {
-                defaultText = prog.galleryTexts[currentLang][currentLightboxMediaId];
-            }
-            
-            const savedText = window.savedCloudTexts[currentLightboxMediaId] || defaultText;
-            
-            if (isAdmin) {
-                captionText.classList.add('hidden');
-                adminContainer.classList.remove('hidden');
-                adminContainer.classList.add('flex');
-                if (initInput) adminInput.value = window.savedCloudTexts[currentLightboxMediaId] || ""; 
-                adminInput.placeholder = defaultText; 
-            } else {
-                adminContainer.classList.add('hidden');
-                adminContainer.classList.remove('flex');
-                captionText.classList.remove('hidden');
-                captionText.innerText = savedText; 
-            }
-        };
-
         function openLightbox(src, type, mediaId) {
             const lightbox = document.getElementById('lightbox');
             const img = document.getElementById('lightbox-img');
             const video = document.getElementById('lightbox-video');
+            const captionText = document.getElementById('lightbox-caption-text');
+            const adminContainer = document.getElementById('admin-edit-container');
+            const adminInput = document.getElementById('admin-edit-input');
 
             currentLightboxMediaId = mediaId;
 
@@ -888,12 +789,31 @@
                     });
                 }
             } else {
-                img.setAttribute('data-fallback', mediaId);
                 img.src = src;
                 img.classList.remove('hidden');
             }
 
             let defaultText = `Imagen completa`;
+            const prog = programs.find(p => p.id === currentProgramId);
+            if(prog && prog.galleryTexts && prog.galleryTexts[currentLang] && prog.galleryTexts[currentLang][mediaId]) {
+                defaultText = prog.galleryTexts[currentLang][mediaId];
+            }
+            
+            const savedText = savedCloudTexts[mediaId] || defaultText;
+            
+            if (isAdmin) {
+                captionText.classList.add('hidden');
+                adminContainer.classList.remove('hidden');
+                adminContainer.classList.add('flex');
+                adminInput.value = savedCloudTexts[mediaId] || ""; 
+                adminInput.placeholder = defaultText; 
+            } else {
+                adminContainer.classList.add('hidden');
+                adminContainer.classList.remove('flex');
+                captionText.classList.remove('hidden');
+                captionText.innerText = savedText; 
+            }
+
             lightbox.classList.remove('hidden');
             setTimeout(() => {
                 lightbox.classList.remove('opacity-0');
