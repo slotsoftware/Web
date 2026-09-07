@@ -210,6 +210,7 @@
         let pendingCommentNewsId = null; 
         let openComments = new Set(); 
         let pendingDeleteAction = null;
+        let dbListener = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('admin') === 'krono') {
@@ -297,7 +298,6 @@
             const existingCards = container.querySelectorAll('.news-card-el');
             existingCards.forEach(card => card.remove());
 
-            // AHORA FILTRA DETECTANDO SI CONTIENE LA PALABRA BASE, SIN IMPORTAR LA VERSIÓN QUE PONGAS
             let filteredNews = allNews.filter(n => {
                 if (!n.category) return false;
                 return n.category.toUpperCase().includes(currentFilter);
@@ -352,10 +352,7 @@
                         const img = document.createElement('img');
                         img.src = news.mediaUrl;
                         img.className = 'w-full h-auto object-cover max-h-80 transition-transform duration-700 group-hover:scale-105 cursor-pointer';
-                        
-                        // Añadir evento para abrir foto en grande al pulsarla
                         img.onclick = () => window.open(news.mediaUrl, '_blank');
-                        
                         mediaContainer.appendChild(img);
                     }
                     card.appendChild(mediaContainer);
@@ -474,14 +471,12 @@
             try {
                 await addDoc(collection(db, 'novedades'), newPost);
                 
-                // Limpiar los campos
                 document.getElementById('news-text').value = '';
                 document.getElementById('news-media').value = '';
                 document.getElementById('news-link').value = '';
                 
                 showToast("¡NOVEDAD EN PISTA!");
                 
-                // Mover automáticamente a la pestaña correcta
                 let catUpper = newPost.category.toUpperCase();
                 let targetFilter = 'KRONO PERSONAL';
                 if(catUpper.includes('KRONO DUAL')) targetFilter = 'KRONO DUAL';
@@ -492,7 +487,7 @@
                 
             } catch (error) {
                 console.error("Error al guardar: ", error);
-                showToast("Error. Revisa los permisos de Firebase", "error");
+                showToast("Error de permisos. Revisa reglas de Firebase", "error");
             } finally {
                 btn.innerHTML = '<div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-80 group-hover:opacity-100 transition-opacity"></div><div class="relative flex justify-center items-center gap-2"><i data-lucide="zap" class="w-5 h-5 text-yellow-300"></i> FORZAR ENVÍO A PISTA</div>';
                 lucide.createIcons();
@@ -560,44 +555,78 @@
             }
         };
 
+        function setupDatabaseListener() {
+            if (dbListener) dbListener(); 
+            const newsRef = collection(db, 'novedades');
+            
+            try {
+                dbListener = onSnapshot(newsRef, (snapshot) => {
+                    const fetchedNews = [];
+                    snapshot.forEach((docSnap) => {
+                        fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                    
+                    fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
+                    allNews = fetchedNews;
+                    
+                    document.getElementById('status-dot').className = "flex h-2.5 w-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]";
+                    document.getElementById('status-dot').title = "Base de datos conectada";
+                    renderNews(); 
+                }, (error) => {
+                    console.error("Error leyendo de Firebase. Permisos denegados:", error);
+                    document.getElementById('status-dot').className = "flex h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]";
+                    const loadingState = document.getElementById('loading-state');
+                    if (loadingState) loadingState.style.display = 'none';
+                    
+                    // Mostrar error visual en la pantalla para ayudar al usuario
+                    const container = document.getElementById('feed-container');
+                    container.innerHTML = `
+                        <div class="glass-panel rounded-2xl p-6 border border-red-500/50 shadow-[0_0_40px_rgba(239,68,68,0.2)] flex flex-col items-center text-center gap-4 animate-float mt-10">
+                            <i data-lucide="shield-alert" class="w-16 h-16 text-red-500"></i>
+                            <h3 class="text-2xl font-bold text-white">¡Base de Datos Bloqueada!</h3>
+                            <p class="text-slate-300">La aplicación funciona, pero Firebase está bloqueando el acceso por seguridad (Error: Missing permissions).</p>
+                            
+                            <div class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mt-2 text-left">
+                                <p class="text-sm font-bold text-cyan-400 mb-2">Solución: Ve a tu proyecto de Firebase -> Compilación -> Firestore Database -> Pestaña "Reglas", y pega esto:</p>
+                                <pre class="text-xs text-green-400 font-mono overflow-x-auto whitespace-pre-wrap">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /novedades/{document=**} {
+      allow read, write: if true;
+    }
+  }
+}</pre>
+                            </div>
+                            <p class="text-sm text-yellow-400 font-bold mt-2">¡No olvides darle al botón azul de "Publicar" en Firebase!</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                });
+            } catch (err) {
+                 console.error("Fallo al iniciar el listener:", err);
+            }
+        }
+
         async function initApp() {
             try {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                await signInAnonymously(auth);
-
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         currentUserUid = user.uid;
-                        const newsRef = collection(db, 'novedades');
-                        
-                        onSnapshot(newsRef, (snapshot) => {
-                            const fetchedNews = [];
-                            snapshot.forEach((docSnap) => {
-                                fetchedNews.push({ id: docSnap.id, ...docSnap.data() });
-                            });
-                            
-                            fetchedNews.sort((a, b) => b.timestamp - a.timestamp);
-                            allNews = fetchedNews;
-                            
-                            document.getElementById('status-dot').className = "flex h-2.5 w-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]";
-                            document.getElementById('status-dot').title = "Base de datos conectada";
-                            
-                            renderNews(); 
-                        }, (error) => {
-                            console.error("Error leyendo de Firebase:", error);
-                            document.getElementById('status-dot').className = "flex h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]";
-                            const loadingState = document.getElementById('loading-state');
-                            if (loadingState) loadingState.style.display = 'none';
-                            renderNews();
+                        setupDatabaseListener();
+                    } else {
+                         signInAnonymously(auth).catch((error) => {
+                            console.error("Error de autenticación anónima:", error);
+                            showToast("Error de autenticación", "error");
                         });
                     }
                 });
 
             } catch (error) {
-                console.error("Fallo general al conectar con Firebase.", error);
+                console.error("Fallo general al inicializar Firebase.", error);
                 document.getElementById('status-dot').className = "flex h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]";
                 const loadingState = document.getElementById('loading-state');
                 if (loadingState) loadingState.style.display = 'none';
