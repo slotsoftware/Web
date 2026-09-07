@@ -410,27 +410,27 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // REGLA 1: Ruta estricta de Firestore para datos públicos (Textos de la galería)
-        const textsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_data', 'gallery_texts');
+        // Ruta obligatoria estricta para datos públicos en el ecosistema
+        const textsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'gallery_texts', 'content');
+
+        window.savedCloudTexts = {};
 
         async function initFirebase() {
             try {
-                // Autenticación obligatoria
                 if (typeof __initial_auth_token !== 'undefined') {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
 
-                // Escuchar cambios en la nube en tiempo real
+                // Escucha de la base de datos en tiempo real
                 onSnapshot(textsDocRef, (snapshot) => {
                     if (snapshot.exists()) {
                         window.savedCloudTexts = snapshot.data();
-                    } else {
-                        window.savedCloudTexts = {};
                     }
                     
-                    // Si un visitante está viendo la imagen, el texto cambia instantáneamente
+                    // Si alguien está viendo una imagen y un admin cambia el texto,
+                    // el texto se le actualizará de inmediato en pantalla.
                     if (window.currentLightboxMediaId && !window.isAdmin) {
                         const captionText = document.getElementById('lightbox-caption-text');
                         if (captionText) {
@@ -441,7 +441,7 @@
                         }
                     }
                 }, (error) => {
-                    console.error("Error al leer textos en la nube:", error);
+                    console.error("Error leyendo textos de la nube:", error);
                 });
             } catch (e) {
                 console.error("Error conectando a Firebase:", e);
@@ -449,11 +449,10 @@
         }
         initFirebase();
 
-        // Función global para guardar en la nube
+        // Función que envía los textos al servidor de Google
         window.saveToCloud = async function(mediaId, text) {
             if (!auth.currentUser) return;
             const newTexts = { ...window.savedCloudTexts };
-            
             if (text.trim() === "") delete newTexts[mediaId];
             else newTexts[mediaId] = text;
             
@@ -610,9 +609,8 @@
 
         let currentLang = 'es';
         let adminClickCount = 0;
-        window.isAdmin = window.isAdmin || false;
-        window.savedCloudTexts = window.savedCloudTexts || JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
-        window.currentLightboxMediaId = window.currentLightboxMediaId || null;
+        window.isAdmin = false;
+        window.currentLightboxMediaId = null;
         let currentProgramId = null;
 
         function changeLanguage(lang) {
@@ -667,7 +665,11 @@
                 document.getElementById('admin-bar').classList.remove('hidden');
                 document.getElementById('admin-pwd').value = '';
             } else {
-                alert("Contraseña incorrecta.");
+                const btn = document.querySelector('#admin-login-modal button');
+                const orig = btn.innerText;
+                btn.innerText = "Error";
+                btn.classList.add('bg-red-600');
+                setTimeout(() => { btn.innerText = orig; btn.classList.remove('bg-red-600'); }, 1500);
             }
         }
 
@@ -679,8 +681,13 @@
                 if(newText.trim() === "") delete window.savedCloudTexts[window.currentLightboxMediaId];
                 else window.savedCloudTexts[window.currentLightboxMediaId] = newText;
                 
+                // Backup local de seguridad
                 localStorage.setItem('slot_cloud_texts', JSON.stringify(window.savedCloudTexts));
-                if (window.saveToCloud) window.saveToCloud(window.currentLightboxMediaId, newText);
+                
+                // GUARDADO REAL EN LA NUBE FIREBASE
+                if (window.saveToCloud) {
+                    window.saveToCloud(window.currentLightboxMediaId, newText);
+                }
                 
                 const btn = input.nextElementSibling;
                 const originalText = btn.innerText;
