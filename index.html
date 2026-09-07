@@ -84,32 +84,32 @@
                         <path d="M12 0C22.8 0 24 1.2 24 12C24 22.8 22.8 24 12 24C1.2 24 0 22.8 0 12C0 1.2 1.2 0 12 0Z" fill="currentColor"/>
                         <path d="M5 14 L10 9 H14 L19 4" stroke="white" stroke-opacity="0.3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         <circle cx="5" cy="14" r="1" fill="white" fill-opacity="0.3"/><circle cx="19" cy="4" r="1" fill="white" fill-opacity="0.3"/>
-                        <path d="M5 19 L10 14 H14 L19 9" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="5" cy="19" r="1.5" fill="white"/><circle cx="19" cy="9" r="1.5" fill="white"/><circle cx="12" cy="14" r="2" fill="#E60000"/>
-                        <path d="M12 10.5 A 3.5 3.5 0 0 1 15.5 14" stroke="#E60000" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-                    </svg>
-                    <span class="font-sans text-xl tracking-tight text-apple-text hidden sm:inline-block"><strong class="font-bold">Slot</strong>Software</span>
+            <!-- CONTENEDOR DE IMÁGENES HERO (5 Imágenes Restauradas) -->
+            <div class="relative w-full max-w-6xl mx-auto h-[450px] sm:h-[600px] md:h-[750px] mt-16 md:mt-24">
+                <!-- Imagen 1 (Central Principal) -->
+                <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[45%] md:w-[32%] h-[85%] md:h-[90%] bg-gray-100 rounded-[100px] md:rounded-[200px] shadow-apple-lg z-30 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
+                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 1.jpg</span>
+                    <img src="1.jpg" alt="Hero 1" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.onerror=null; this.src='https://placehold.co/400x800/F5F5F7/1D1D1F?text=1.jpg';">
                 </div>
-                
-                <div class="flex items-center gap-2 sm:gap-3 z-50">
-                    <select id="global-lang-select" onchange="changeLanguage(this.value)" class="bg-gray-100 border border-gray-300 text-apple-text text-xs font-semibold rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-apple-blue cursor-pointer">
-                        <option value="es">🇪🇸 ES</option>
-                        <option value="en">🇬🇧 EN</option>
-                        <option value="fr">🇫🇷 FR</option>
-                        <option value="it">🇮🇹 IT</option>
-                    </select>
-
-                    <div class="hidden md:flex space-x-6 items-center ml-4">
-                        <a href="#programas" class="font-sans text-sm text-apple-gray hover:text-apple-text transition-colors" data-i18n="navSoftware">Software</a>
-                        <a href="#filosofia" class="font-sans text-sm text-apple-gray hover:text-apple-text transition-colors" data-i18n="navPhilosophy">Filosofía</a>
-                        <a href="https://chat.whatsapp.com/FPzanPD3pRbFVoQmpoMmXY?s=cl&p=a&mlu=4&ilr=4" target="_blank" class="font-sans text-sm text-apple-gray hover:text-apple-text transition-colors flex items-center gap-1" data-i18n="navWsp">Wsp SlotSoftware</a>
-                        <a href="#programas" class="btn-apple bg-apple-text text-white px-5 py-2 text-sm" data-i18n="navCatalog">Ver Catálogo</a>
-                    </div>
-
-                    <button type="button" onclick="toggleMobileMenu()" class="md:hidden p-2 text-apple-text hover:bg-gray-100 rounded-md transition-colors" aria-label="Abrir menú">
-                        <svg id="menu-icon-open" class="w-6 h-6 block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                        <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
+                <!-- Imagen 2 (Arriba Izquierda) -->
+                <div class="absolute left-[5%] md:left-[12%] top-[10%] md:top-[15%] w-[40%] md:w-[26%] aspect-square bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
+                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 2.jpg</span>
+                    <img src="2.jpg" alt="Hero 2" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.onerror=null; this.src='https://placehold.co/400x400/F5F5F7/1D1D1F?text=2.jpg';">
+                </div>
+                <!-- Imagen 3 (Arriba Derecha) -->
+                <div class="absolute right-[5%] md:right-[10%] top-[5%] md:top-[8%] w-[42%] md:w-[30%] aspect-[4/3] bg-gray-100 rounded-[2rem] md:rounded-[3rem] shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
+                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 3.jpg</span>
+                    <img src="3.jpg" alt="Hero 3" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.onerror=null; this.src='https://placehold.co/600x450/F5F5F7/1D1D1F?text=3.jpg';">
+                </div>
+                <!-- Imagen 4 (Abajo Izquierda) -->
+                <div class="absolute left-[10%] bottom-[15%] md:bottom-[5%] w-[40%] md:w-[30%] h-[35%] md:h-[40%] bg-gray-100 rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-xl rounded-bl-xl shadow-apple-lg z-20 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
+                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 4.jpg</span>
+                    <img src="4.jpg" alt="Hero 4" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.onerror=null; this.src='https://placehold.co/600x400/F5F5F7/1D1D1F?text=4.jpg';">
+                </div>
+                <!-- Imagen 5 (Abajo Derecha) -->
+                <div class="absolute right-[8%] bottom-[5%] md:bottom-[15%] w-[45%] md:w-[35%] h-[25%] md:h-[30%] bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
+                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 5.jpg</span>
+                    <img src="5.jpg" alt="Hero 5" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.onerror=null; this.src='https://placehold.co/600x300/F5F5F7/1D1D1F?text=5.jpg';">
                 </div>
             </div>
         </div>
@@ -253,7 +253,7 @@
         </button>
         
         <div class="relative w-full h-full flex flex-col items-center justify-center p-4" onclick="if(event.target === this) closeLightbox()">
-            <img id="lightbox-img" src="" alt="Vista ampliada" class="hidden max-w-full max-h-[75vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default">
+            <img id="lightbox-img" src="" alt="Vista ampliada" class="hidden max-w-full max-h-[75vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default" onerror="this.onerror=null; this.src='https://placehold.co/1200x800/F5F5F7/1D1D1F?text=' + (this.getAttribute('data-fallback') || 'Imagen');">
             <video id="lightbox-video" src="" class="hidden max-w-full max-h-[75vh] object-contain shadow-2xl border-4 border-white rounded-xl transform scale-90 transition-transform duration-500 ease-out cursor-default" controls playsinline></video>
             
             <div id="lightbox-caption-container" class="mt-6 text-center w-full max-w-2xl px-4">
@@ -703,6 +703,7 @@
             const grid = document.getElementById('programs-grid');
             grid.innerHTML = '';
             programs.forEach(prog => {
+                // Ahora TODOS los programas tienen el formato póster/móvil (aspect-[9/16])
                 const imgAspectClass = 'aspect-[9/16] w-[70%] max-w-[220px]';
                 
                 const card = document.createElement('div');
@@ -711,7 +712,7 @@
                     <div class="software-img-container mb-6 flex justify-center">
                         <div class="${imgAspectClass} relative rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white flex items-center justify-center">
                             <span class="text-gray-400 font-bold text-xs z-0 uppercase tracking-widest">${i18nData[currentLang].placeholder} ${prog.img}</span>
-                            <img src="${prog.img}" alt="${prog.title[currentLang]}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 z-10" onerror="this.style.display='none';">
+                            <img src="${prog.img}" alt="${prog.title[currentLang]}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 z-10" onerror="this.onerror=null; this.src='https://placehold.co/400x700/F5F5F7/1D1D1F?text=${prog.img}';">
                             <div class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5 z-20"></div>
                         </div>
                     </div>
@@ -805,7 +806,7 @@
                         <div class="absolute inset-0 bg-gray-200 flex flex-col items-center justify-center text-gray-400 p-4 text-center z-0">
                             <span class="font-bold text-sm uppercase tracking-widest">${errorText}</span>
                         </div>
-                        <img src="https://placehold.co/600x400/F5F5F7/1D1D1F?text=${currentMediaId}" alt="Gallery" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none';">
+                        <img src="${currentMediaId}" alt="Gallery" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.onerror=null; this.src='https://placehold.co/600x400/F5F5F7/1D1D1F?text=${currentMediaId}';">
                         ${!isNotAvailable ? `<div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors z-20 pointer-events-none"></div>` : ''}
                     `;
                 }
@@ -887,12 +888,12 @@
                     });
                 }
             } else {
+                img.setAttribute('data-fallback', mediaId);
                 img.src = src;
                 img.classList.remove('hidden');
             }
 
-            window.updateLightboxText(true);
-
+            let defaultText = `Imagen completa`;
             lightbox.classList.remove('hidden');
             setTimeout(() => {
                 lightbox.classList.remove('opacity-0');
