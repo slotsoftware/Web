@@ -398,68 +398,101 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'slotsoftware-app';
-        const fallbackConfig = { apiKey: "dummy", projectId: "dummy" };
-        const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : JSON.stringify(fallbackConfig);
-        const firebaseConfig = JSON.parse(configStr);
+        // =====================================================================
+        // Claves Reales extraídas de canal.html
+        // =====================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyD42jUfZAHQxgB_sufnWFjpNbkyxeQq640",
+            authDomain: "slotsoftware-98893.firebaseapp.com",
+            projectId: "slotsoftware-98893",
+            storageBucket: "slotsoftware-98893.firebasestorage.app",
+            messagingSenderId: "758147068859",
+            appId: "1:758147068859:web:471b9bd137d2b0baedca9e",
+            measurementId: "G-QP0Y1GEXCC"
+        };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const appId = 'slotsoftware-app';
+        let auth, db, textsDocRef;
+        window.savedCloudTexts = window.savedCloudTexts || JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
+        window.useFirebase = false;
 
-        // Ruta obligatoria estricta para datos públicos en el ecosistema
-        const textsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'gallery_texts', 'content');
-
-        window.savedCloudTexts = {};
+        // Comprobar si el usuario ha puesto claves reales antes de inicializar Firebase
+        if (firebaseConfig.apiKey !== "PEGAR_AQUI_TU_API_KEY") {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                textsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'gallery_texts', 'content');
+                window.useFirebase = true;
+            } catch (e) {
+                console.warn("Advertencia: No se pudo iniciar Firebase. Revisa las credenciales.");
+            }
+        }
 
         async function initFirebase() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined') {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+            if (!window.useFirebase) {
+                console.log("☁️ Modo Nube Desactivado: Faltan las claves reales de Firebase. Los textos se guardarán localmente.");
+                updateUIAfterLoad();
+                return; // Salir para evitar el error 'api-key-not-valid'
+            }
 
-                // Escucha de la base de datos en tiempo real
+            try {
+                await signInAnonymously(auth);
+                if (!auth.currentUser) return;
+
                 onSnapshot(textsDocRef, (snapshot) => {
                     if (snapshot.exists()) {
                         window.savedCloudTexts = snapshot.data();
+                        localStorage.setItem('slot_cloud_texts', JSON.stringify(window.savedCloudTexts)); // Backup local
+                    } else {
+                        window.savedCloudTexts = {};
                     }
-                    
-                    // Si alguien está viendo una imagen y un admin cambia el texto,
-                    // el texto se le actualizará de inmediato en pantalla.
-                    if (window.currentLightboxMediaId && !window.isAdmin) {
-                        const captionText = document.getElementById('lightbox-caption-text');
-                        if (captionText) {
-                            const savedText = window.savedCloudTexts[window.currentLightboxMediaId];
-                            if (savedText) {
-                                captionText.innerText = savedText;
-                            }
-                        }
-                    }
+                    updateUIAfterLoad();
                 }, (error) => {
-                    console.error("Error leyendo textos de la nube:", error);
+                    console.warn("Advertencia leyendo de Firebase:", error);
                 });
             } catch (e) {
-                console.error("Error conectando a Firebase:", e);
+                console.warn("No se pudo iniciar sesión anónima en Firebase. Usando modo local.", e);
             }
         }
+
+        function updateUIAfterLoad() {
+            if (window.currentLightboxMediaId && !window.isAdmin) {
+                const captionText = document.getElementById('lightbox-caption-text');
+                if (captionText) {
+                    const savedText = window.savedCloudTexts[window.currentLightboxMediaId];
+                    if (savedText) {
+                        captionText.innerText = savedText;
+                    }
+                }
+            }
+        }
+
         initFirebase();
 
-        // Función que envía los textos al servidor de Google
         window.saveToCloud = async function(mediaId, text) {
-            if (!auth.currentUser) return;
+            // Siempre guardamos en local primero de forma instantánea
             const newTexts = { ...window.savedCloudTexts };
             if (text.trim() === "") delete newTexts[mediaId];
             else newTexts[mediaId] = text;
             
+            window.savedCloudTexts = newTexts;
+            localStorage.setItem('slot_cloud_texts', JSON.stringify(window.savedCloudTexts));
+
+            // Si Firebase está bien configurado, lo subimos a la nube
+            if (!window.useFirebase || !auth?.currentUser) {
+                console.log("💾 Guardado solo en memoria local (Falta configurar Firebase).");
+                return;
+            }
+            
             try {
                 await setDoc(textsDocRef, newTexts);
+                console.log("☁️ ¡Guardado en la nube correctamente!");
             } catch(e) {
-                console.error("No se pudo guardar el texto en Firestore:", e);
+                console.warn("Error guardando en Firestore.", e);
             }
         };
     </script>
@@ -610,6 +643,7 @@
         let currentLang = 'es';
         let adminClickCount = 0;
         window.isAdmin = false;
+        window.savedCloudTexts = window.savedCloudTexts || JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
         window.currentLightboxMediaId = null;
         let currentProgramId = null;
 
@@ -681,10 +715,8 @@
                 if(newText.trim() === "") delete window.savedCloudTexts[window.currentLightboxMediaId];
                 else window.savedCloudTexts[window.currentLightboxMediaId] = newText;
                 
-                // Backup local de seguridad
                 localStorage.setItem('slot_cloud_texts', JSON.stringify(window.savedCloudTexts));
                 
-                // GUARDADO REAL EN LA NUBE FIREBASE
                 if (window.saveToCloud) {
                     window.saveToCloud(window.currentLightboxMediaId, newText);
                 }
