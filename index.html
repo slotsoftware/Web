@@ -610,10 +610,9 @@
 
         let currentLang = 'es';
         let adminClickCount = 0;
-        
-        window.isAdmin = false;
-        window.savedCloudTexts = JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
-        window.currentLightboxMediaId = null;
+        window.isAdmin = window.isAdmin || false;
+        window.savedCloudTexts = window.savedCloudTexts || JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
+        window.currentLightboxMediaId = window.currentLightboxMediaId || null;
         let currentProgramId = null;
 
         function changeLanguage(lang) {
@@ -680,13 +679,8 @@
                 if(newText.trim() === "") delete window.savedCloudTexts[window.currentLightboxMediaId];
                 else window.savedCloudTexts[window.currentLightboxMediaId] = newText;
                 
-                // Mantenemos localStorage temporalmente por si falla la red
                 localStorage.setItem('slot_cloud_texts', JSON.stringify(window.savedCloudTexts));
-                
-                // Guardamos en Firebase Cloud
-                if (window.saveToCloud) {
-                    window.saveToCloud(window.currentLightboxMediaId, newText);
-                }
+                if (window.saveToCloud) window.saveToCloud(window.currentLightboxMediaId, newText);
                 
                 const btn = input.nextElementSibling;
                 const originalText = btn.innerText;
