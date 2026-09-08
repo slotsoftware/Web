@@ -396,9 +396,14 @@
         <audio id="bg-music" src="1.mp3" loop preload="metadata"></audio>
     </div>
 
+    <!-- Tostada de notificaciones para el Administrador (Nueva) -->
+    <div id="admin-toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-bold transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-3 border border-slate-700">
+        <span id="admin-toast-msg">Mensaje</span>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // =====================================================================
@@ -414,10 +419,28 @@
             measurementId: "G-QP0Y1GEXCC"
         };
 
-        const appId = 'slotsoftware-app';
         let auth, db, textsDocRef;
         window.savedCloudTexts = window.savedCloudTexts || JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
         window.useFirebase = false;
+
+        // Función para mostrar mensajes de éxito o error al administrador
+        function showAdminToast(msg, isError = false) {
+            const toast = document.getElementById('admin-toast');
+            document.getElementById('admin-toast-msg').innerText = msg;
+            if (isError) {
+                toast.classList.add('bg-red-900', 'border-red-500', 'text-red-100');
+                toast.classList.remove('bg-slate-900', 'border-slate-700', 'text-white', 'bg-green-900', 'border-green-500');
+            } else {
+                toast.classList.add('bg-green-900', 'border-green-500', 'text-white');
+                toast.classList.remove('bg-slate-900', 'border-slate-700', 'bg-red-900', 'border-red-500', 'text-red-100');
+            }
+            toast.classList.remove('opacity-0', '-translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-4');
+            }, 4500);
+        }
 
         // Comprobar si el usuario ha puesto claves reales antes de inicializar Firebase
         if (firebaseConfig.apiKey !== "PEGAR_AQUI_TU_API_KEY") {
@@ -425,37 +448,52 @@
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-                textsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'gallery_texts', 'content');
+                
+                // TRUCO: Usamos la colección "novedades" que ya tiene los permisos abiertos en tu Firebase
+                textsDocRef = doc(db, 'novedades', 'textos_galeria_web');
                 window.useFirebase = true;
             } catch (e) {
                 console.warn("Advertencia: No se pudo iniciar Firebase. Revisa las credenciales.");
             }
         }
 
+        function setupDatabaseListener() {
+            onSnapshot(textsDocRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    window.savedCloudTexts = snapshot.data();
+                    localStorage.setItem('slot_cloud_texts', JSON.stringify(window.savedCloudTexts)); // Backup local
+                } else {
+                    window.savedCloudTexts = {};
+                }
+                updateUIAfterLoad();
+            }, (error) => {
+                console.warn("Aviso de Firebase (usando datos locales):", error.message);
+                if (window.isAdmin) {
+                    showAdminToast("⚠️ Error: Firebase bloquea la lectura. Revisa las reglas de Firestore.", true);
+                }
+            });
+        }
+
         async function initFirebase() {
             if (!window.useFirebase) {
                 console.log("☁️ Modo Nube Desactivado: Faltan las claves reales de Firebase. Los textos se guardarán localmente.");
                 updateUIAfterLoad();
-                return; // Salir para evitar el error 'api-key-not-valid'
+                return; 
             }
 
             try {
-                await signInAnonymously(auth);
-                if (!auth.currentUser) return;
-
-                onSnapshot(textsDocRef, (snapshot) => {
-                    if (snapshot.exists()) {
-                        window.savedCloudTexts = snapshot.data();
-                        localStorage.setItem('slot_cloud_texts', JSON.stringify(window.savedCloudTexts)); // Backup local
+                // CAMBIO: Usamos onAuthStateChanged igual que en canal-1.html para mayor fiabilidad
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        setupDatabaseListener();
                     } else {
-                        window.savedCloudTexts = {};
+                        signInAnonymously(auth).catch((error) => {
+                            console.warn("No se pudo iniciar sesión anónima en Firebase.", error);
+                        });
                     }
-                    updateUIAfterLoad();
-                }, (error) => {
-                    console.warn("Advertencia leyendo de Firebase:", error);
                 });
             } catch (e) {
-                console.warn("No se pudo iniciar sesión anónima en Firebase. Usando modo local.", e);
+                console.warn("No se pudo iniciar Firebase. Usando modo local.", e);
             }
         }
 
@@ -484,15 +522,17 @@
 
             // Si Firebase está bien configurado, lo subimos a la nube
             if (!window.useFirebase || !auth?.currentUser) {
-                console.log("💾 Guardado solo en memoria local (Falta configurar Firebase).");
+                showAdminToast("💾 Guardado solo en tu dispositivo (No hay conexión a Firebase).", true);
                 return;
             }
             
             try {
                 await setDoc(textsDocRef, newTexts);
                 console.log("☁️ ¡Guardado en la nube correctamente!");
+                showAdminToast("☁️ ¡Textos sincronizados globalmente!");
             } catch(e) {
                 console.warn("Error guardando en Firestore.", e);
+                showAdminToast("⚠️ Error de permisos al guardar. ¡Revisa las reglas en Firebase!", true);
             }
         };
     </script>
