@@ -150,7 +150,7 @@
                 </a>
             </div>
             
-            <!-- CONTENEDOR DE IMÁGENES HERO (5 Imágenes Restauradas) -->
+            <!-- CONTENEDOR DE IMÁGENES HERO -->
             <div class="relative w-full max-w-6xl mx-auto h-[450px] sm:h-[600px] md:h-[750px] mt-16 md:mt-24">
                 <!-- Imagen 1 (Central Principal) -->
                 <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[45%] md:w-[32%] h-[85%] md:h-[90%] bg-gray-100 rounded-[100px] md:rounded-[200px] shadow-apple-lg z-30 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
@@ -396,7 +396,7 @@
         <audio id="bg-music" src="1.mp3" loop preload="metadata"></audio>
     </div>
 
-    <!-- Tostada de notificaciones para el Administrador (Nueva) -->
+    <!-- Tostada de notificaciones para el Administrador -->
     <div id="admin-toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-bold transition-all duration-300 opacity-0 pointer-events-none z-[100] flex items-center gap-3 border border-slate-700">
         <span id="admin-toast-msg">Mensaje</span>
     </div>
@@ -407,7 +407,7 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // =====================================================================
-        // Claves Reales extraídas de canal.html
+        // Claves Reales
         // =====================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyD42jUfZAHQxgB_sufnWFjpNbkyxeQq640",
@@ -442,14 +442,13 @@
             }, 4500);
         }
 
-        // Comprobar si el usuario ha puesto claves reales antes de inicializar Firebase
+        // Inicializar Firebase
         if (firebaseConfig.apiKey !== "PEGAR_AQUI_TU_API_KEY") {
             try {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-                
-                // TRUCO: Usamos la colección "novedades" que ya tiene los permisos abiertos en tu Firebase
+                // TRUCO: Usamos la colección 'novedades' para que herede los permisos abiertos y no dé error.
                 textsDocRef = doc(db, 'novedades', 'textos_galeria_web');
                 window.useFirebase = true;
             } catch (e) {
@@ -482,7 +481,6 @@
             }
 
             try {
-                // CAMBIO: Usamos onAuthStateChanged igual que en canal-1.html para mayor fiabilidad
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         setupDatabaseListener();
@@ -512,7 +510,6 @@
         initFirebase();
 
         window.saveToCloud = async function(mediaId, text) {
-            // Siempre guardamos en local primero de forma instantánea
             const newTexts = { ...window.savedCloudTexts };
             if (text.trim() === "") delete newTexts[mediaId];
             else newTexts[mediaId] = text;
@@ -520,7 +517,6 @@
             window.savedCloudTexts = newTexts;
             localStorage.setItem('slot_cloud_texts', JSON.stringify(window.savedCloudTexts));
 
-            // Si Firebase está bien configurado, lo subimos a la nube
             if (!window.useFirebase || !auth?.currentUser) {
                 showAdminToast("💾 Guardado solo en tu dispositivo (No hay conexión a Firebase).", true);
                 return;
@@ -776,7 +772,6 @@
             const grid = document.getElementById('programs-grid');
             grid.innerHTML = '';
             programs.forEach(prog => {
-                // Ahora TODOS los programas tienen el formato póster/móvil (aspect-[9/16])
                 const imgAspectClass = 'aspect-[9/16] w-[70%] max-w-[220px]';
                 
                 const card = document.createElement('div');
@@ -897,6 +892,30 @@
                 }
 
                 galleryGrid.appendChild(item);
+
+                // EXCEPCIÓN: Inyectar 77-1.jpg directamente después de 77.jpg
+                if (prog.id === 'tracks-telemetry-v2' && currentMediaId === '77.jpg') {
+                    const itemExtra = document.createElement('div');
+                    itemExtra.className = item.className; // Mantiene el aspecto correcto
+                    
+                    const extraMediaId = '77-1.jpg';
+                    itemExtra.onclick = () => openLightbox(extraMediaId, 'img', extraMediaId);
+                    
+                    itemExtra.innerHTML = `
+                        <div class="absolute inset-0 bg-gray-200 flex flex-col items-center justify-center text-gray-400 p-4 text-center z-0">
+                            <span class="font-bold text-sm uppercase tracking-widest">${i18nData[currentLang].errorMissing} ${extraMediaId}</span>
+                        </div>
+                        <img src="${extraMediaId}" alt="Gallery Extra" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none';">
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors z-20 pointer-events-none"></div>
+                    `;
+                    
+                    const captionExtra = document.createElement('div');
+                    captionExtra.className = 'absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white text-xs font-medium z-30 pointer-events-none';
+                    captionExtra.innerText = `${i18nData[currentLang].imgCaption} EXTRA`;
+                    itemExtra.appendChild(captionExtra);
+                    
+                    galleryGrid.appendChild(itemExtra);
+                }
             }
 
             const modal = document.getElementById('program-modal');
