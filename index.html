@@ -824,18 +824,9 @@
             const isHybrid = prog.id === 'krono-personal-tv' || prog.id === 'krono-dual-tv';
 
             if (isVertical) { totalImages = 15; subKey = i18nData[currentLang].modalSubtitleVid14; }
-            else if (prog.id === 'krono-personal-tv' || prog.id === 'krono-dual-tv') { subKey = i18nData[currentLang].modalSubtitleVid29; }
+            else if (isHybrid) { subKey = i18nData[currentLang].modalSubtitleVid29; }
             else if (prog.id === 'tracks-telemetry-v2') { totalImages = 49; subKey = i18nData[currentLang].modalSubtitle49; }
-            else if (prog.id === 'sector-time-v1') { 
-                totalImages = 19; // 4 Vídeos + 15 Imágenes = 19
-                const secTimeTitles = {
-                    es: "Galería Completa - 15 Imágenes + 4 Vídeos",
-                    en: "Complete Gallery - 15 Images + 4 Videos",
-                    fr: "Galerie Complète - 15 Images + 4 Vidéos",
-                    it: "Galleria Completa - 15 Immagini + 4 Video"
-                };
-                subKey = secTimeTitles[currentLang] || secTimeTitles.es; 
-            }
+            else if (prog.id === 'sector-time-v1') { totalImages = 18; subKey = i18nData[currentLang].modalSubtitleVidSec; }
             
             document.getElementById('modal-subtitle').innerText = subKey;
 
@@ -853,27 +844,27 @@
                     if (i === 0) { isVideoPosition = true; videoSrc = 'sector-time-1.mp4'; }
                     else if (i === 1) { isVideoPosition = true; videoSrc = 'sector-time-2.mp4'; }
                     else if (i === 2) { isVideoPosition = true; videoSrc = 'sector-time-3.mp4'; }
-                    else if (i === 3) { isVideoPosition = true; videoSrc = 'sector-time-4.mp4'; }
                 }
 
                 let itemAspect = 'aspect-video';
                 if (isVertical) itemAspect = 'aspect-[9/16]';
                 else if (isHybrid && i % 2 !== 0) itemAspect = 'aspect-[9/16]';
 
+                // Usar min-h para que el contenedor gris no se aplaste si no hay imagen
                 item.className = `masonry-item group cursor-pointer w-full relative ${itemAspect} min-h-[150px]`;
-                
-                // Lógica dinámica para contar cuántos vídeos hay antes de la imagen actual
-                let videosBeforeThisIndex = 0;
-                if ((prog.id === 'krono-personal-v3' || prog.id === 'krono-dual-v3' || prog.id === 'krono-personal-tv' || prog.id === 'krono-dual-tv') && i > 0) videosBeforeThisIndex = 1;
-                if (prog.id === 'sector-time-v1' && i > 3) videosBeforeThisIndex = 4;
                 
                 let currentMediaId = '';
                 if (isVideoPosition) {
                     currentMediaId = videoSrc;
                 } else {
-                    currentMediaId = `${(prog.imgStartId || 12) + i - videosBeforeThisIndex}.jpg`;
+                    let videosBeforeThisIndex = 0;
+                    if (i > 0 && (prog.id === 'krono-personal-v3' || prog.id === 'krono-dual-v3' || prog.id === 'krono-personal-tv' || prog.id === 'krono-dual-tv')) videosBeforeThisIndex = 1;
+                    if (i > 2 && prog.id === 'sector-time-v1') videosBeforeThisIndex = 3;
+
+                    currentMediaId = `${(prog.imgStartId || 12) + (i - videosBeforeThisIndex)}.jpg`;
                 }
                 
+                // Hacer clic en toda la tarjeta para abrir el Lightbox gigante
                 item.onclick = () => openLightbox(isVideoPosition ? videoSrc : currentMediaId, isVideoPosition ? 'video' : 'img', currentMediaId);
 
                 if (isVideoPosition) {
@@ -902,17 +893,20 @@
                 const caption = document.createElement('div');
                 caption.className = 'absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white text-xs font-medium z-30 pointer-events-none';
                 
-                const vidTitle = { es: 'VÍDEO PRESENTACIÓN', en: 'VIDEO PRESENTATION', fr: 'PRÉSENTATION VIDÉO', it: 'VIDEO PRESENTAZIONE' };
-                let imgNumber = (i + 1) - videosBeforeThisIndex;
-                caption.innerText = isVideoPosition ? vidTitle[currentLang] : `${i18nData[currentLang].imgCaption} ${imgNumber}`;
+                let videosBefore = 0;
+                if (prog.id === 'krono-personal-v3' || prog.id === 'krono-dual-v3' || prog.id === 'krono-personal-tv' || prog.id === 'krono-dual-tv') videosBefore = 1;
+                if (prog.id === 'sector-time-v1') videosBefore = 3;
+                let imgNumber = (i + 1) - videosBefore;
+
+                caption.innerText = isVideoPosition ? 'VIDEO PRESENTACIÓN' : `${i18nData[currentLang].imgCaption} ${imgNumber}`;
                 item.appendChild(caption);
 
                 galleryGrid.appendChild(item);
 
-                // EXCEPCIÓN: Inyectar 77-1.jpg
+                // EXCEPCIÓN: Inyectar 77-1.jpg directamente después de 77.jpg
                 if (prog.id === 'tracks-telemetry-v2' && currentMediaId === '77.jpg') {
                     const itemExtra = document.createElement('div');
-                    itemExtra.className = item.className; 
+                    itemExtra.className = item.className; // Mantiene el aspecto correcto
                     
                     const extraMediaId = '77-1.jpg';
                     itemExtra.onclick = () => openLightbox(extraMediaId, 'img', extraMediaId);
