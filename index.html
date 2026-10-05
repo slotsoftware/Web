@@ -664,8 +664,8 @@
             },
             {
                 id: 'sector-time-v1', img: '11.jpg', imgStartId: 181, link: 'https://slotsoftware.github.io/SectorTime/index.html',
-                title: { es: "Sector Time V1.0.", en: "Sector Time V1.0.", fr: "Sector Time V1.0.", it: "Sector Time V1.0." },
-                desc: { es: "Herramienta de análisis sectorial.", en: "Sector analysis tool. Requires sensors.", fr: "Outil d'analyse sectorielle. Nécessite capteurs.", it: "Strumento di analisi settoriale. Richiede sensori." },
+                title: { es: "Sector Time V1.0 (Próximamente)", en: "Sector Time V1.0 (Coming Soon)", fr: "Sector Time V1.0 (Bientôt)", it: "Sector Time V1.0 (Prossimamente)" },
+                desc: { es: "Herramienta de análisis sectorial. Requiere sensores adicionales.", en: "Sector analysis tool. Requires sensors.", fr: "Outil d'analyse sectorielle. Nécessite capteurs.", it: "Strumento di analisi settoriale. Richiede sensori." },
                 descLong: { es: "Para los ingenieros de pista más exigentes. Divide y analiza.", en: "For demanding track engineers.", fr: "Pour les ingénieurs exigeants.", it: "Per ingegneri esigenti." },
                 features: { es: ["Cronometraje por Sectores", "Análisis de Velocidad", "Gráficos Ganancia/Pérdida", "Integración Krono V3"], en: ["Sector Timing", "Speed Analysis", "Charts", "Krono Integration"], fr: ["Chronométrage Secteurs", "Analyse Vitesse", "Graphiques", "Intégration"], it: ["Cronometraggio Settori", "Analisi Velocità", "Grafici", "Integrazione"] },
                 galleryTexts: { es: {} }
@@ -1115,6 +1115,94 @@
                     toggleMobileMenu();
                 }
             });
+        });
+
+        // ==========================================
+        // SISTEMA DE SEGUIMIENTO Y NOTIFICACIONES
+        // ==========================================
+        const SlotTracker = {
+            startTime: Date.now(),
+            sectionsViewed: new Set(),
+            programsClicked: new Set(),
+            
+            // 👇 Correo actualizado para notificaciones 👇
+            emailToNotify: "slotcarhome@gmail.com", 
+
+            init() {
+                // 1. Rastrear qué secciones mira el usuario haciendo scroll
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && entry.target.id) {
+                            this.sectionsViewed.add(entry.target.id);
+                        }
+                    });
+                }, { threshold: 0.3 });
+                
+                document.querySelectorAll('section, header, footer').forEach(el => observer.observe(el));
+
+                // 2. Interceptar clicks en las galerías para saber qué les interesa
+                const originalOpenModal = window.openModal;
+                window.openModal = (progId) => {
+                    this.programsClicked.add(progId);
+                    if(originalOpenModal) originalOpenModal(progId);
+                };
+
+                // 3. Enviar reporte cuando el usuario cierra la pestaña o cambia de app en el móvil
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'hidden') {
+                        this.sendReport();
+                    }
+                });
+            },
+
+            sendReport() {
+                const timeSpent = Math.floor((Date.now() - this.startTime) / 1000); // En Segundos
+                if (timeSpent < 10) return; // Anti-Spam: No avisar si el usuario entra y se va en menos de 10 segundos
+
+                const minutes = Math.floor(timeSpent / 60);
+                const seconds = timeSpent % 60;
+                const timeString = `${minutes} min ${seconds} seg`;
+                
+                const progs = Array.from(this.programsClicked);
+                const programasTexto = progs.length > 0 ? progs.join(', ') : 'Solo miró la web, no abrió ninguna galería.';
+
+                const reportData = {
+                    _subject: "🚀 Nueva visita en SlotSoftware",
+                    _template: "box",
+                    Tiempo_en_la_web: timeString,
+                    Le_intereso: programasTexto,
+                    Secciones_exploradas: Array.from(this.sectionsViewed).join(', '),
+                    Idioma_del_navegador: currentLang,
+                    Dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? 'Móvil / Tablet' : 'PC (Escritorio)'
+                };
+
+                // Enviar correo de forma invisible usando FormSubmit
+                if (this.emailToNotify && this.emailToNotify.includes('@') && this.emailToNotify !== "TU_CORREO@gmail.com") {
+                    fetch(`https://formsubmit.co/ajax/${this.emailToNotify}`, {
+                        method: "POST",
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify(reportData),
+                        keepalive: true // Vital para que el mensaje no se cancele al cerrarse la pestaña
+                    }).catch(() => {});
+                }
+
+                // (Extra) Guardado en tu base de datos de Firebase para generar gráficas en un futuro
+                if (window.useFirebase && db) {
+                    import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(({ collection, addDoc }) => {
+                        addDoc(collection(db, 'estadisticas_visitas'), {
+                            fecha: new Date().toISOString(),
+                            segundos: timeSpent,
+                            programas_vistos: progs,
+                            plataforma: reportData.Dispositivo
+                        }).catch(() => {});
+                    });
+                }
+            }
+        };
+
+        // Iniciar el rastreador en cuanto la página esté lista
+        document.addEventListener('DOMContentLoaded', () => {
+            SlotTracker.init();
         });
     </script>
 </body>
