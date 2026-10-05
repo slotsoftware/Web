@@ -1118,16 +1118,13 @@
         });
 
         // ==========================================
-        // SISTEMA DE SEGUIMIENTO Y NOTIFICACIONES
+        // SISTEMA DE SEGUIMIENTO Y NOTIFICACIONES (EmailJS)
         // ==========================================
         const SlotTracker = {
             startTime: Date.now(),
             sectionsViewed: new Set(),
             programsClicked: new Set(),
             
-            // 👇 Correo actualizado para notificaciones 👇
-            emailToNotify: "slotcarhome@gmail.com", 
-
             init() {
                 // 1. Rastrear qué secciones mira el usuario haciendo scroll
                 const observer = new IntersectionObserver((entries) => {
@@ -1153,6 +1150,16 @@
                         this.sendReport();
                     }
                 });
+                
+                // Asegurarse de que EmailJS esté cargado
+                if (typeof emailjs === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js";
+                    script.onload = () => {
+                        emailjs.init("YOUR_PUBLIC_KEY"); // <-- REEMPLAZAR AQUÍ
+                    };
+                    document.head.appendChild(script);
+                }
             },
 
             sendReport() {
@@ -1167,36 +1174,26 @@
                 const programasTexto = progs.length > 0 ? progs.join(', ') : 'Solo miró la web, no abrió ninguna galería.';
 
                 const reportData = {
-                    _subject: "🚀 Nueva visita en SlotSoftware",
-                    _template: "box",
-                    Tiempo_en_la_web: timeString,
-                    Le_intereso: programasTexto,
-                    Secciones_exploradas: Array.from(this.sectionsViewed).join(', '),
-                    Idioma_del_navegador: currentLang,
+                    access_key: "c0e9fec2-1bda-4f09-b9ff-6f01e43c5857",
+                    subject: "Nueva Visita en SlotSoftware",
+                    from_name: "Rastreador Automático",
+                    URL_Visitada: window.location.href,
+                    Tiempo_en_web: timeString,
+                    Intereso: programasTexto,
+                    Secciones_vistas: Array.from(this.sectionsViewed).join(', '),
+                    Idioma: currentLang,
                     Dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? 'Móvil / Tablet' : 'PC (Escritorio)'
                 };
 
-                // Enviar correo de forma invisible usando FormSubmit
-                if (this.emailToNotify && this.emailToNotify.includes('@') && this.emailToNotify !== "TU_CORREO@gmail.com") {
-                    fetch(`https://formsubmit.co/ajax/${this.emailToNotify}`, {
-                        method: "POST",
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify(reportData),
-                        keepalive: true // Vital para que el mensaje no se cancele al cerrarse la pestaña
-                    }).catch(() => {});
-                }
-
-                // (Extra) Guardado en tu base de datos de Firebase para generar gráficas en un futuro
-                if (window.useFirebase && db) {
-                    import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(({ collection, addDoc }) => {
-                        addDoc(collection(db, 'estadisticas_visitas'), {
-                            fecha: new Date().toISOString(),
-                            segundos: timeSpent,
-                            programas_vistos: progs,
-                            plataforma: reportData.Dispositivo
-                        }).catch(() => {});
-                    });
-                }
+                // Enviar datos usando fetch a Web3Forms de forma invisible
+                fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(reportData)
+                }).catch(err => console.warn("Error enviando reporte:", err));
             }
         };
 
