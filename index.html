@@ -141,9 +141,9 @@
             
             <div class="flex flex-col sm:flex-row gap-6 items-center justify-center">
                 <a href="#programas" class="btn-apple bg-apple-text text-white px-8 py-3 text-lg" data-i18n="heroBtnExplore">Explorar Software</a>
-                <a href="#filosofia" class="link-apple text-lg font-medium flex items-center gap-1">
-                    <span data-i18n="heroBtnTech">Descubrir la tecnología</span> <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </a>
+                <button onclick="openPricingModal()" class="link-apple text-lg font-medium flex items-center gap-1 cursor-pointer bg-transparent border-none">
+                    <span data-i18n="heroBtnTech">Ver precios</span> <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
             </div>
             
             <!-- CONTENEDOR DE IMÁGENES HERO -->
@@ -329,6 +329,153 @@
                     <div class="w-12 h-6 bg-slot-red rounded-full relative cursor-pointer transition-colors" onclick="this.classList.toggle('bg-gray-300'); this.classList.toggle('bg-slot-red'); this.children[0].classList.toggle('right-1'); this.children[0].classList.toggle('left-1');"><div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full transition-all"></div></div>
                 </div>
                 <button onclick="acceptCookies(); closeCookieSettings();" class="w-full py-4 bg-slot-dark text-white font-bold uppercase tracking-widest text-sm hover:bg-slot-red transition-colors rounded cursor-pointer" data-i18n="cookieSave">Guardar Preferencias</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Modal -->
+    <div id="pricing-modal" class="fixed inset-0 z-[70] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-slot-dark/80 backdrop-blur-sm transition-opacity" onclick="closePricingModal()"></div>
+        <div class="bg-white relative z-10 w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col rounded-2xl shadow-2xl">
+            <div class="p-6 border-b border-gray-100 bg-white/90 backdrop-blur-md flex justify-between items-center sticky top-0 z-20">
+                <div>
+                    <h3 class="font-sans font-bold text-2xl text-apple-text" data-i18n="pricingTitle">Tarifas y Licencias</h3>
+                    <p class="text-sm text-apple-gray mt-1" data-i18n="pricingSub">Adquiere tu herramienta definitiva.</p>
+                </div>
+                <button onclick="closePricingModal()" class="bg-apple-bg text-apple-text hover:bg-gray-200 transition-colors p-2 rounded-full cursor-pointer">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            
+            <div class="bg-slot-red text-white text-center py-2 text-xs font-bold uppercase tracking-widest" data-i18n="pricingLifetime">
+                Pago único para toda la vida
+            </div>
+            
+            <div class="p-6 overflow-y-auto bg-apple-bg flex-1">
+                <div class="space-y-4 mb-8">
+                    <!-- Product List -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-apple-text">Krono Personal V3.0</h4>
+                            <p class="text-xs text-apple-gray">Visión artificial un carril</p>
+                        </div>
+                        <span class="font-sans font-bold text-lg text-slot-red">5 €</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-apple-text">Krono Dual V3.0</h4>
+                            <p class="text-xs text-apple-gray">Sistema 1vs1 dos carriles</p>
+                        </div>
+                        <span class="font-sans font-bold text-lg text-slot-red">10 €</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-apple-text">Tracks Telemetry V2.0</h4>
+                            <p class="text-xs text-apple-gray">Diseño 2D y simulador 3D</p>
+                        </div>
+                        <span class="font-sans font-bold text-lg text-slot-red">20 €</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-apple-text">Krono Personal TV</h4>
+                            <p class="text-xs text-apple-gray">Dashboard Smart TV</p>
+                        </div>
+                        <span class="font-sans font-bold text-lg text-slot-red">10 €</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-apple-text">Krono Dual TV</h4>
+                            <p class="text-xs text-apple-gray">Telemetría TV 1vs1</p>
+                        </div>
+                        <span class="font-sans font-bold text-lg text-slot-red">15 €</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-apple-text">Sector Time V1.0</h4>
+                            <p class="text-xs text-apple-gray">Análisis sectorial</p>
+                        </div>
+                        <span class="font-sans font-bold text-lg text-slot-red">15 €</span>
+                    </div>
+                </div>
+                
+                <!-- Contenedor del Formulario (Paso 1) -->
+                <div id="pricing-form-container" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center">
+                    <div class="flex justify-center items-center gap-8 mb-6 opacity-60">
+                        <div class="w-16 h-16 bg-[#003087] rounded-full flex items-center justify-center shadow-md">
+                            <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.11c-.473 0-.867.379-.953.844l-.694 4.437-.473 2.676c-.053.308-.316.529-.63.529zM20.257 6.44c-.035-.123-.076-.246-.12-.368-1.047 3.655-4.462 5.09-8.47 5.09h-2.11c-.818 0-1.498.653-1.646 1.455l-1.013 6.48h3.385c.473 0 .867-.379.953-.844l.025-.138.644-4.103c.086-.465.48-.844.953-.844h1.166c3.67 0 6.55-1.492 7.378-5.834.025-.132.046-.264.065-.396.113-.778.074-1.571-.21-2.498z"/></svg>
+                        </div>
+                        <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center shadow-md">
+                            <span class="text-white font-bold text-xl tracking-tighter">bizum</span>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-sans font-bold text-sm text-apple-text uppercase tracking-widest mb-2" data-i18n="pricingStep1">1. Solicita tu Licencia</h4>
+                    <p class="text-xs text-apple-gray mb-6" data-i18n="pricingStep1Desc">Rellena el formulario para recibir las instrucciones de pago seguras.</p>
+                    
+                    <form id="license-form" onsubmit="handleLicenseSubmit(event)" class="space-y-4 text-left">
+                        <div>
+                            <label class="block text-xs font-semibold text-apple-gray mb-1" data-i18n="formEmail">Tu Correo Electrónico</label>
+                            <input type="email" id="form-email" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-slot-red outline-none text-sm bg-gray-50 transition-colors" placeholder="correo@ejemplo.com">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-apple-gray mb-1" data-i18n="formProgram">Programa a adquirir</label>
+                            <select id="form-program" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-slot-red outline-none text-sm bg-gray-50 cursor-pointer">
+                                <option value="" disabled selected>Selecciona una opción...</option>
+                                <option value="Krono Personal V3.0 (5€)">Krono Personal V3.0 (5€)</option>
+                                <option value="Krono Dual V3.0 (10€)">Krono Dual V3.0 (10€)</option>
+                                <option value="Tracks Telemetry V2.0 (20€)">Tracks Telemetry V2.0 (20€)</option>
+                                <option value="Krono Personal TV (10€)">Krono Personal TV (10€)</option>
+                                <option value="Krono Dual TV (15€)">Krono Dual TV (15€)</option>
+                                <option value="Sector Time V1.0 (15€)">Sector Time V1.0 (15€)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-apple-gray mb-1" data-i18n="formMethod">Método de pago preferido</label>
+                            <select id="form-method" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-slot-red outline-none text-sm bg-gray-50 cursor-pointer">
+                                <option value="" disabled selected>Selecciona una opción...</option>
+                                <option value="PayPal">PayPal</option>
+                                <option value="Bizum">Bizum</option>
+                            </select>
+                        </div>
+                        <button type="submit" id="form-submit-btn" class="w-full bg-slot-dark text-white font-bold py-3 rounded-lg hover:bg-slot-red transition-colors uppercase tracking-wider text-sm mt-2 flex justify-center items-center">
+                            <span data-i18n="formSubmit">Solicitar Instrucciones</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Contenedor de Éxito / Instrucciones (Paso 2) -->
+                <div id="pricing-success-container" class="hidden bg-white p-8 mt-4 rounded-xl shadow-sm border border-gray-100 text-center">
+                    <h4 class="font-sans font-bold text-xl text-slot-red uppercase tracking-widest mb-2" data-i18n="pricingStep2">¡Solicitud Registrada!</h4>
+                    <p class="text-sm text-apple-gray mb-8" data-i18n="pricingStep2Desc">Realiza el pago mediante el método seleccionado para finalizar.</p>
+                    
+                    <!-- Icono Gigante PayPal -->
+                    <div id="instruction-paypal" class="hidden flex-col items-center gap-4">
+                        <a href="https://paypal.me/slotcarvideo" target="_blank" rel="noopener noreferrer" class="w-24 h-24 bg-[#003087] rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform cursor-pointer">
+                            <svg class="w-12 h-12 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.11c-.473 0-.867.379-.953.844l-.694 4.437-.473 2.676c-.053.308-.316.529-.63.529zM20.257 6.44c-.035-.123-.076-.246-.12-.368-1.047 3.655-4.462 5.09-8.47 5.09h-2.11c-.818 0-1.498.653-1.646 1.455l-1.013 6.48h3.385c.473 0 .867-.379.953-.844l.025-.138.644-4.103c.086-.465.48-.844.953-.844h1.166c3.67 0 6.55-1.492 7.378-5.834.025-.132.046-.264.065-.396.113-.778.074-1.571-.21-2.498z"/></svg>
+                        </a>
+                        <div class="flex flex-col items-center text-center">
+                            <span class="font-bold text-lg">PayPal</span>
+                            <a href="https://paypal.me/slotcarvideo" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-[#0066CC] bg-[#0066CC]/10 px-4 py-1.5 rounded-lg mt-2 hover:underline cursor-pointer" data-i18n="paypalClick">Haz clic aquí para pagar a @slotcarvideo</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Icono Gigante Bizum -->
+                    <div id="instruction-bizum" class="hidden flex-col items-center gap-4">
+                        <div class="w-24 h-24 bg-black rounded-full flex items-center justify-center shadow-xl">
+                            <span class="text-white font-bold text-3xl tracking-tighter">bizum</span>
+                        </div>
+                        <div class="flex flex-col items-center text-center">
+                            <span class="font-bold text-lg">Bizum</span>
+                            <span class="text-xl font-bold text-apple-text bg-gray-100 border-2 border-dashed border-gray-300 px-6 py-2 rounded-xl mt-2 select-all">686 16 60 07</span>
+                            <p class="text-xs text-apple-gray mt-3 font-medium" data-i18n="bizumConcept">Por favor, indica tu correo en el concepto del Bizum.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-100">
+                        <p class="text-xs font-semibold text-slot-red" data-i18n="paymentCheck">Una vez verifiquemos el ingreso, te enviaremos la licencia al correo proporcionado.</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -535,7 +682,7 @@
                 navSoftware: "Software", navPhilosophy: "Filosofía", navWsp: "Wsp SlotSoftware", navCatalog: "Ver Catálogo",
                 maintenanceMsg: "Sitio web en mantenimiento. Disculpa las molestias.", heroSubtitle: "Ingeniería de Competición",
                 heroDesc: "El ecosistema definitivo. Diseña tu circuito con precisión milimétrica y gestiona la telemetría en tiempo real.",
-                heroBtnExplore: "Explorar Software", heroBtnTech: "Descubrir la tecnología", catalogTitle: "Elige tu herramienta.", 
+                heroBtnExplore: "Explorar Software", heroBtnTech: "VER PRECIOS", catalogTitle: "Elige tu herramienta.", 
                 catalogSub: "Haz clic en cualquier aplicación para abrir su galería completa interactiva con capturas reales.",
                 catalogGalleryBtn: "VER GALERÍA", philTitle: "Pura Ingeniería Slot.", 
                 phil1Title: "Visión Artificial & IA Fotométrica", phil1Desc: "Las series Krono Personal y Dual convierten cualquier cámara web en un sistema de cronometraje profesional a 30 FPS. Mediante ROI ajustables y filtros inteligentes de iluminación, detectan el paso milimétrico de los bólidos, controlan salidas nulas y retransmiten la carrera con síntesis de voz multilingüe.",
@@ -549,6 +696,7 @@
                 footerCopy: "Copyright 2026 SlotSoftware. Todos los derechos reservados. Desarrollado 100% con tecnología web y totalmente compatible con Android, iOS, Windows, macOS, Linux, Unix y Smart TV.",
                 cookieTitle: "Privacidad y Cookies", cookieDesc: "Usamos cookies técnicas y analíticas para mejorar tu experiencia en la plataforma.", cookieSettings: "Ajustes", cookieAccept: "Aceptar",
                 cookieModalTitle: "Ajustes de Privacidad", cookieReq: "Técnicas (Obligatorias)", cookieReqDesc: "Necesarias para que la plataforma funcione correctamente.", cookieOpt: "Analíticas (Opcionales)", cookieOptDesc: "Nos ayudan a mejorar el rendimiento y estabilidad de las apps.", cookieSave: "Guardar Preferencias",
+                pricingTitle: "Tarifas y Licencias", pricingSub: "Adquiere tu herramienta definitiva.", pricingLifetime: "Pago único para toda la vida", pricingStep1: "1. Solicita tu Licencia", pricingStep1Desc: "Rellena el formulario para recibir las instrucciones de pago seguras.", formEmail: "Tu Correo Electrónico", formProgram: "Programa a adquirir", formMethod: "Método de pago preferido", formSubmit: "Solicitar Instrucciones", pricingStep2: "¡Solicitud Registrada!", pricingStep2Desc: "Realiza el pago mediante el método seleccionado para finalizar.", paypalClick: "Haz clic aquí para pagar a @slotcarvideo", bizumConcept: "Por favor, indica tu correo en el concepto del Bizum.", paymentCheck: "Una vez verifiquemos el ingreso, te enviaremos la licencia.",
                 legalDefaultTitle: "Documento Legal",
                 legalSupportTitle: "Soporte Técnico",
                 legalSupportContent: `<div class="space-y-6"><h4 class="font-bold text-slot-dark text-lg">Canales de Asistencia</h4><p>Para dudas, reportes de errores o asistencia con la configuración de tu software, utiliza nuestros canales oficiales:</p><ul class="list-disc pl-5 space-y-2 text-apple-blue"><li><strong>Grupo Oficial de WhatsApp:</strong> Acceso directo mediante el botón flotante de la web para consultas rápidas y comunidad.</li><li><strong>Correo Electrónico:</strong> slotcarhome@gmail.com para casos que requieran adjuntar archivos o registros detallados.</li></ul><h4 class="font-bold text-slot-dark text-lg mt-8">Solución de Problemas Frecuentes (FAQ)</h4><div class="space-y-4"><div><h5 class="font-semibold">Visión Artificial (Krono Personal/Dual)</h5><p class="text-sm">Asegúrate de tener <strong>buena iluminación constante</strong> sobre la pista. Evita sombras proyectadas o luces parpadeantes (fluorescentes antiguos) que puedan afectar a la detección fotométrica. Calibra el ROI (Región de Interés) en la configuración antes de cada carrera.</p></div><div><h5 class="font-semibold">Renderizado 3D (Tracks Telemetry)</h5><p class="text-sm">Si notas lentitud en la vista 3D, verifica que tu navegador tenga activada la <strong>aceleración por hardware</strong> en la configuración. Recomendamos usar Chrome, Firefox o Edge actualizados a la última versión.</p></div><div><h5 class="font-semibold">Sincronización Cloud (Krono TV)</h5><p class="text-sm">La latencia en la sincronización depende de tu conexión a internet. Para la mejor experiencia en tiempo real, utiliza una conexión <strong>Wi-Fi estable de 5Ghz o cable Ethernet</strong> en el dispositivo principal que gestiona la carrera.</p></div></div></div>`,
@@ -561,7 +709,7 @@
                 navSoftware: "Software", navPhilosophy: "Philosophy", navWsp: "Wsp SlotSoftware", navCatalog: "View Catalog",
                 maintenanceMsg: "Website under maintenance. Sorry for the inconvenience.", heroSubtitle: "Racing Engineering",
                 heroDesc: "The ultimate ecosystem. Design your track with millimeter precision and manage real-time telemetry.",
-                heroBtnExplore: "Explore Software", heroBtnTech: "Discover the technology", catalogTitle: "Choose your tool.", 
+                heroBtnExplore: "Explore Software", heroBtnTech: "VIEW PRICES", catalogTitle: "Choose your tool.", 
                 catalogSub: "Click on any application to open its full interactive gallery with real screenshots.",
                 catalogGalleryBtn: "VIEW GALLERY", philTitle: "Pure Slot Engineering.", 
                 phil1Title: "Artificial Vision & Photometric AI", phil1Desc: "The Krono series turns any webcam into a professional 30 FPS timing system.",
@@ -575,6 +723,7 @@
                 footerCopy: "Copyright 2026 SlotSoftware. All rights reserved.",
                 cookieTitle: "Privacy & Cookies", cookieDesc: "We use technical and analytical cookies to improve your experience on the platform.", cookieSettings: "Settings", cookieAccept: "Accept",
                 cookieModalTitle: "Privacy Settings", cookieReq: "Technical (Required)", cookieReqDesc: "Necessary for the platform to function correctly.", cookieOpt: "Analytical (Optional)", cookieOptDesc: "Help us improve the performance of the apps.", cookieSave: "Save Preferences",
+                pricingTitle: "Rates & Licenses", pricingSub: "Get your ultimate tool.", pricingLifetime: "Lifetime single payment", pricingStep1: "1. Request your License", pricingStep1Desc: "Fill out the form to receive secure payment instructions.", formEmail: "Your Email Address", formProgram: "Program to acquire", formMethod: "Preferred payment method", formSubmit: "Request Instructions", pricingStep2: "Request Registered!", pricingStep2Desc: "Make the payment using the selected method to finish.", paypalClick: "Click here to pay @slotcarvideo", bizumConcept: "Please include your email in the Bizum concept.", paymentCheck: "Once we verify the payment, we will send the license.",
                 legalDefaultTitle: "Legal Document", legalSupportTitle: "Technical Support", legalSupportContent: "<p>Support content in English.</p>",
                 legalTermsTitle: "Terms of Service", legalTermsContent: "<p>Terms of service in English.</p>",
                 legalPrivacyTitle: "Privacy Policy", legalPrivacyContent: "<p>Privacy policy in English.</p>"
@@ -583,7 +732,7 @@
                 navSoftware: "Logiciel", navPhilosophy: "Philosophie", navWsp: "Wsp SlotSoftware", navCatalog: "Voir le Catalogue",
                 maintenanceMsg: "Site web en maintenance.", heroSubtitle: "Ingénierie de Compétition",
                 heroDesc: "L'écosystème ultime. Concevez votre circuit avec une précision millimétrique et gérez la télémétrie.",
-                heroBtnExplore: "Explorer le Logiciel", heroBtnTech: "Découvrir la technologie", catalogTitle: "Choisissez votre outil.", 
+                heroBtnExplore: "Explorer le Logiciel", heroBtnTech: "VOIR LES PRIX", catalogTitle: "Choisissez votre outil.", 
                 catalogSub: "Cliquez sur n'importe quelle application pour ouvrir sa galerie interactive complète.",
                 catalogGalleryBtn: "VOIR GALERÍA", philTitle: "Pure Ingénierie Slot.", 
                 phil1Title: "Vision Artificielle", phil1Desc: "Chronométrage professionnel.",
@@ -597,13 +746,14 @@
                 footerCopy: "Copyright 2026 SlotSoftware. Tous droits réservés.",
                 cookieTitle: "Confidentialité et Cookies", cookieDesc: "Nous utilisons des cookies techniques.", cookieSettings: "Paramètres", cookieAccept: "Accepter",
                 cookieModalTitle: "Paramètres", cookieReq: "Techniques", cookieReqDesc: "Obligatoires.", cookieOpt: "Analytiques", cookieOptDesc: "Optionnels.", cookieSave: "Enregistrer",
+                pricingTitle: "Tarifs et Licences", pricingSub: "Obtenez votre outil ultime.", pricingLifetime: "Paiement unique à vie", pricingStep1: "1. Demandez votre licence", pricingStep1Desc: "Remplissez le formulaire pour recevoir les instructions.", formEmail: "Votre E-mail", formProgram: "Programme à acquérir", formMethod: "Méthode de paiement", formSubmit: "Demander les instructions", pricingStep2: "Demande enregistrée!", pricingStep2Desc: "Effectuez le paiement via la méthode sélectionnée.", paypalClick: "Cliquez ici pour payer @slotcarvideo", bizumConcept: "Veuillez inclure votre e-mail dans le concept Bizum.", paymentCheck: "Une fois le paiement vérifié, nous enverrons la licence.",
                 legalDefaultTitle: "Document Légal", legalSupportTitle: "Support", legalSupportContent: "<p>Support fr</p>", legalTermsTitle: "Conditions", legalTermsContent: "<p>Conditions fr</p>", legalPrivacyTitle: "Confidentialité", legalPrivacyContent: "<p>Confidentialité fr</p>"
             },
             it: {
                 navSoftware: "Software", navPhilosophy: "Filosofia", navWsp: "Wsp SlotSoftware", navCatalog: "Vedi Catalogo",
                 maintenanceMsg: "Sito web in manutenzione.", heroSubtitle: "Ingegneria di Competizione",
                 heroDesc: "L'ecosistema definitivo. Progetta il tuo circuito con precisione millimetrica.",
-                heroBtnExplore: "Esplora Software", heroBtnTech: "Scopri la tecnologia", catalogTitle: "Scegli il tuo strumento.", 
+                heroBtnExplore: "Esplora Software", heroBtnTech: "VEDI PREZZI", catalogTitle: "Scegli il tuo strumento.", 
                 catalogSub: "Clicca su qualsiasi applicazione per aprire la sua galleria interattiva completa.",
                 catalogGalleryBtn: "VEDI GALLERIA", philTitle: "Pura Ingegneria Slot.", 
                 phil1Title: "Visione Artificiale", phil1Desc: "Cronometraggio professionale.",
@@ -617,6 +767,7 @@
                 footerCopy: "Copyright 2026 SlotSoftware. Tutti i diritti riservati.",
                 cookieTitle: "Privacy e Cookie", cookieDesc: "Utilizziamo cookie tecnici.", cookieSettings: "Impostazioni", cookieAccept: "Accetta",
                 cookieModalTitle: "Impostazioni Privacy", cookieReq: "Tecnici", cookieReqDesc: "Obbligatori.", cookieOpt: "Analitici", cookieOptDesc: "Opzionali.", cookieSave: "Salva Preferenze",
+                pricingTitle: "Tariffe e Licenze", pricingSub: "Ottieni il tuo strumento definitivo.", pricingLifetime: "Pagamento unico a vita", pricingStep1: "1. Richiedi la tua licenza", pricingStep1Desc: "Compila il modulo per ricevere le istruzioni.", formEmail: "La tua email", formProgram: "Programma da acquisire", formMethod: "Metodo di pagamento", formSubmit: "Richiedi Istruzioni", pricingStep2: "Richiesta Registrata!", pricingStep2Desc: "Effettua il pagamento tramite il metodo selezionato.", paypalClick: "Clicca qui per pagare @slotcarvideo", bizumConcept: "Si prega di includere l'e-mail nel concetto Bizum.", paymentCheck: "Una volta verificato il pagamento, invieremo la licenza.",
                 legalDefaultTitle: "Documento Legale", legalSupportTitle: "Supporto", legalSupportContent: "<p>Support it</p>", legalTermsTitle: "Termini", legalTermsContent: "<p>Termini it</p>", legalPrivacyTitle: "Riservatezza", legalPrivacyContent: "<p>Riservatezza it</p>"
             }
         };
@@ -678,6 +829,56 @@
         window.savedCloudTexts = window.savedCloudTexts || JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
         window.currentLightboxMediaId = null;
         let currentProgramId = null;
+
+        async function handleLicenseSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('form-submit-btn');
+            const email = document.getElementById('form-email').value;
+            const program = document.getElementById('form-program').value;
+            const method = document.getElementById('form-method').value;
+
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<svg class="animate-spin h-5 w-5 mx-auto text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+            btn.disabled = true;
+
+            const data = {
+                access_key: "c0e9fec2-1bda-4f09-b9ff-6f01e43c5857",
+                subject: "💰 COMPRA PENDIENTE DE PAGO - SLOTSOFTWARE",
+                from_name: "Sistema de Ventas Web",
+                Correo_Cliente_Comprador: email,
+                Programa_Seleccionado: program,
+                Metodo_Pago: method,
+                Estado_Actual: "🟡 PENDIENTE DE PAGO",
+                Recordatorio_Para_SlotSoftware: "Este mensaje es un aviso interno solo para ti. El cliente está viendo en su pantalla ahora mismo tus datos de pago. Revisa si te ha llegado el ingreso por Bizum/PayPal y envíale su licencia al correo indicado arriba."
+            };
+
+            try {
+                await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                // Ocultar formulario y mostrar instrucciones gigantes
+                document.getElementById('pricing-form-container').classList.add('hidden');
+                document.getElementById('pricing-success-container').classList.remove('hidden');
+                
+                if(method === 'PayPal') {
+                    document.getElementById('instruction-paypal').classList.remove('hidden');
+                    document.getElementById('instruction-paypal').classList.add('flex');
+                } else {
+                    document.getElementById('instruction-bizum').classList.remove('hidden');
+                    document.getElementById('instruction-bizum').classList.add('flex');
+                }
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            } catch (error) {
+                console.error(error);
+                btn.innerHTML = "Error de conexión";
+                setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 3000);
+            }
+        }
 
         function changeLanguage(lang) {
             currentLang = lang;
@@ -1068,6 +1269,31 @@
             setTimeout(() => {
                 modal.classList.add('hidden');
                 document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        function openPricingModal() {
+            const modal = document.getElementById('pricing-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePricingModal() {
+            const modal = document.getElementById('pricing-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                
+                // Reiniciar el formulario de ventas al cerrar la ventana
+                document.getElementById('license-form').reset();
+                document.getElementById('pricing-form-container').classList.remove('hidden');
+                document.getElementById('pricing-success-container').classList.add('hidden');
+                document.getElementById('instruction-paypal').classList.add('hidden');
+                document.getElementById('instruction-paypal').classList.remove('flex');
+                document.getElementById('instruction-bizum').classList.add('hidden');
+                document.getElementById('instruction-bizum').classList.remove('flex');
             }, 300);
         }
 
