@@ -142,7 +142,20 @@
             <div class="flex flex-col sm:flex-row gap-6 items-center justify-center">
                 <a href="#programas" class="btn-apple bg-apple-text text-white px-8 py-3 text-lg" data-i18n="heroBtnExplore">Explorar Software</a>
                 <button onclick="openPricingModal()" class="link-apple text-lg font-medium flex items-center gap-1 cursor-pointer bg-transparent border-none">
-                    <span data-i18n="heroBtnTech">Ver precios</span> <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <span data-i18n="heroBtnTech">VER PRECIOS</span> <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+
+            <!-- VÍDEO DE PUBLICIDAD EN BUCLE -->
+            <div class="mt-12 w-full max-w-4xl mx-auto aspect-video bg-gray-100 rounded-3xl md:rounded-[2.5rem] shadow-apple-lg overflow-hidden border-4 md:border-8 border-white relative flex items-center justify-center z-30 group">
+                <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest absolute">Poner publicidad.mp4</span>
+                <video id="promo-video" src="publicidad.mp4" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-10 bg-black/5"></video>
+                
+                <!-- Botón flotante para activar/desactivar sonido -->
+                <button onclick="togglePromoSound(event)" class="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-40 bg-black/60 hover:bg-black/80 backdrop-blur-md text-white p-2.5 md:px-5 md:py-2.5 rounded-full flex items-center gap-2 transition-all shadow-lg border border-white/20 cursor-pointer">
+                    <svg id="promo-icon-muted" class="w-5 h-5 block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+                    <svg id="promo-icon-unmuted" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                    <span id="promo-sound-text" class="text-xs md:text-sm font-semibold tracking-wide hidden sm:block" data-i18n="promoSoundOn">Activar Sonido</span>
                 </button>
             </div>
             
@@ -682,7 +695,7 @@
                 navSoftware: "Software", navPhilosophy: "Filosofía", navWsp: "Wsp SlotSoftware", navCatalog: "Ver Catálogo",
                 maintenanceMsg: "Sitio web en mantenimiento. Disculpa las molestias.", heroSubtitle: "Ingeniería de Competición",
                 heroDesc: "El ecosistema definitivo. Diseña tu circuito con precisión milimétrica y gestiona la telemetría en tiempo real.",
-                heroBtnExplore: "Explorar Software", heroBtnTech: "VER PRECIOS", catalogTitle: "Elige tu herramienta.", 
+                heroBtnExplore: "Explorar Software", heroBtnTech: "VER PRECIOS", promoSoundOn: "Activar Sonido", promoSoundOff: "Silenciar", catalogTitle: "Elige tu herramienta.", 
                 catalogSub: "Haz clic en cualquier aplicación para abrir su galería completa interactiva con capturas reales.",
                 catalogGalleryBtn: "VER GALERÍA", philTitle: "Pura Ingeniería Slot.", 
                 phil1Title: "Visión Artificial & IA Fotométrica", phil1Desc: "Las series Krono Personal y Dual convierten cualquier cámara web en un sistema de cronometraje profesional a 30 FPS. Mediante ROI ajustables y filtros inteligentes de iluminación, detectan el paso milimétrico de los bólidos, controlan salidas nulas y retransmiten la carrera con síntesis de voz multilingüe.",
@@ -709,7 +722,7 @@
                 navSoftware: "Software", navPhilosophy: "Philosophy", navWsp: "Wsp SlotSoftware", navCatalog: "View Catalog",
                 maintenanceMsg: "Website under maintenance. Sorry for the inconvenience.", heroSubtitle: "Racing Engineering",
                 heroDesc: "The ultimate ecosystem. Design your track with millimeter precision and manage real-time telemetry.",
-                heroBtnExplore: "Explore Software", heroBtnTech: "VIEW PRICES", catalogTitle: "Choose your tool.", 
+                heroBtnExplore: "Explore Software", heroBtnTech: "VIEW PRICES", promoSoundOn: "Unmute", promoSoundOff: "Mute", catalogTitle: "Choose your tool.", 
                 catalogSub: "Click on any application to open its full interactive gallery with real screenshots.",
                 catalogGalleryBtn: "VIEW GALLERY", philTitle: "Pure Slot Engineering.", 
                 phil1Title: "Artificial Vision & Photometric AI", phil1Desc: "The Krono series turns any webcam into a professional 30 FPS timing system.",
@@ -732,7 +745,7 @@
                 navSoftware: "Logiciel", navPhilosophy: "Philosophie", navWsp: "Wsp SlotSoftware", navCatalog: "Voir le Catalogue",
                 maintenanceMsg: "Site web en maintenance.", heroSubtitle: "Ingénierie de Compétition",
                 heroDesc: "L'écosystème ultime. Concevez votre circuit avec une précision millimétrique et gérez la télémétrie.",
-                heroBtnExplore: "Explorer le Logiciel", heroBtnTech: "VOIR LES PRIX", catalogTitle: "Choisissez votre outil.", 
+                heroBtnExplore: "Explorer le Logiciel", heroBtnTech: "VOIR LES PRIX", promoSoundOn: "Activer le son", promoSoundOff: "Couper le son", catalogTitle: "Choisissez votre outil.", 
                 catalogSub: "Cliquez sur n'importe quelle application pour ouvrir sa galerie interactive complète.",
                 catalogGalleryBtn: "VOIR GALERÍA", philTitle: "Pure Ingénierie Slot.", 
                 phil1Title: "Vision Artificielle", phil1Desc: "Chronométrage professionnel.",
@@ -746,14 +759,13 @@
                 footerCopy: "Copyright 2026 SlotSoftware. Tous droits réservés.",
                 cookieTitle: "Confidentialité et Cookies", cookieDesc: "Nous utilisons des cookies techniques.", cookieSettings: "Paramètres", cookieAccept: "Accepter",
                 cookieModalTitle: "Paramètres", cookieReq: "Techniques", cookieReqDesc: "Obligatoires.", cookieOpt: "Analytiques", cookieOptDesc: "Optionnels.", cookieSave: "Enregistrer",
-                pricingTitle: "Tarifs et Licences", pricingSub: "Obtenez votre outil ultime.", pricingLifetime: "Paiement unique à vie", pricingStep1: "1. Demandez votre licence", pricingStep1Desc: "Remplissez le formulaire pour recevoir les instructions.", formEmail: "Votre E-mail", formProgram: "Programme à acquérir", formMethod: "Méthode de paiement", formSubmit: "Demander les instructions", pricingStep2: "Demande enregistrée!", pricingStep2Desc: "Effectuez le paiement via la méthode sélectionnée.", paypalClick: "Cliquez ici pour payer @slotcarvideo", bizumConcept: "Veuillez inclure votre e-mail dans le concept Bizum.", paymentCheck: "Une fois le paiement vérifié, nous enverrons la licence.",
                 legalDefaultTitle: "Document Légal", legalSupportTitle: "Support", legalSupportContent: "<p>Support fr</p>", legalTermsTitle: "Conditions", legalTermsContent: "<p>Conditions fr</p>", legalPrivacyTitle: "Confidentialité", legalPrivacyContent: "<p>Confidentialité fr</p>"
             },
             it: {
                 navSoftware: "Software", navPhilosophy: "Filosofia", navWsp: "Wsp SlotSoftware", navCatalog: "Vedi Catalogo",
                 maintenanceMsg: "Sito web in manutenzione.", heroSubtitle: "Ingegneria di Competizione",
                 heroDesc: "L'ecosistema definitivo. Progetta il tuo circuito con precisione millimetrica.",
-                heroBtnExplore: "Esplora Software", heroBtnTech: "VEDI PREZZI", catalogTitle: "Scegli il tuo strumento.", 
+                heroBtnExplore: "Esplora Software", heroBtnTech: "VEDI PREZZI", promoSoundOn: "Attiva audio", promoSoundOff: "Disattiva audio", catalogTitle: "Scegli il tuo strumento.", 
                 catalogSub: "Clicca su qualsiasi applicazione per aprire la sua galleria interattiva completa.",
                 catalogGalleryBtn: "VEDI GALLERIA", philTitle: "Pura Ingegneria Slot.", 
                 phil1Title: "Visione Artificiale", phil1Desc: "Cronometraggio professionale.",
@@ -1323,6 +1335,30 @@
                 }
             }
             isMusicPlaying = !isMusicPlaying;
+        }
+
+        function togglePromoSound(e) {
+            if(e) e.preventDefault();
+            const video = document.getElementById('promo-video');
+            const iconMuted = document.getElementById('promo-icon-muted');
+            const iconUnmuted = document.getElementById('promo-icon-unmuted');
+            const textBtn = document.getElementById('promo-sound-text');
+            
+            if (video.muted) {
+                video.muted = false;
+                iconMuted.classList.add('hidden');
+                iconMuted.classList.remove('block');
+                iconUnmuted.classList.remove('hidden');
+                iconUnmuted.classList.add('block');
+                textBtn.innerText = i18nData[currentLang].promoSoundOff || "Silenciar";
+            } else {
+                video.muted = true;
+                iconUnmuted.classList.add('hidden');
+                iconUnmuted.classList.remove('block');
+                iconMuted.classList.remove('hidden');
+                iconMuted.classList.add('block');
+                textBtn.innerText = i18nData[currentLang].promoSoundOn || "Activar Sonido";
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
