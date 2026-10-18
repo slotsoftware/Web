@@ -105,8 +105,56 @@
 <body class="antialiased">
 
     <!-- Barra de Admin (Oculta por defecto) -->
-    <div id="admin-bar" class="hidden fixed top-0 left-0 w-full bg-slot-red text-white text-center py-1 text-xs font-bold uppercase tracking-widest z-[100] shadow-md">
-        Modo Administrador Activo - Edición de Textos en la Nube
+    <div id="admin-bar" class="hidden fixed top-0 left-0 w-full bg-slot-red text-white text-center py-1.5 px-4 text-xs font-bold uppercase tracking-widest z-[100] shadow-md flex flex-wrap items-center justify-center gap-3">
+        <span>Modo Administrador Activo</span>
+        <button onclick="openAnalyticsModal()" class="bg-yellow-400 text-slot-dark px-3.5 py-1 rounded-full text-[11px] font-extrabold hover:bg-yellow-300 transition-all cursor-pointer shadow-md flex items-center gap-1.5">
+            📊 Ver Visitas en Vivo (<span id="admin-visit-counter">0</span>)
+        </button>
+        <button onclick="SlotTracker.testReport()" class="bg-white text-slot-red px-3 py-1 rounded-full text-[10px] font-extrabold hover:bg-gray-100 transition-colors cursor-pointer shadow">
+            🔔 Probar Correo Web3Forms
+        </button>
+    </div>
+
+    <!-- Modal de Analíticas en Tiempo Real (Exclusivo Admin) -->
+    <div id="analytics-modal" class="fixed inset-0 z-[95] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-2 sm:p-4">
+        <div class="fixed inset-0 bg-slot-dark/90 backdrop-blur-md" onclick="closeAnalyticsModal()"></div>
+        <div class="bg-white relative z-10 w-full max-w-5xl max-h-[88vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-gray-200">
+            <div class="p-5 md:px-8 bg-slot-dark text-white flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-yellow-400 block">Conectado a tu Nube Firebase en Tiempo Real</span>
+                    <h3 class="font-sans font-bold text-xl md:text-2xl">📊 Registro Fiable de Visitas y Actividad</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="clearCloudAnalytics()" class="bg-red-600/20 hover:bg-red-600 text-red-200 hover:text-white border border-red-500/40 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer">
+                        🗑️ Limpiar Historial
+                    </button>
+                    <button onclick="closeAnalyticsModal()" class="bg-white/10 hover:bg-slot-red p-2 rounded-full transition-colors cursor-pointer">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 md:p-6 bg-gray-50 border-b border-gray-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
+                    <span class="text-[10px] font-bold uppercase text-gray-400 block">Visitas Registradas</span>
+                    <span id="stat-total-visits" class="text-2xl font-extrabold text-slot-dark">0</span>
+                </div>
+                <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
+                    <span class="text-[10px] font-bold uppercase text-gray-400 block">Desde Móvil / PC</span>
+                    <span id="stat-devices" class="text-lg font-extrabold text-apple-blue">0 📱 / 0 💻</span>
+                </div>
+                <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
+                    <span class="text-[10px] font-bold uppercase text-gray-400 block">Abrieron Precios</span>
+                    <span id="stat-pricing-clicks" class="text-2xl font-extrabold text-slot-red">0</span>
+                </div>
+                <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
+                    <span class="text-[10px] font-bold uppercase text-gray-400 block">Tiempo Medio</span>
+                    <span id="stat-avg-time" class="text-xl font-extrabold text-green-600">0s</span>
+                </div>
+            </div>
+            <div id="analytics-list" class="p-4 md:p-6 overflow-y-auto space-y-3 flex-1 bg-[#F5F5F7]">
+                <p class="text-center text-gray-400 py-8 text-sm">Cargando visitas en tiempo real desde Firebase...</p>
+            </div>
+        </div>
     </div>
 
     <nav class="fixed top-0 w-full z-40 glass-nav border-b border-gray-100 transition-all duration-300 mt-[env(safe-area-inset-top)]" id="navbar">
@@ -503,14 +551,14 @@
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
                     
                     <!-- Columna Izquierda: Botón Oficial de PayPal Directo y Bizum -->
-                    <div class="md:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col justify-between">
-                        <div>
-                            <span class="text-[11px] font-bold uppercase tracking-widest text-slot-red block mb-1">Pago Directo Instantáneo</span>
-                            <h4 class="font-sans font-bold text-lg text-apple-text mb-4">Enlace Directo de Pago</h4>
-                            
-                            <!-- Tarjeta Interactiva con Logo de PayPal y Enlace Directo -->
-                            <a href="https://paypal.me/slotcarvideo" target="_blank" rel="noopener noreferrer" onclick="if(window.SlotTracker) window.SlotTracker.actionsTaken.add('Clic en Botón Directo PayPal');" class="group block w-full bg-gradient-to-r from-[#003087] to-[#0070ba] hover:from-[#001c64] hover:to-[#005ea6] text-white p-4 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 mb-4">
-                                <div class="flex items-center justify-between mb-2">
+            <div class="md:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col justify-between">
+                <div>
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-slot-red block mb-1">Pago Directo Instantáneo</span>
+                    <h4 class="font-sans font-bold text-lg text-apple-text mb-4">Enlace Directo de Pago</h4>
+                    
+                    <!-- Tarjeta Interactiva con Logo de PayPal y Enlace Directo -->
+                    <a href="https://paypal.me/slotcarvideo" target="_blank" rel="noopener noreferrer" onclick="if(window.SlotTracker) window.SlotTracker.logAction('Clic en Botón Directo PayPal');" class="group block w-full bg-gradient-to-r from-[#003087] to-[#0070ba] hover:from-[#001c64] hover:to-[#005ea6] text-white p-4 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 mb-4">
+                        <div class="flex items-center justify-between mb-2">
                                     <!-- Logo PayPal SVG + Tipografía Oficial -->
                                     <div class="flex items-center gap-2">
                                         <div class="bg-white p-2 rounded-xl shadow-sm">
@@ -692,8 +740,9 @@
             measurementId: "G-QP0Y1GEXCC"
         };
 
-        let auth, db, textsDocRef;
+        let auth, db, textsDocRef, visitsDocRef;
         window.savedCloudTexts = window.savedCloudTexts || JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
+        window.cloudVisitsList = JSON.parse(localStorage.getItem('slot_cloud_visits')) || [];
         window.useFirebase = false;
 
         function showAdminToast(msg, isError = false) {
@@ -720,6 +769,7 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
                 textsDocRef = doc(db, 'novedades', 'textos_galeria_web');
+                visitsDocRef = doc(db, 'novedades', 'registro_visitas_web');
                 window.useFirebase = true;
             } catch (e) {
                 console.warn("Advertencia: No se pudo iniciar Firebase. Revisa las credenciales.");
@@ -737,15 +787,22 @@
                 updateUIAfterLoad();
             }, (error) => {
                 console.warn("Aviso de Firebase (usando datos locales):", error.message);
-                if (window.isAdmin) {
-                    showAdminToast("⚠️ Error: Firebase bloquea la lectura. Revisa las reglas de Firestore.", true);
+            });
+
+            // Escuchar las visitas en vivo guardadas en la nube de Firebase
+            onSnapshot(visitsDocRef, (snapshot) => {
+                if (snapshot.exists() && Array.isArray(snapshot.data().sessions)) {
+                    window.cloudVisitsList = snapshot.data().sessions;
+                    localStorage.setItem('slot_cloud_visits', JSON.stringify(window.cloudVisitsList));
                 }
+                if (window.renderAnalyticsUI) window.renderAnalyticsUI();
+            }, (error) => {
+                console.warn("Aviso al leer visitas en Firebase:", error.message);
             });
         }
 
         async function initFirebase() {
             if (!window.useFirebase) {
-                console.log("☁️ Modo Nube Desactivado: Faltan las claves reales de Firebase. Los textos se guardarán localmente.");
                 updateUIAfterLoad();
                 return; 
             }
@@ -754,6 +811,7 @@
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         setupDatabaseListener();
+                        if (window.SlotTracker) window.SlotTracker.syncToCloud();
                     } else {
                         signInAnonymously(auth).catch((error) => {
                             console.warn("No se pudo iniciar sesión anónima en Firebase.", error);
@@ -794,11 +852,47 @@
             
             try {
                 await setDoc(textsDocRef, newTexts);
-                console.log("☁️ ¡Guardado en la nube correctamente!");
                 showAdminToast("☁️ ¡Textos sincronizados globalmente!");
             } catch(e) {
                 console.warn("Error guardando en Firestore.", e);
                 showAdminToast("⚠️ Error de permisos al guardar. ¡Revisa las reglas en Firebase!", true);
+            }
+        };
+
+        // Guardar sesión actual del visitante en Firebase en tiempo real (100% fiable, no depende de que cierre la pestaña)
+        window.syncVisitSessionToCloud = async function(sessionObj) {
+            let list = Array.isArray(window.cloudVisitsList) ? [...window.cloudVisitsList] : [];
+            const idx = list.findIndex(s => s.id === sessionObj.id);
+            if (idx >= 0) {
+                list[idx] = sessionObj;
+            } else {
+                list.unshift(sessionObj);
+            }
+            // Mantener las últimas 80 visitas para que siempre vaya rápido
+            list = list.slice(0, 80);
+            window.cloudVisitsList = list;
+            localStorage.setItem('slot_cloud_visits', JSON.stringify(list));
+            if (window.renderAnalyticsUI) window.renderAnalyticsUI();
+
+            if (!window.useFirebase || !auth?.currentUser) return;
+            try {
+                await setDoc(visitsDocRef, { sessions: list });
+            } catch (e) {
+                console.warn("No se pudo sincronizar la visita en Firebase:", e.message);
+            }
+        };
+
+        window.clearCloudAnalytics = async function() {
+            window.cloudVisitsList = [];
+            localStorage.removeItem('slot_cloud_visits');
+            if (window.renderAnalyticsUI) window.renderAnalyticsUI();
+            if (window.useFirebase && auth?.currentUser) {
+                try {
+                    await setDoc(visitsDocRef, { sessions: [] });
+                    showAdminToast("🗑️ Historial de visitas limpiado en la nube.");
+                } catch (e) {
+                    showAdminToast("⚠️ Error limpiando en la nube.", true);
+                }
             }
         };
     </script>
@@ -982,6 +1076,9 @@
             if (select) {
                 select.value = programValue;
             }
+            if (window.SlotTracker) {
+                window.SlotTracker.logAction(`Seleccionó tarifa: ${programValue}`);
+            }
             document.querySelectorAll('.pricing-card').forEach(el => {
                 el.classList.remove('ring-2', 'ring-slot-red', 'bg-red-50/30');
             });
@@ -1001,6 +1098,10 @@
             const email = document.getElementById('form-email').value;
             const program = document.getElementById('form-program').value;
             const method = document.getElementById('form-method').value;
+
+            if (window.SlotTracker) {
+                window.SlotTracker.logAction(`🎉 Envió pedido: ${program} (${method}) - ${email}`);
+            }
 
             const originalText = btn.innerHTML;
             btn.innerHTML = `<svg class="animate-spin h-5 w-5 mx-auto text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
@@ -1531,9 +1632,95 @@
         // ==========================================
         // SISTEMA DE SEGUIMIENTO Y NOTIFICACIONES (Web3Forms)
         // ==========================================
+        // SISTEMA DE SEGUIMIENTO Y NOTIFICACIONES (Web3Forms Infalible)
+        // ==========================================
+        // SISTEMA DE SEGUIMIENTO DOBLE: NUBE FIREBASE EN TIEMPO REAL + CORREO WEB3FORMS
+        // ==========================================
+        function openAnalyticsModal() {
+            const modal = document.getElementById('analytics-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            if (window.renderAnalyticsUI) window.renderAnalyticsUI();
+        }
+
+        function closeAnalyticsModal() {
+            const modal = document.getElementById('analytics-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        window.renderAnalyticsUI = function() {
+            const list = window.cloudVisitsList || [];
+            const counterBadge = document.getElementById('admin-visit-counter');
+            if (counterBadge) counterBadge.innerText = list.length;
+
+            const totalEl = document.getElementById('stat-total-visits');
+            const devicesEl = document.getElementById('stat-devices');
+            const pricingEl = document.getElementById('stat-pricing-clicks');
+            const avgTimeEl = document.getElementById('stat-avg-time');
+            const container = document.getElementById('analytics-list');
+            if (!container) return;
+
+            let mobileCount = 0;
+            let pcCount = 0;
+            let pricingCount = 0;
+            let totalSeconds = 0;
+
+            list.forEach(s => {
+                if (s.device && s.device.includes('Móvil')) mobileCount++;
+                else pcCount++;
+                if (s.actions && s.actions.some(a => a.includes('Tarifas') || a.includes('tarifa') || a.includes('PayPal'))) pricingCount++;
+                totalSeconds += (s.seconds || 0);
+            });
+
+            if (totalEl) totalEl.innerText = list.length;
+            if (devicesEl) devicesEl.innerText = `${mobileCount} 📱 / ${pcCount} 💻`;
+            if (pricingEl) pricingEl.innerText = pricingCount;
+            if (avgTimeEl) {
+                const avg = list.length > 0 ? Math.round(totalSeconds / list.length) : 0;
+                avgTimeEl.innerText = `${Math.floor(avg / 60)}m ${avg % 60}s`;
+            }
+
+            if (list.length === 0) {
+                container.innerHTML = `<div class="bg-white p-8 rounded-2xl text-center text-gray-400 text-sm">Todavía no hay visitas registradas en el historial.</div>`;
+                return;
+            }
+
+            container.innerHTML = list.map(s => {
+                const actionsHtml = (s.actions && s.actions.length > 0)
+                    ? s.actions.map(act => `<span class="inline-block bg-red-50 text-slot-red border border-red-200 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">${act}</span>`).join(' ')
+                    : `<span class="text-xs text-gray-400 italic">Solo lectura / scroll</span>`;
+
+                const sectionsHtml = (s.sections && s.sections.length > 0)
+                    ? s.sections.join(' → ')
+                    : 'Portada';
+
+                return `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200/80 flex flex-col md:flex-row justify-between gap-3 items-start md:items-center">
+                        <div class="space-y-1.5 flex-1">
+                            <div class="flex flex-wrap items-center gap-2 text-xs">
+                                <span class="font-extrabold text-slot-dark bg-gray-100 px-2.5 py-1 rounded-lg">${s.date || 'Hoy'}</span>
+                                <span class="font-bold text-apple-blue">${s.device || 'Dispositivo'}</span>
+                                <span class="text-gray-400 font-semibold uppercase">Idioma: ${s.lang || 'ES'}</span>
+                                <span class="bg-green-100 text-green-800 font-extrabold px-2.5 py-0.5 rounded-md">⏱️ ${s.timeString || '0 seg'}</span>
+                            </div>
+                            <div class="text-xs text-gray-500">
+                                <strong>Secciones vistas:</strong> ${sectionsHtml}
+                            </div>
+                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                ${actionsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
         const SlotTracker = {
+            sessionId: 'v_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+            startDate: new Date().toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
             startTime: Date.now(),
-            sectionsViewed: new Set(['Inicio (Hero)']),
+            sectionsViewed: new Set(['Portada']),
             programsClicked: new Set(),
             actionsTaken: new Set(),
             reportSent: false,
@@ -1544,59 +1731,94 @@
                     entries.forEach(entry => {
                         if (entry.isIntersecting && entry.target.id) {
                             this.sectionsViewed.add(entry.target.id);
+                            this.syncToCloud();
                         }
                     });
                 }, { threshold: 0.25 });
                 
                 document.querySelectorAll('section, header, footer').forEach(el => observer.observe(el));
 
-                // 2. Interceptar clicks en las galerías para saber qué programas les interesan
+                // 2. Interceptar clicks en las galerías
                 const originalOpenModal = window.openModal;
                 window.openModal = (progId) => {
                     this.programsClicked.add(progId);
-                    this.actionsTaken.add(`Abrió galería: ${progId}`);
+                    this.logAction(`Abrió galería: ${progId}`);
                     if(originalOpenModal) originalOpenModal(progId);
                 };
 
                 // 3. Interceptar si abren la ventana de precios
                 const originalOpenPricing = window.openPricingModal;
                 window.openPricingModal = () => {
-                    this.actionsTaken.add('Consultó Tarifas y Licencias');
+                    this.logAction('Consultó Tarifas y Licencias');
                     if(originalOpenPricing) originalOpenPricing();
                 };
 
-                // 4. Interceptar clics en enlaces externos (Adquisición, WhatsApp)
-                document.querySelectorAll('a[target="_blank"]').forEach(link => {
-                    link.addEventListener('click', () => {
+                // 4. Interceptar clics en enlaces externos (WhatsApp, PayPal, Demos)
+                document.addEventListener('click', (e) => {
+                    const link = e.target.closest('a[target="_blank"]');
+                    if (link) {
                         const href = link.getAttribute('href') || '';
                         if (href.includes('whatsapp')) {
-                            this.actionsTaken.add('Clic en Grupo WhatsApp');
+                            this.logAction('Clic en Grupo WhatsApp');
+                        } else if (href.includes('paypal')) {
+                            this.logAction('Clic en Enlace PayPal');
                         } else {
-                            this.actionsTaken.add(`Clic en Adquisición (${href})`);
+                            this.logAction(`Probó App: ${href.replace('https://slotsoftware.github.io/', '')}`);
                         }
-                    });
+                    }
                 });
 
-                // 5. Detectar salida de la página (Móvil y PC) usando eventos modernos
+                // 5. Actualizar en la nube de Firebase cada 10 segundos mientras el usuario sigue en la web
+                setInterval(() => {
+                    if (document.visibilityState === 'visible') {
+                        this.syncToCloud();
+                    }
+                }, 10000);
+
+                // Registrar la entrada inicial a los 3 segundos
+                setTimeout(() => this.syncToCloud(), 3000);
+
+                // 6. Detectar salida para el envío por correo
                 document.addEventListener('visibilitychange', () => {
                     if (document.visibilityState === 'hidden') {
-                        this.sendReport();
+                        this.syncToCloud();
+                        this.sendReport(false);
                     }
                 });
 
                 window.addEventListener('pagehide', () => {
-                    this.sendReport();
+                    this.syncToCloud();
+                    this.sendReport(false);
                 });
             },
 
-            sendReport() {
-                if (this.reportSent) return; // Evitar correos duplicados en la misma sesión
+            logAction(actionText) {
+                this.actionsTaken.add(actionText);
+                this.syncToCloud();
+            },
 
+            syncToCloud() {
+                if (window.isAdmin) return; // No ensuciar las estadísticas cuando tú entras como Admin
                 const timeSpent = Math.floor((Date.now() - this.startTime) / 1000);
-                if (timeSpent < 5) return; // Filtro anti-rebote (mínimo 5 segundos)
+                const minutes = Math.floor(timeSpent / 60);
+                const seconds = timeSpent % 60;
+                const sessionObj = {
+                    id: this.sessionId,
+                    date: this.startDate,
+                    seconds: timeSpent,
+                    timeString: `${minutes}m ${seconds}s`,
+                    device: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? '📱 Móvil / Tablet' : '💻 PC',
+                    lang: currentLang.toUpperCase(),
+                    sections: Array.from(this.sectionsViewed),
+                    actions: Array.from(this.actionsTaken)
+                };
+                if (window.syncVisitSessionToCloud) {
+                    window.syncVisitSessionToCloud(sessionObj);
+                }
+            },
 
-                this.reportSent = true;
-
+            buildFormData(isTest = false) {
+                const timeSpent = Math.floor((Date.now() - this.startTime) / 1000);
                 const minutes = Math.floor(timeSpent / 60);
                 const seconds = timeSpent % 60;
                 const timeString = `${minutes} min ${seconds} seg`;
@@ -1607,31 +1829,67 @@
                 const acciones = Array.from(this.actionsTaken);
                 const accionesTexto = acciones.length > 0 ? acciones.join(' | ') : 'Navegación general y lectura';
 
-                const reportData = {
-                    access_key: "c0e9fec2-1bda-4f09-b9ff-6f01e43c5857",
-                    subject: `📊 Visita en SlotSoftware (${timeString})`,
-                    from_name: "Rastreador SlotSoftware",
-                    URL_Visitada: window.location.href,
-                    Tiempo_en_web: timeString,
-                    Galerias_Vistas: programasTexto,
-                    Acciones_Realizadas: accionesTexto,
-                    Secciones_Recorridas: Array.from(this.sectionsViewed).join(', '),
-                    Idioma: currentLang.toUpperCase(),
-                    Dispositivo: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? '📱 Móvil / Tablet' : '💻 PC (Escritorio)'
-                };
+                const formData = new FormData();
+                formData.append("access_key", "c0e9fec2-1bda-4f09-b9ff-6f01e43c5857");
+                formData.append("subject", isTest ? `✅ PRUEBA DE RASTREADOR (${timeString})` : `📊 Visita en SlotSoftware (${timeString})`);
+                formData.append("from_name", "Rastreador SlotSoftware");
+                formData.append("Tiempo_en_web", timeString);
+                formData.append("Que_hizo_el_usuario", accionesTexto);
+                formData.append("Galerias_Vistas", programasTexto);
+                formData.append("Secciones_Recorridas", Array.from(this.sectionsViewed).join(', '));
+                formData.append("Idioma", currentLang.toUpperCase());
+                formData.append("Dispositivo", /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? '📱 Móvil / Tablet' : '💻 PC (Escritorio)');
+                formData.append("URL_Visitada", window.location.href);
+                return formData;
+            },
 
-                // CRÍTICO: "keepalive: true" evita que el navegador cancele el envío al cerrar la pestaña
+            sendReport(isTest = false) {
+                if (this.reportSent && !isTest) return;
+
+                const timeSpent = Math.floor((Date.now() - this.startTime) / 1000);
+                if (timeSpent < 4 && !isTest) return;
+
+                if (!isTest) this.reportSent = true;
+                const formData = this.buildFormData(isTest);
+
+                if (!isTest && navigator.sendBeacon) {
+                    const queued = navigator.sendBeacon('https://api.web3forms.com/submit', formData);
+                    if (queued) return;
+                }
+
                 fetch('https://api.web3forms.com/submit', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(reportData),
+                    body: formData,
                     keepalive: true
                 }).catch(err => console.warn("Aviso al enviar reporte:", err));
+            },
+
+            async testReport() {
+                const toast = document.getElementById('admin-toast');
+                const toastMsg = document.getElementById('admin-toast-msg');
+                toastMsg.innerText = "⏳ Probando conexión con Web3Forms...";
+                toast.classList.remove('opacity-0', 'pointer-events-none');
+
+                try {
+                    const formData = this.buildFormData(true);
+                    const res = await fetch('https://api.web3forms.com/submit', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        toastMsg.innerText = "✅ ¡Web3Forms funciona! Si no lo ves, mira en la carpeta SPAM de tu correo.";
+                    } else {
+                        toastMsg.innerText = "❌ Web3Forms bloqueó el envío: " + (data.message || "Límite gratuito superado.");
+                    }
+                } catch (err) {
+                    toastMsg.innerText = "❌ Bloqueado por AdBlock o red: " + err.message;
+                }
+                setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none'), 6000);
             }
         };
+
+        window.SlotTracker = SlotTracker;
 
         document.addEventListener('DOMContentLoaded', () => {
             SlotTracker.init();
