@@ -283,24 +283,38 @@
                 </button>
 
                 <!-- Flecha Derecha (Manual) -->
-                <button onclick="nextPromoSlide(event)" aria-label="Siguiente vídeo" class="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-40 bg-black/45 hover:bg-slot-red text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 shadow-lg border border-white/25 cursor-pointer hover:scale-105">
+                <button onclick="nextPromoSlide(event)" aria-label="Vídeo siguiente" class="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-40 bg-black/45 hover:bg-slot-red text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 shadow-lg border border-white/25 cursor-pointer hover:scale-105">
                     <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                 </button>
 
-                <!-- Indicadores inferiores (Puntos clicables) -->
+                <!-- Indicadores inferiores (5 puntos) -->
                 <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/15">
                     <button onclick="goToPromoSlide(0, event)" class="promo-dot w-6 h-2 rounded-full bg-slot-red transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 1"></button>
-                    <button onclick="goToPromoSlide(1, event)" class="promo-dot w-2 h-2 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 2"></button>
-                    <button onclick="goToPromoSlide(2, event)" class="promo-dot w-2 h-2 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 3"></button>
-                    <button onclick="goToPromoSlide(3, event)" class="promo-dot w-2 h-2 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 4"></button>
-                    <button onclick="goToPromoSlide(4, event)" class="promo-dot w-2 h-2 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 5"></button>
+                    <button onclick="goToPromoSlide(1, event)" class="promo-dot w-2 h-2 rounded-full bg-white/50 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 2"></button>
+                    <button onclick="goToPromoSlide(2, event)" class="promo-dot w-2 h-2 rounded-full bg-white/50 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 3"></button>
+                    <button onclick="goToPromoSlide(3, event)" class="promo-dot w-2 h-2 rounded-full bg-white/50 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 4"></button>
+                    <button onclick="goToPromoSlide(4, event)" class="promo-dot w-2 h-2 rounded-full bg-white/50 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 5"></button>
                 </div>
 
-                <!-- Botón flotante para fijar/desactivar el paso automático y ver el vídeo tranquilo -->
-                <button id="promo-autoscroll-btn" onclick="togglePromoAutoScroll(event)" class="absolute bottom-4 left-4 md:bottom-6 md:left-6 z-40 bg-black/60 hover:bg-black/80 backdrop-blur-md text-white p-2.5 md:px-4 md:py-2.5 rounded-full flex items-center gap-2 transition-all shadow-lg border border-white/20 cursor-pointer">
-                    <svg id="promo-icon-autoscroll-pause" class="w-4 h-4 md:w-5 md:h-5 block text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <svg id="promo-icon-autoscroll-play" class="w-4 h-4 md:w-5 md:h-5 hidden text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span id="promo-autoscroll-text" class="text-xs md:text-sm font-semibold tracking-wide hidden sm:block" data-i18n="promoAutoScrollOff">Fijar Vídeo</span>
+                <!-- Botones flotantes inferiores izquierda: Fijar Vídeo + Botón Play/Pausa cuando está fijado -->
+                <div class="absolute bottom-4 left-4 md:bottom-6 md:left-6 z-40 flex items-center gap-2">
+                    <button id="promo-autoscroll-btn" onclick="togglePromoAutoScroll(event)" class="bg-black/60 hover:bg-black/80 backdrop-blur-md text-white p-2.5 md:px-4 md:py-2.5 rounded-full flex items-center gap-2 transition-all shadow-lg border border-white/20 cursor-pointer">
+                        <svg id="promo-icon-autoscroll-pause" class="w-4 h-4 md:w-5 md:h-5 block text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <svg id="promo-icon-autoscroll-play" class="w-4 h-4 md:w-5 md:h-5 hidden text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <span id="promo-autoscroll-text" class="text-xs md:text-sm font-semibold tracking-wide hidden sm:block" data-i18n="promoAutoScrollOff">Fijar Vídeo</span>
+                    </button>
+
+                    <!-- Botón de Play / Pausa del vídeo (aparece al fijar el vídeo) -->
+                    <button id="promo-playpause-btn" onclick="togglePromoVideoPlay(event)" class="hidden bg-slot-red hover:bg-red-700 backdrop-blur-md text-white p-2.5 md:px-4 md:py-2.5 rounded-full items-center gap-2 transition-all shadow-lg border border-white/30 cursor-pointer">
+                        <svg id="promo-vid-icon-play" class="w-4 h-4 md:w-5 md:h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg id="promo-vid-icon-pause" class="w-4 h-4 md:w-5 md:h-5 block" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        <span id="promo-vid-play-text" class="text-xs md:text-sm font-bold tracking-wide">Pausar</span>
+                    </button>
+                </div>
+
+                <!-- Botón Gigante Central de Play cuando el vídeo está fijado y en pausa -->
+                <button id="promo-center-play" onclick="togglePromoVideoPlay(event)" aria-label="Reproducir vídeo" class="hidden absolute inset-0 m-auto w-20 h-20 rounded-full bg-slot-red/90 hover:bg-slot-red text-white items-center justify-center z-30 shadow-2xl border-4 border-white/40 transition-transform hover:scale-110 cursor-pointer">
+                    <svg class="w-10 h-10 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </button>
                 
                 <!-- Botón flotante para activar/desactivar sonido -->
@@ -407,6 +421,20 @@
             </div>
             
             <div class="flex-grow overflow-y-auto p-4 md:p-6 relative bg-white overscroll-contain">
+                <!-- Banner grande de Próximas Versiones Pro / Lite -->
+                <div id="modal-upcoming-banner" class="bg-gradient-to-r from-slot-dark via-[#252528] to-slot-dark text-white p-6 md:p-8 rounded-3xl mb-6 text-center shadow-apple-lg border-2 border-slot-red/80 relative overflow-hidden">
+                    <div class="inline-flex items-center gap-2 bg-slot-red text-white text-xs font-extrabold uppercase tracking-widest px-4 py-1 rounded-full mb-3 shadow">
+                        <span class="w-2 h-2 rounded-full bg-yellow-300 animate-ping"></span>
+                        <span>Novedad en Desarrollo</span>
+                    </div>
+                    <h4 id="modal-upcoming-title" class="font-sans font-extrabold text-2xl sm:text-4xl md:text-5xl tracking-tight uppercase text-white drop-shadow-md leading-tight">
+                        PRÓXIMAS VERSIONES PRO
+                    </h4>
+                    <p id="modal-upcoming-sub" class="font-sans font-bold text-lg sm:text-2xl md:text-3xl text-yellow-400 uppercase tracking-widest mt-2 drop-shadow">
+                        TODO CON MÁS PRECISIÓN 100 X 100
+                    </p>
+                </div>
+
                 <div class="bg-apple-bg p-6 md:p-8 rounded-3xl mb-8 flex flex-col md:flex-row gap-8 items-start">
                     <div class="flex-1"><p id="modal-desc" class="text-apple-text text-lg font-light leading-relaxed"></p></div>
                     <div class="w-full md:w-1/3">
@@ -531,8 +559,8 @@
                         Haz clic en cualquier programa para seleccionarlo:
                     </p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                        <!-- 1. Krono Personal TV -->
-                        <div onclick="selectProgramForPurchase('Krono Personal TV (10€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
+                        <!-- 1. KRONO PERSONAL PRO TV -->
+                        <div onclick="selectProgramForPurchase('KRONO PERSONAL PRO TV (10€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                             <div>
                                 <div class="flex justify-between items-start gap-2">
                                     <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 group-hover:bg-red-50 group-hover:text-slot-red transition-colors">Smart TV • Cloud</span>
@@ -540,13 +568,13 @@
                                         <span class="font-sans font-extrabold text-2xl text-apple-text group-hover:text-slot-red transition-colors">10€</span>
                                     </div>
                                 </div>
-                                <h4 class="font-bold text-base text-apple-text mt-2">Krono Personal TV</h4>
+                                <h4 class="font-bold text-base text-apple-text mt-2">KRONO PERSONAL PRO TV</h4>
                                 <p class="text-xs text-apple-gray mt-1">Paneles modulares en pantalla gigante.</p>
                             </div>
                         </div>
 
-                        <!-- 2. Krono Dual TV -->
-                        <div onclick="selectProgramForPurchase('Krono Dual TV (15€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
+                        <!-- 2. KRONO DUAL PRO TV -->
+                        <div onclick="selectProgramForPurchase('KRONO DUAL PRO TV (15€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                             <div>
                                 <div class="flex justify-between items-start gap-2">
                                     <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 group-hover:bg-red-50 group-hover:text-slot-red transition-colors">Torneos TV 1vs1</span>
@@ -554,13 +582,13 @@
                                         <span class="font-sans font-extrabold text-2xl text-apple-text group-hover:text-slot-red transition-colors">15€</span>
                                     </div>
                                 </div>
-                                <h4 class="font-bold text-base text-apple-text mt-2">Krono Dual TV</h4>
+                                <h4 class="font-bold text-base text-apple-text mt-2">KRONO DUAL PRO TV</h4>
                                 <p class="text-xs text-apple-gray mt-1">Telemetría comparativa en vivo y torneos.</p>
                             </div>
                         </div>
 
-                        <!-- 3. Sector Time V1.0 -->
-                        <div onclick="selectProgramForPurchase('Sector Time V1.0 (15€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
+                        <!-- 3. SECTOR TIME PRO -->
+                        <div onclick="selectProgramForPurchase('SECTOR TIME PRO (15€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                             <div>
                                 <div class="flex justify-between items-start gap-2">
                                     <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 group-hover:bg-red-50 group-hover:text-slot-red transition-colors">Ingeniería</span>
@@ -568,13 +596,13 @@
                                         <span class="font-sans font-extrabold text-2xl text-apple-text group-hover:text-slot-red transition-colors">15€</span>
                                     </div>
                                 </div>
-                                <h4 class="font-bold text-base text-apple-text mt-2">Sector Time V1.0</h4>
+                                <h4 class="font-bold text-base text-apple-text mt-2">SECTOR TIME PRO</h4>
                                 <p class="text-xs text-apple-gray mt-1">Cronometraje por sectores y análisis de tramos.</p>
                             </div>
                         </div>
 
-                        <!-- 4. Tracks Telemetry V2.0 -->
-                        <div onclick="selectProgramForPurchase('Tracks Telemetry V2.0 (20€)', this)" class="pricing-card cursor-pointer bg-gradient-to-br from-white to-blue-50/40 p-4 rounded-2xl shadow-sm border-2 border-apple-blue/30 hover:border-apple-blue hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
+                        <!-- 4. TRACKS TELEMETRY PRO -->
+                        <div onclick="selectProgramForPurchase('TRACKS TELEMETRY PRO (20€)', this)" class="pricing-card cursor-pointer bg-gradient-to-br from-white to-blue-50/40 p-4 rounded-2xl shadow-sm border-2 border-apple-blue/30 hover:border-apple-blue hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                             <div>
                                 <div class="flex justify-between items-start gap-2">
                                     <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-apple-blue text-white">Suite Pro 2D/3D</span>
@@ -582,13 +610,13 @@
                                         <span class="font-sans font-extrabold text-2xl text-apple-blue">20€</span>
                                     </div>
                                 </div>
-                                <h4 class="font-bold text-base text-apple-text mt-2">Tracks Telemetry V2.0</h4>
+                                <h4 class="font-bold text-base text-apple-text mt-2">TRACKS TELEMETRY PRO</h4>
                                 <p class="text-xs text-apple-gray mt-1">Diseñador de circuitos 2D, vista 3D y garaje PDF.</p>
                             </div>
                         </div>
 
-                        <!-- 5. Krono Dual V3.0 -->
-                        <div onclick="selectProgramForPurchase('Krono Dual V3.0 (10€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
+                        <!-- 5. KRONO DUAL LITE -->
+                        <div onclick="selectProgramForPurchase('KRONO DUAL LITE (10€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                             <div>
                                 <div class="flex justify-between items-start gap-2">
                                     <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-red-50 text-slot-red">Popular • 1 vs 1</span>
@@ -596,13 +624,13 @@
                                         <span class="font-sans font-extrabold text-2xl text-apple-text group-hover:text-slot-red transition-colors">10€</span>
                                     </div>
                                 </div>
-                                <h4 class="font-bold text-base text-apple-text mt-2">Krono Dual V3.0</h4>
+                                <h4 class="font-bold text-base text-apple-text mt-2">KRONO DUAL LITE</h4>
                                 <p class="text-xs text-apple-gray mt-1">Piques a 2 carriles, falsas salidas y narrador.</p>
                             </div>
                         </div>
 
-                        <!-- 6. Krono Personal V3.0 -->
-                        <div onclick="selectProgramForPurchase('Krono Personal V3.0 (5€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
+                        <!-- 6. KRONO PERSONAL LITE -->
+                        <div onclick="selectProgramForPurchase('KRONO PERSONAL LITE (5€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                             <div>
                                 <div class="flex justify-between items-start gap-2">
                                     <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 group-hover:bg-red-50 group-hover:text-slot-red transition-colors">1 Carril • Webcam</span>
@@ -610,7 +638,7 @@
                                         <span class="font-sans font-extrabold text-2xl text-apple-text group-hover:text-slot-red transition-colors">5€</span>
                                     </div>
                                 </div>
-                                <h4 class="font-bold text-base text-apple-text mt-2">Krono Personal V3.0</h4>
+                                <h4 class="font-bold text-base text-apple-text mt-2">KRONO PERSONAL LITE</h4>
                                 <p class="text-xs text-apple-gray mt-1">Visión artificial fotométrica y voz en tiempo real.</p>
                             </div>
                         </div>
@@ -681,12 +709,12 @@
                                 <label class="block text-xs font-bold text-apple-text mb-1" data-i18n="formProgram">Programa a adquirir</label>
                                 <select id="form-program" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-slot-red focus:border-transparent outline-none text-sm bg-gray-50 cursor-pointer font-medium">
                                     <option value="" disabled selected>Selecciona un programa de la lista...</option>
-                                    <option value="Krono Personal TV (10€)">Krono Personal TV — 10 €</option>
-                                    <option value="Krono Dual TV (15€)">Krono Dual TV — 15 €</option>
-                                    <option value="Sector Time V1.0 (15€)">Sector Time V1.0 — 15 €</option>
-                                    <option value="Tracks Telemetry V2.0 (20€)">Tracks Telemetry V2.0 — 20 €</option>
-                                    <option value="Krono Dual V3.0 (10€)">Krono Dual V3.0 — 10 €</option>
-                                    <option value="Krono Personal V3.0 (5€)">Krono Personal V3.0 — 5 €</option>
+                                    <option value="KRONO PERSONAL PRO TV (10€)">KRONO PERSONAL PRO TV — 10 €</option>
+                                    <option value="KRONO DUAL PRO TV (15€)">KRONO DUAL PRO TV — 15 €</option>
+                                    <option value="SECTOR TIME PRO (15€)">SECTOR TIME PRO — 15 €</option>
+                                    <option value="TRACKS TELEMETRY PRO (20€)">TRACKS TELEMETRY PRO — 20 €</option>
+                                    <option value="KRONO DUAL LITE (10€)">KRONO DUAL LITE — 10 €</option>
+                                    <option value="KRONO PERSONAL LITE (5€)">KRONO PERSONAL LITE — 5 €</option>
                                 </select>
                             </div>
                             <div>
@@ -1090,23 +1118,23 @@
         const programs = [
             {
                 id: 'krono-personal-tv', img: '9.jpg', imgStartId: 121, link: 'https://slotsoftware.github.io/KronoPerTV/',
-                title: { es: "Krono Personal TV", en: "Krono Personal TV", fr: "Krono Personal TV", it: "Krono Personal TV" },
+                title: { es: "KRONO PERSONAL PRO TV", en: "KRONO PERSONAL PRO TV", fr: "KRONO PERSONAL PRO TV", it: "KRONO PERSONAL PRO TV" },
                 desc: { es: "Versión Big Screen del cronómetro personal con paneles modulares.", en: "Big Screen version of the personal timer.", fr: "Version Grand Écran du chronomètre personnel.", it: "Versione Grande Schermo del timer personale." },
-                descLong: { es: "Transforma tu salón en un paddock profesional con Krono Personal TV.", en: "Transform your living room into a paddock.", fr: "Transformez votre salon en paddock.", it: "Trasforma il tuo soggiorno in un paddock." },
+                descLong: { es: "Transforma tu salón en un paddock profesional con KRONO PERSONAL PRO TV.", en: "Transform your living room into a paddock.", fr: "Transformez votre salon en paddock.", it: "Trasforma il tuo soggiorno in un paddock." },
                 features: { es: ["Interfaz Smart TV", "Paneles Flotantes Modulares", "Sincronización Cloud", "Control Remoto desde Móvil"], en: ["Smart TV Interface", "Floating Panels", "Cloud Sync", "Mobile Remote"], fr: ["Interface Smart TV", "Panneaux Flottants", "Cloud Sync", "Télécommande"], it: ["Interfaccia Smart TV", "Pannelli Galleggianti", "Cloud Sync", "Telecomando"] },
-                galleryTexts: { es: { "krono-personal-tv.mp4": "Demo Krono Personal TV" } }
+                galleryTexts: { es: { "krono-personal-tv.mp4": "Demo KRONO PERSONAL PRO TV" } }
             },
             {
                 id: 'krono-dual-tv', img: '10.jpg', imgStartId: 151, link: 'https://slotsoftware.github.io/KronoDual-TV/',
-                title: { es: "Krono Dual TV", en: "Krono Dual TV", fr: "Krono Dual TV", it: "Krono Dual TV" },
+                title: { es: "KRONO DUAL PRO TV", en: "KRONO DUAL PRO TV", fr: "KRONO DUAL PRO TV", it: "KRONO DUAL PRO TV" },
                 desc: { es: "Experiencia competitiva en pantalla gigante con telemetría en vivo.", en: "Competitive experience on the big screen.", fr: "Expérience compétitive sur grand écran.", it: "Esperienza competitiva sul grande schermo." },
                 descLong: { es: "Diseñado para ser el centro de atención en competiciones serias.", en: "Designed for serious competitions.", fr: "Conçu pour les compétitions sérieuses.", it: "Progettato per competizioni serie." },
                 features: { es: ["Telemetría Comparativa 1vs1", "Repeticiones Simulación", "Gestión de Torneos", "Director de Carrera Remoto"], en: ["Live 1vs1 Telemetry", "Replays", "Tournaments", "Remote Director"], fr: ["Télémétrie 1vs1", "Ralentis", "Tournois", "Directeur"], it: ["Telemetria 1vs1", "Replay", "Tornei", "Direttore"] },
-                galleryTexts: { es: { "krono-dual-tv.mp4": "Demo Krono Dual TV" } }
+                galleryTexts: { es: { "krono-dual-tv.mp4": "Demo KRONO DUAL PRO TV" } }
             },
             {
                 id: 'sector-time-v1', img: '11.jpg', imgStartId: 181, link: 'https://slotsoftware.github.io/SectorTime/',
-                title: { es: "Sector Time V1.0", en: "Sector Time V1.0", fr: "Sector Time V1.0", it: "Sector Time V1.0" },
+                title: { es: "SECTOR TIME PRO", en: "SECTOR TIME PRO", fr: "SECTOR TIME PRO", it: "SECTOR TIME PRO" },
                 desc: { es: "Herramienta de análisis sectorial.", en: "Sector analysis tool.", fr: "Outil d'analyse sectorielle.", it: "Strumento di analisi settoriale." },
                 descLong: { es: "Para los ingenieros de pista más exigentes. Divide y analiza.", en: "For demanding track engineers.", fr: "Pour les ingegneri esigenti.", it: "Per ingegneri esigenti." },
                 features: { es: ["Cronometraje por Sectores", "Análisis de Velocidad", "Gráficos Ganancia/Pérdida", "Integración Krono V3"], en: ["Sector Timing", "Speed Analysis", "Charts", "Krono Integration"], fr: ["Chronométrage Secteurs", "Analyse Vitesse", "Graphiques", "Intégration"], it: ["Cronometraggio Settori", "Analisi Velocità", "Grafici", "Integrazione"] },
@@ -1114,27 +1142,27 @@
             },
             {
                 id: 'tracks-telemetry-v2', img: '8.jpg', imgStartId: 72, link: 'https://slotsoftware.github.io/Telemetria/',
-                title: { es: "Tracks Telemetry V2.0", en: "Tracks Telemetry V2.0", fr: "Tracks Telemetry V2.0", it: "Tracks Telemetry V2.0" },
+                title: { es: "TRACKS TELEMETRY PRO", en: "TRACKS TELEMETRY PRO", fr: "TRACKS TELEMETRY PRO", it: "TRACKS TELEMETRY PRO" },
                 desc: { es: "Suite completa de ingeniería. Diseña circuitos en 2D y visualízalos en 3D.", en: "Complete engineering suite.", fr: "Suite d'ingénierie complète.", it: "Suite di ingegneria completa." },
-                descLong: { es: "Tracks Telemetry V2.0 es el sueño de cualquier diseñador de pistas.", en: "The dream of any track designer.", fr: "Le rêve de tout concepteur de piste.", it: "Il sogno di ogni progettista di piste." },
+                descLong: { es: "TRACKS TELEMETRY PRO es el sueño de cualquier diseñador de pistas.", en: "The dream of any track designer.", fr: "Le rêve de tout concepteur de piste.", it: "Il sogno di ogni progettista di piste." },
                 features: { es: ["Diseñador 2D Multi-Marca", "Visualizador 3D Hiperrealista", "Garaje Interactivo", "Generación de Fichas en PDF"], en: ["Multi-Brand 2D Designer", "3D Viewer", "Interactive Garage", "PDF Generation"], fr: ["Concepteur 2D Multi-Marques", "Visualiseur 3D", "Garage Interactif", "PDF"], it: ["Progettista 2D Multi-Marca", "Visualizzatore 3D", "Garage Interattivo", "PDF"] },
                 galleryTexts: { es: {} }
             },
             {
                 id: 'krono-dual-v3', img: '7.jpg', imgStartId: 42, link: 'https://slotsoftware.github.io/TiemposDual/',
-                title: { es: "Krono Dual V3.0", en: "Krono Dual V3.0", fr: "Krono Dual V3.0", it: "Krono Dual V3.0" },
+                title: { es: "KRONO DUAL LITE", en: "KRONO DUAL LITE", fr: "KRONO DUAL LITE", it: "KRONO DUAL LITE" },
                 desc: { es: "El sistema definitivo para piques 1vs1. Controla dos carriles simultáneamente.", en: "The ultimate system for 1vs1 duels.", fr: "Le système ultime pour les duels 1vs1.", it: "Il sistema definitivo per i duelli 1vs1." },
-                descLong: { es: "Lleva la emoción de la competición a tu hogar. Krono Dual V3.0 está diseñado específicamente para duelos intensos.", en: "Bring excitement to your home.", fr: "Apportez l'excitation chez vous.", it: "Porta l'emozione a casa tua." },
+                descLong: { es: "Lleva la emoción de la competición a tu hogar. KRONO DUAL LITE está diseñado específicamente para duelos intensos.", en: "Bring excitement to your home.", fr: "Apportez l'excitation chez vous.", it: "Porta l'emozione a casa tua." },
                 features: { es: ["Cronometraje de 2 Carriles", "Control de Falsas Salidas", "Semáforo Visual y Sonoro", "Narración de Carrera"], en: ["2-Lane Timing", "False Start Control", "Visual/Audio Lights", "Race Narration"], fr: ["Chronométrage 2 Voies", "Contrôle Faux Départs", "Feux", "Narration"], it: ["Cronometraggio 2 Corsie", "Controllo False Partenze", "Semaforo", "Narrazione"] },
-                galleryTexts: { es: { "krono-dual.mp4": "Vídeo Presentación Krono Dual V3.0" } }
+                galleryTexts: { es: { "krono-dual.mp4": "Vídeo Presentación KRONO DUAL LITE" } }
             },
             {
                 id: 'krono-personal-v3', img: '6.jpg', imgStartId: 12, link: 'https://slotsoftware.github.io/TiemposPersonal/',
-                title: { es: "Krono Personal V3.0", en: "Krono Personal V3.0", fr: "Krono Personal V3.0", it: "Krono Personal V3.0" },
+                title: { es: "KRONO PERSONAL LITE", en: "KRONO PERSONAL LITE", fr: "KRONO PERSONAL LITE", it: "KRONO PERSONAL LITE" },
                 desc: { es: "Cronometraje profesional para un solo carril mediante visión artificial.", en: "Professional single-lane timing via artificial vision.", fr: "Chronométrage professionnel par vision artificielle.", it: "Cronometraggio professionale tramite visione artificiale." },
-                descLong: { es: "La solución definitiva para el piloto solitario que busca la perfección. Krono Personal V3.0 transforma tu webcam en un juez de línea implacable.", en: "The ultimate solution for the solo racer.", fr: "La solution ultime pour le pilote solitaire.", it: "La soluzione definitiva per il pilota solitario." },
+                descLong: { es: "La solución definitiva para el piloto solitario que busca la perfección. KRONO PERSONAL LITE transforma tu webcam en un juez de línea implacable.", en: "The ultimate solution for the solo racer.", fr: "La solution ultime pour le pilote solitaire.", it: "La soluzione definitiva per il pilota solitario." },
                 features: { es: ["Detección por Visión Artificial", "Precisión de Milésimas", "Historial de Vueltas Detallado", "Síntesis de Voz en Español"], en: ["Artificial Vision Detection", "Thousandths Precision", "Detailed Lap History", "Speech Synthesis"], fr: ["Détection par Vision Artificielle", "Précision Milliseconde", "Historique", "Synthèse Vocale"], it: ["Rilevamento Visione Artificiale", "Precisione Millesimi", "Cronologia", "Sintesi Vocale"] },
-                galleryTexts: { es: { "krono-personal.mp4": "Vídeo Presentación Krono Personal V3.0", "12.jpg": "Pantalla principal de entrenamiento con los mejores tiempos del piloto." } }
+                galleryTexts: { es: { "krono-personal.mp4": "Vídeo Presentación KRONO PERSONAL LITE", "12.jpg": "Pantalla principal de entrenamiento con los mejores tiempos del piloto." } }
             }
         ];
 
@@ -1345,6 +1373,14 @@
 
             document.getElementById('modal-title').innerText = prog.title[currentLang];
             document.getElementById('modal-desc').innerText = prog.descLong[currentLang];
+
+            const isLiteTool = prog.id === 'krono-dual-v3' || prog.id === 'krono-personal-v3';
+            const upcomingTitle = document.getElementById('modal-upcoming-title');
+            const upcomingSub = document.getElementById('modal-upcoming-sub');
+            if (upcomingTitle && upcomingSub) {
+                upcomingTitle.innerText = isLiteTool ? 'PRÓXIMAS VERSIONES LITE' : 'PRÓXIMAS VERSIONES PRO';
+                upcomingSub.innerText = 'TODO CON MÁS PRECISIÓN 100 X 100';
+            }
             
             const featuresList = document.getElementById('modal-features');
             featuresList.innerHTML = '';
@@ -1659,7 +1695,7 @@
             isMusicPlaying = !isMusicPlaying;
         }
 
-        // Lógica del Carrusel de 5 Vídeos de Publicidad
+        // Control del Carrusel de 5 Vídeos Promocionales (Automático cada 5s y Manual)
         let currentPromoSlide = 0;
         const totalPromoSlides = 5;
         let promoInterval = null;
@@ -1668,25 +1704,83 @@
 
         function updatePromoCarousel() {
             const track = document.getElementById('promo-track');
-            if (!track) return;
-            track.style.transform = `translateX(-${currentPromoSlide * 100}%)`;
+            if (track) {
+                track.style.transform = `translateX(-${currentPromoSlide * 100}%)`;
+            }
 
             const dots = document.querySelectorAll('.promo-dot');
             dots.forEach((dot, idx) => {
                 if (idx === currentPromoSlide) {
-                    dot.classList.remove('w-2', 'bg-white/60');
+                    dot.classList.remove('w-2', 'bg-white/50');
                     dot.classList.add('w-6', 'bg-slot-red');
                 } else {
                     dot.classList.remove('w-6', 'bg-slot-red');
-                    dot.classList.add('w-2', 'bg-white/60');
+                    dot.classList.add('w-2', 'bg-white/50');
                 }
             });
 
-            // Sincronizar audio solo con el vídeo visible en este momento
+            // Sincronizar audio y estado de reproducción solo con el vídeo visible en este momento
             const videos = document.querySelectorAll('.promo-video-item');
             videos.forEach((vid, idx) => {
                 vid.muted = isPromoMuted || (idx !== currentPromoSlide);
+                if (idx === currentPromoSlide && isPromoAutoScroll) {
+                    const p = vid.play();
+                    if (p !== undefined) p.catch(() => {});
+                }
             });
+            syncPromoPlayPauseUI();
+        }
+
+        function getActivePromoVideo() {
+            const videos = document.querySelectorAll('.promo-video-item');
+            return videos[currentPromoSlide] || null;
+        }
+
+        function syncPromoPlayPauseUI() {
+            const vid = getActivePromoVideo();
+            const iconPlay = document.getElementById('promo-vid-icon-play');
+            const iconPause = document.getElementById('promo-vid-icon-pause');
+            const textPlay = document.getElementById('promo-vid-play-text');
+            const centerPlay = document.getElementById('promo-center-play');
+            if (!vid || !iconPlay || !iconPause || !textPlay || !centerPlay) return;
+
+            if (vid.paused) {
+                iconPlay.classList.remove('hidden');
+                iconPlay.classList.add('block');
+                iconPause.classList.add('hidden');
+                iconPause.classList.remove('block');
+                textPlay.innerText = "Play";
+                if (!isPromoAutoScroll) {
+                    centerPlay.classList.remove('hidden');
+                    centerPlay.classList.add('flex');
+                }
+            } else {
+                iconPlay.classList.add('hidden');
+                iconPlay.classList.remove('block');
+                iconPause.classList.remove('hidden');
+                iconPause.classList.add('block');
+                textPlay.innerText = "Pausar";
+                centerPlay.classList.add('hidden');
+                centerPlay.classList.remove('flex');
+            }
+        }
+
+        function togglePromoVideoPlay(e) {
+            if (e) e.stopPropagation();
+            const vid = getActivePromoVideo();
+            if (!vid) return;
+
+            if (vid.paused) {
+                const p = vid.play();
+                if (p !== undefined) {
+                    p.then(() => syncPromoPlayPauseUI()).catch(() => syncPromoPlayPauseUI());
+                } else {
+                    syncPromoPlayPauseUI();
+                }
+            } else {
+                vid.pause();
+                syncPromoPlayPauseUI();
+            }
         }
 
         function startPromoAutoSlide() {
@@ -1705,6 +1799,9 @@
             const iconPlay = document.getElementById('promo-icon-autoscroll-play');
             const textBtn = document.getElementById('promo-autoscroll-text');
             const btn = document.getElementById('promo-autoscroll-btn');
+            const playPauseBtn = document.getElementById('promo-playpause-btn');
+            const centerPlay = document.getElementById('promo-center-play');
+            const vid = getActivePromoVideo();
 
             if (isPromoAutoScroll) {
                 iconPause.classList.remove('hidden');
@@ -1714,6 +1811,18 @@
                 textBtn.innerText = i18nData[currentLang].promoAutoScrollOff || "Fijar Vídeo";
                 btn.classList.remove('bg-slot-red/90', 'border-red-300');
                 btn.classList.add('bg-black/60', 'border-white/20');
+                if (playPauseBtn) {
+                    playPauseBtn.classList.add('hidden');
+                    playPauseBtn.classList.remove('flex');
+                }
+                if (centerPlay) {
+                    centerPlay.classList.add('hidden');
+                    centerPlay.classList.remove('flex');
+                }
+                if (vid && vid.paused) {
+                    const p = vid.play();
+                    if (p !== undefined) p.catch(() => {});
+                }
                 startPromoAutoSlide();
             } else {
                 clearInterval(promoInterval);
@@ -1724,6 +1833,15 @@
                 textBtn.innerText = i18nData[currentLang].promoAutoScrollOn || "Auto-Scroll";
                 btn.classList.remove('bg-black/60', 'border-white/20');
                 btn.classList.add('bg-slot-red/90', 'border-red-300');
+                if (playPauseBtn) {
+                    playPauseBtn.classList.remove('hidden');
+                    playPauseBtn.classList.add('flex');
+                }
+                // Al fijar el vídeo, lo pausamos y mostramos el botón de Play listo para darle cuando el usuario quiera
+                if (vid) {
+                    vid.pause();
+                }
+                syncPromoPlayPauseUI();
             }
         }
 
