@@ -56,18 +56,11 @@
         
         .glass-nav { background: rgba(255, 255, 255, 0.7); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
         
-        /* Animaciones para el Ecualizador de Música */
-        .eq-bar { width: 4px; background-color: #E60000; border-radius: 2px; transition: height 0.2s ease; }
-        .playing .eq-bar { animation: eq-bounce 0.7s infinite alternate ease-in-out; }
-        .playing .eq-bar:nth-child(1) { animation-delay: 0.1s; }
-        .playing .eq-bar:nth-child(2) { animation-delay: 0.4s; }
-        .playing .eq-bar:nth-child(3) { animation-delay: 0.2s; }
-        .playing .eq-bar:nth-child(4) { animation-delay: 0.5s; }
-        .paused .eq-bar { height: 4px !important; animation: none !important; }
-        @keyframes eq-bounce {
-            0% { height: 4px; }
-            100% { height: 20px; }
-        }
+        /* Sintetizador / Analizador de Espectro Real (Web Audio API) */
+        .eq-bar { width: 3.5px; background: linear-gradient(to top, #B30000, #E60000, #FF4D4D); border-radius: 999px; transition: height 0.04s linear; will-change: height; }
+        .paused .eq-bar { height: 4px !important; opacity: 0.45; }
+        .playing .eq-bar { opacity: 1; }
+        #music-player.playing { box-shadow: 0 0 20px rgba(230, 0, 0, 0.35), 0 8px 20px -4px rgba(0, 0, 0, 0.15); border-color: rgba(230, 0, 0, 0.35); }
 
         /* Estilos espectaculares para el botón Ver Precios */
         @keyframes pulse-glow-red {
@@ -896,8 +889,9 @@
         <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
     </a>
 
-    <div id="music-player" class="fixed bottom-6 left-6 z-50 bg-white border border-gray-100 w-14 h-14 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center cursor-pointer paused" onclick="toggleMusic()" title="Música de Fondo">
-        <div class="flex items-end justify-center gap-[3px] h-5">
+    <div id="music-player" class="fixed bottom-6 left-6 z-50 bg-white border border-gray-100 w-14 h-14 rounded-full shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center cursor-pointer paused" onclick="toggleMusic()" title="Música de Fondo (Sintetizador en Tiempo Real)">
+        <div class="flex items-end justify-center gap-[3px] h-6" id="eq-bars-container">
+            <div class="eq-bar h-1"></div>
             <div class="eq-bar h-1"></div>
             <div class="eq-bar h-1"></div>
             <div class="eq-bar h-1"></div>
@@ -2054,6 +2048,101 @@
 
         let isMusicPlaying = false;
         let userManuallyPausedMusic = false;
+        let audioCtx = null;
+        let audioAnalyser = null;
+        let audioDataArray = null;
+        let eqAnimFrameId = null;
+        let audioGraphConnected = false;
+
+        // Conecta el elemento <audio id="bg-music"> con el analizador de espectro en tiempo real
+        function initRealTimeSynthesizer() {
+            const audio = document.getElementById('bg-music');
+            if (!audio || audioGraphConnected) return;
+
+            try {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) return;
+
+                audioCtx = new AudioContextClass();
+                const source = audioCtx.createMediaElementSource(audio);
+                audioAnalyser = audioCtx.createAnalyser();
+                audioAnalyser.fftSize = 64; // 32 bandas de frecuencia rápidas y precisas
+                audioAnalyser.smoothingTimeConstant = 0.72;
+
+                source.connect(audioAnalyser);
+                audioAnalyser.connect(audioCtx.destination);
+
+                audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
+                audioGraphConnected = true;
+            } catch (err) {
+                console.warn("Aviso Web Audio API:", err);
+            }
+        }
+
+        function renderRealTimeSynthesizer() {
+            const bars = document.querySelectorAll('#eq-bars-container .eq-bar');
+            const player = document.getElementById('music-player');
+            if (!isMusicPlaying || !bars.length) {
+                bars.forEach(b => b.style.height = '4px');
+                if (player) player.style.transform = '';
+                return;
+            }
+
+            if (audioAnalyser && audioDataArray) {
+                audioAnalyser.getByteFrequencyData(audioDataArray);
+
+                // Mapeamos 5 bandas reales de la canción: Subgraves, Graves, Medios-bajos, Medios-altos y Agudos
+                const bandBins = [1, 3, 6, 10, 15];
+                let bassEnergy = 0;
+
+                bars.forEach((bar, i) => {
+                    const binIndex = bandBins[i] !== undefined ? bandBins[i] : i * 2;
+                    // Promediamos el bin actual y el adyacente para una respuesta más rica
+                    const rawVal = (audioDataArray[binIndex] + (audioDataArray[binIndex + 1] || audioDataArray[binIndex])) / 2;
+                    if (i <= 1) bassEnergy += rawVal;
+
+                    // Escalamos de 0-255 a una altura entre 4px y 26px
+                    const minH = 4;
+                    const maxH = 26;
+                    const normalized = Math.pow(rawVal / 255, 0.85);
+                    const heightPx = Math.max(minH, Math.min(maxH, Math.round(minH + normalized * (maxH - minH))));
+                    bar.style.height = `${heightPx}px`;
+                });
+
+                // Pequeño pulso en el círculo blanco cuando golpean los graves (bombo/bajo)
+                if (player) {
+                    const beatBoost = (bassEnergy / 510) * 0.08;
+                    player.style.transform = `scale(${(1 + beatBoost).toFixed(3)})`;
+                }
+            }
+
+            eqAnimFrameId = requestAnimationFrame(renderRealTimeSynthesizer);
+        }
+
+        function activateMusicVisuals() {
+            const player = document.getElementById('music-player');
+            if (player) {
+                player.classList.remove('paused');
+                player.classList.add('playing');
+            }
+            initRealTimeSynthesizer();
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume().catch(() => {});
+            }
+            cancelAnimationFrame(eqAnimFrameId);
+            renderRealTimeSynthesizer();
+        }
+
+        function deactivateMusicVisuals() {
+            const player = document.getElementById('music-player');
+            if (player) {
+                player.classList.remove('playing');
+                player.classList.add('paused');
+                player.style.transform = '';
+            }
+            cancelAnimationFrame(eqAnimFrameId);
+            document.querySelectorAll('#eq-bars-container .eq-bar').forEach(b => b.style.height = '4px');
+        }
 
         function startMusicAutoplay() {
             const audio = document.getElementById('bg-music');
@@ -2064,16 +2153,18 @@
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     isMusicPlaying = true;
-                    player.classList.remove('paused');
-                    player.classList.add('playing');
+                    activateMusicVisuals();
                 }).catch(() => {
                     // Si el navegador bloquea el autoplay con sonido antes de interactuar, lo activamos al primer clic/toque/scroll
                     const unlockAudio = () => {
                         if (!isMusicPlaying && !userManuallyPausedMusic) {
+                            initRealTimeSynthesizer();
+                            if (audioCtx && audioCtx.state === 'suspended') {
+                                audioCtx.resume().catch(() => {});
+                            }
                             audio.play().then(() => {
                                 isMusicPlaying = true;
-                                player.classList.remove('paused');
-                                player.classList.add('playing');
+                                activateMusicVisuals();
                             }).catch(() => {});
                         }
                         document.removeEventListener('click', unlockAudio);
@@ -2089,22 +2180,23 @@
 
         function toggleMusic() {
             const audio = document.getElementById('bg-music');
-            const player = document.getElementById('music-player');
             
             if (isMusicPlaying) {
                 audio.pause();
-                player.classList.remove('playing');
-                player.classList.add('paused');
                 isMusicPlaying = false;
                 userManuallyPausedMusic = true;
+                deactivateMusicVisuals();
             } else {
                 userManuallyPausedMusic = false;
+                initRealTimeSynthesizer();
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume().catch(() => {});
+                }
                 const playPromise = audio.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
-                        player.classList.remove('paused');
-                        player.classList.add('playing');
                         isMusicPlaying = true;
+                        activateMusicVisuals();
                     }).catch(error => {
                         console.warn("Aún no se ha encontrado el archivo 1.mp3 en el servidor para reproducirlo:", error);
                     });
@@ -2398,7 +2490,7 @@
             const currentItem = verticalToolImages[currentVerticalIndex];
             const label = document.getElementById('vcarousel-tool-label');
             if (label && currentItem) {
-                label.innerText = `${currentItem.toolTitle} — (${currentItem.src})`;
+                label.innerText = currentItem.toolTitle;
             }
 
             const counter = document.getElementById('vcarousel-counter');
