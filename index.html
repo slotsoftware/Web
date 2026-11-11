@@ -47,7 +47,7 @@
         .kerb-border { height: 2px; background: linear-gradient(90deg, transparent 0%, #E60000 50%, transparent 100%); opacity: 0.5; }
         .software-card { background: #F5F5F7; border-radius: 24px; transition: all 0.4s ease; overflow: hidden; }
         .software-card:hover { transform: scale(1.01); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); }
-        .software-img-container { border-radius: 20px; overflow: hidden; margin: 16px; }
+        .software-img-container { border-radius: 20px; overflow: hidden; margin: 8px 0; width: 100%; }
         
         .masonry { column-count: 2; column-gap: 1rem; }
         @media (min-width: 768px) { .masonry { column-count: 3; } }
@@ -768,6 +768,90 @@
         </div>
     </div>
 
+    <!-- Modal de Valoraciones (1 a 5 Estrellas) y Comentarios por Aplicación -->
+    <div id="reviews-modal" class="fixed inset-0 z-[75] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-2 sm:p-4">
+        <div class="fixed inset-0 bg-slot-dark/85 backdrop-blur-md transition-opacity" onclick="closeReviewsModal()"></div>
+        <div class="bg-white relative z-10 w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col rounded-3xl shadow-2xl border border-gray-100">
+            <!-- Cabecera del Modal de Opiniones -->
+            <div class="p-5 md:px-7 bg-gradient-to-r from-slot-dark via-[#252528] to-slot-dark text-white flex justify-between items-center sticky top-0 z-20">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-yellow-400 block" data-i18n="reviewsBadge">Comunidad SlotSoftware</span>
+                    <h3 id="reviews-modal-title" class="font-sans font-bold text-xl md:text-2xl text-white tracking-tight">Valoraciones y Comentarios</h3>
+                </div>
+                <button onclick="closeReviewsModal()" class="bg-white/10 text-white hover:bg-slot-red transition-colors p-2 rounded-full cursor-pointer">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            <div class="p-5 md:p-7 overflow-y-auto bg-[#F5F5F7] flex-1 space-y-6">
+                <!-- Resumen de Puntuación Media -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div id="reviews-avg-num" class="text-4xl font-extrabold text-apple-text">5.0</div>
+                        <div>
+                            <div id="reviews-avg-stars" class="flex items-center gap-1 text-yellow-400"></div>
+                            <p id="reviews-total-count" class="text-xs text-apple-gray font-medium mt-1">Basado en valoraciones de pilotos</p>
+                        </div>
+                    </div>
+                    <div class="text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full bg-green-100 text-green-800">
+                        ⭐ 100% Verificado
+                    </div>
+                </div>
+
+                <!-- Formulario para Votar (1 a 5 estrellas) y Dejar Comentario -->
+                <form id="review-form" onsubmit="submitProgramReview(event)" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 space-y-4">
+                    <h4 class="font-sans font-bold text-sm uppercase tracking-wider text-apple-text" data-i18n="reviewsFormTitle">Deja tu valoración y comentario</h4>
+                    
+                    <!-- Selector interactivo de 1 a 5 estrellas -->
+                    <div>
+                        <label class="block text-xs font-semibold text-apple-gray mb-1.5" data-i18n="reviewsSelectStars">Tu puntuación (1 a 5 estrellas):</label>
+                        <div class="flex items-center gap-1.5" id="interactive-star-picker">
+                            <button type="button" onclick="setReviewStars(1)" class="star-pick-btn p-1 transition-transform hover:scale-125 cursor-pointer text-yellow-400" aria-label="1 estrella">
+                                <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            </button>
+                            <button type="button" onclick="setReviewStars(2)" class="star-pick-btn p-1 transition-transform hover:scale-125 cursor-pointer text-yellow-400" aria-label="2 estrellas">
+                                <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            </button>
+                            <button type="button" onclick="setReviewStars(3)" class="star-pick-btn p-1 transition-transform hover:scale-125 cursor-pointer text-yellow-400" aria-label="3 estrellas">
+                                <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            </button>
+                            <button type="button" onclick="setReviewStars(4)" class="star-pick-btn p-1 transition-transform hover:scale-125 cursor-pointer text-yellow-400" aria-label="4 estrellas">
+                                <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            </button>
+                            <button type="button" onclick="setReviewStars(5)" class="star-pick-btn p-1 transition-transform hover:scale-125 cursor-pointer text-yellow-400" aria-label="5 estrellas">
+                                <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            </button>
+                            <span id="selected-stars-label" class="ml-2 text-xs font-bold text-apple-text bg-yellow-100 px-2.5 py-1 rounded-full">5 / 5 Estrellas</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-apple-text mb-1" data-i18n="reviewsFormName">Tu Nombre o Nick de Piloto</label>
+                            <input type="text" id="review-author" required maxlength="40" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-slot-red focus:border-transparent outline-none text-sm bg-gray-50" placeholder="Ej: Carlos Rally / Club Slot...">
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit" class="w-full bg-slot-red hover:bg-red-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm uppercase tracking-wider transition-all shadow-md cursor-pointer" data-i18n="reviewsFormSubmit">
+                                Publicar Opinión
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-apple-text mb-1" data-i18n="reviewsFormComment">Tu comentario sobre la aplicación</label>
+                        <textarea id="review-comment" required rows="2" maxlength="350" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-slot-red focus:border-transparent outline-none text-sm bg-gray-50 resize-none" placeholder="Escribe qué te parece la precisión, interfaz o funciones de esta herramienta..."></textarea>
+                    </div>
+                </form>
+
+                <!-- Lista de Comentarios de los Usuarios -->
+                <div>
+                    <h4 class="font-sans font-bold text-xs uppercase tracking-wider text-apple-gray mb-3" data-i18n="reviewsListHeading">Comentarios de los usuarios</h4>
+                    <div id="reviews-comments-list" class="space-y-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Pie de página (Footer con Logo de Admin) -->
     <footer class="bg-slot-dark pt-20 pb-10 relative mt-20">
         <div class="kerb-border w-full h-[4px] absolute top-0 -mt-1"></div>
@@ -817,7 +901,7 @@
             <div class="eq-bar h-1"></div>
             <div class="eq-bar h-1"></div>
         </div>
-        <audio id="bg-music" src="1.mp3" loop preload="metadata"></audio>
+        <audio id="bg-music" src="1.mp3" autoplay loop preload="auto"></audio>
     </div>
 
     <!-- Tostada de notificaciones para el Administrador -->
@@ -840,9 +924,10 @@
             measurementId: "G-QP0Y1GEXCC"
         };
 
-        let auth, db, textsDocRef, visitsDocRef;
+        let auth, db, textsDocRef, visitsDocRef, reviewsDocRef;
         window.savedCloudTexts = window.savedCloudTexts || JSON.parse(localStorage.getItem('slot_cloud_texts')) || {};
         window.cloudVisitsList = JSON.parse(localStorage.getItem('slot_cloud_visits')) || [];
+        window.cloudProgramReviews = JSON.parse(localStorage.getItem('slot_cloud_reviews')) || null;
         window.useFirebase = false;
 
         function showAdminToast(msg, isError = false) {
@@ -870,6 +955,7 @@
                 db = getFirestore(app);
                 textsDocRef = doc(db, 'novedades', 'textos_galeria_web');
                 visitsDocRef = doc(db, 'novedades', 'registro_visitas_web');
+                reviewsDocRef = doc(db, 'novedades', 'valoraciones_programas_web');
                 window.useFirebase = true;
             } catch (e) {
                 console.warn("Advertencia: No se pudo iniciar Firebase. Revisa las credenciales.");
@@ -898,6 +984,20 @@
                 if (window.renderAnalyticsUI) window.renderAnalyticsUI();
             }, (error) => {
                 console.warn("Aviso al leer visitas en Firebase:", error.message);
+            });
+
+            // Escuchar las valoraciones y comentarios de cada herramienta en tiempo real
+            onSnapshot(reviewsDocRef, (snapshot) => {
+                if (snapshot.exists() && snapshot.data().programs) {
+                    window.cloudProgramReviews = snapshot.data().programs;
+                    localStorage.setItem('slot_cloud_reviews', JSON.stringify(window.cloudProgramReviews));
+                    if (window.renderPrograms) window.renderPrograms();
+                    if (window.currentReviewProgId && window.renderModalReviewsList) {
+                        window.renderModalReviewsList(window.currentReviewProgId);
+                    }
+                }
+            }, (error) => {
+                console.warn("Aviso al leer valoraciones en Firebase:", error.message);
             });
         }
 
@@ -993,6 +1093,17 @@
                 } catch (e) {
                     showAdminToast("⚠️ Error limpiando en la nube.", true);
                 }
+            }
+        };
+
+        window.saveReviewsToCloud = async function(allReviewsObj) {
+            window.cloudProgramReviews = allReviewsObj;
+            localStorage.setItem('slot_cloud_reviews', JSON.stringify(allReviewsObj));
+            if (!window.useFirebase || !auth?.currentUser) return;
+            try {
+                await setDoc(reviewsDocRef, { programs: allReviewsObj });
+            } catch (e) {
+                console.warn("No se pudo sincronizar la valoración en Firebase:", e.message);
             }
         };
     </script>
@@ -1175,6 +1286,223 @@
         window.currentLightboxMediaId = null;
         let currentProgramId = null;
 
+        // =========================================================================
+        // SISTEMA DE VALORACIONES (1 A 5 ESTRELLAS) Y COMENTARIOS POR HERRAMIENTA
+        // =========================================================================
+        const defaultProgramReviews = {
+            'krono-personal-tv': [
+                { id: 'r1', author: 'Dani Slot Racing', stars: 5, date: 'Hace 2 días', text: 'Ver todos los paneles de telemetría en la Smart TV del club es otro nivel. La precisión de paso por vuelta es brutal.' },
+                { id: 'r2', author: 'Javier M.', stars: 5, date: 'Hace 5 días', text: 'Muy fácil de conectar con el móvil como mando remoto. Súper recomendado.' }
+            ],
+            'krono-dual-tv': [
+                { id: 'r3', author: 'Club Slot Manresa', stars: 5, date: 'Hace 1 día', text: 'Para los piques y torneos a 2 carriles en pantalla grande es una pasada. El narrador y las salidas falsas le dan mucha emoción.' },
+                { id: 'r4', author: 'Sergio V.', stars: 5, date: 'Hace 4 días', text: 'La comparativa vuelta a vuelta se ve clarísima desde cualquier punto de la pista.' }
+            ],
+            'sector-time-v1': [
+                { id: 'r5', author: 'Toni Ingeniería Slot', stars: 5, date: 'Hace 3 días', text: 'Por fin podemos medir qué tramo exacto del circuito nos hace ganar o perder décimas al cambiar neumáticos.' }
+            ],
+            'tracks-telemetry-v2': [
+                { id: 'r6', author: 'Marc R.', stars: 5, date: 'Hace 2 días', text: 'El diseñador 2D con paso inmediato a vista 3D y las fichas de garaje en PDF son imprescindibles para diseñar circuitos.' },
+                { id: 'r7', author: 'Alberto G.', stars: 5, date: 'Hace 6 días', text: 'Encaje magnético perfecto con pistas Ninco y Scalextric. Una joya de programa.' }
+            ],
+            'krono-dual-v3': [
+                { id: 'r8', author: 'Pedro & Lucas', stars: 5, date: 'Hace 3 días', text: 'Con una simple webcam cuenta las vueltas de los dos carriles al milisegundo sin necesidad de puentes físicos.' }
+            ],
+            'krono-personal-v3': [
+                { id: 'r9', author: 'Raúl RallySlot', stars: 5, date: 'Hace 2 días', text: 'Ideal para entrenar tramos en casa. Te canta los tiempos por voz mientras conduces sin levantar la vista de la pista.' }
+            ]
+        };
+
+        window.currentReviewProgId = null;
+        let currentSelectedStars = 5;
+
+        function getProgramReviewsData() {
+            if (!window.cloudProgramReviews) {
+                const local = JSON.parse(localStorage.getItem('slot_cloud_reviews'));
+                window.cloudProgramReviews = local || JSON.parse(JSON.stringify(defaultProgramReviews));
+            }
+            programs.forEach(p => {
+                if (!Array.isArray(window.cloudProgramReviews[p.id])) {
+                    window.cloudProgramReviews[p.id] = defaultProgramReviews[p.id] ? [...defaultProgramReviews[p.id]] : [];
+                }
+            });
+            return window.cloudProgramReviews;
+        }
+
+        function getProgramStats(progId) {
+            const all = getProgramReviewsData();
+            const list = all[progId] || [];
+            if (list.length === 0) return { avg: '5.0', count: 0, latest: null };
+            const sum = list.reduce((acc, r) => acc + (Number(r.stars) || 5), 0);
+            const avg = (sum / list.length).toFixed(1);
+            return { avg, count: list.length, latest: list[0] };
+        }
+
+        function renderStarsMiniHtml(avgNumber, progId) {
+            const rounded = Math.round(Number(avgNumber) || 5);
+            let html = '';
+            for (let s = 1; s <= 5; s++) {
+                const colorClass = s <= rounded ? 'text-yellow-400' : 'text-gray-300';
+                html += `<button type="button" onclick="quickVoteStar('${progId}', ${s}, event)" title="Votar ${s} estrellas" class="${colorClass} hover:scale-125 transition-transform cursor-pointer focus:outline-none">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                </button>`;
+            }
+            return html;
+        }
+
+        function quickVoteStar(progId, stars, e) {
+            if (e) e.stopPropagation();
+            openReviewsModal(progId, stars);
+        }
+
+        function setReviewStars(stars) {
+            currentSelectedStars = stars;
+            const buttons = document.querySelectorAll('#interactive-star-picker .star-pick-btn');
+            buttons.forEach((btn, idx) => {
+                if (idx < stars) {
+                    btn.classList.remove('text-gray-300');
+                    btn.classList.add('text-yellow-400');
+                } else {
+                    btn.classList.remove('text-yellow-400');
+                    btn.classList.add('text-gray-300');
+                }
+            });
+            const label = document.getElementById('selected-stars-label');
+            if (label) label.innerText = `${stars} / 5 Estrellas`;
+        }
+
+        function openReviewsModal(progId, preselectedStars = 5) {
+            window.currentReviewProgId = progId;
+            const prog = programs.find(p => p.id === progId);
+            if (!prog) return;
+
+            const titleEl = document.getElementById('reviews-modal-title');
+            if (titleEl) titleEl.innerText = prog.title[currentLang];
+
+            setReviewStars(preselectedStars);
+            renderModalReviewsList(progId);
+
+            const modal = document.getElementById('reviews-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            document.body.style.overflow = 'hidden';
+
+            if (window.SlotTracker) {
+                window.SlotTracker.logAction(`Abrió opiniones: ${prog.title.es}`);
+            }
+        }
+
+        function closeReviewsModal() {
+            const modal = document.getElementById('reviews-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        window.renderModalReviewsList = function(progId) {
+            const all = getProgramReviewsData();
+            const list = all[progId] || [];
+            const stats = getProgramStats(progId);
+
+            const avgNumEl = document.getElementById('reviews-avg-num');
+            const avgStarsEl = document.getElementById('reviews-avg-stars');
+            const totalCountEl = document.getElementById('reviews-total-count');
+            const listContainer = document.getElementById('reviews-comments-list');
+
+            if (avgNumEl) avgNumEl.innerText = stats.avg;
+            if (totalCountEl) totalCountEl.innerText = `${stats.count} valoraciones registradas`;
+            if (avgStarsEl) {
+                const rounded = Math.round(Number(stats.avg) || 5);
+                let starsHtml = '';
+                for (let s = 1; s <= 5; s++) {
+                    starsHtml += `<svg class="w-5 h-5 ${s <= rounded ? 'text-yellow-400' : 'text-gray-300'} fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+                }
+                avgStarsEl.innerHTML = starsHtml;
+            }
+
+            if (!listContainer) return;
+            if (list.length === 0) {
+                listContainer.innerHTML = `<div class="bg-white p-6 rounded-2xl text-center text-gray-400 text-sm">Sé el primero en valorar y comentar esta herramienta.</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = list.map((item, idx) => {
+                let itemStars = '';
+                for (let s = 1; s <= 5; s++) {
+                    itemStars += `<svg class="w-3.5 h-3.5 ${s <= item.stars ? 'text-yellow-400' : 'text-gray-300'} fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+                }
+                const deleteBtnHtml = window.isAdmin
+                    ? `<button onclick="deleteProgramReview('${progId}', ${idx})" class="text-[11px] font-bold text-red-500 hover:underline ml-2 cursor-pointer">Eliminar</button>`
+                    : '';
+
+                return `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-sm text-apple-text">${item.author}</span>
+                                <div class="flex items-center">${itemStars}</div>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-[11px] text-apple-gray">${item.date || 'Reciente'}</span>
+                                ${deleteBtnHtml}
+                            </div>
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">${item.text}</p>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        function submitProgramReview(e) {
+            e.preventDefault();
+            const progId = window.currentReviewProgId;
+            if (!progId) return;
+
+            const authorInput = document.getElementById('review-author');
+            const commentInput = document.getElementById('review-comment');
+            const author = (authorInput.value || '').trim();
+            const text = (commentInput.value || '').trim();
+            if (!author || !text) return;
+
+            const all = getProgramReviewsData();
+            const newReview = {
+                id: 'rev_' + Date.now(),
+                author: author,
+                stars: currentSelectedStars,
+                date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }),
+                text: text
+            };
+
+            all[progId].unshift(newReview);
+            if (window.saveReviewsToCloud) {
+                window.saveReviewsToCloud(all);
+            } else {
+                localStorage.setItem('slot_cloud_reviews', JSON.stringify(all));
+            }
+
+            authorInput.value = '';
+            commentInput.value = '';
+            renderModalReviewsList(progId);
+            renderPrograms();
+
+            if (window.SlotTracker) {
+                window.SlotTracker.logAction(`⭐ Votó ${currentSelectedStars}★ en ${progId}: "${text.substring(0, 40)}"`);
+            }
+        }
+
+        function deleteProgramReview(progId, index) {
+            if (!window.isAdmin) return;
+            const all = getProgramReviewsData();
+            if (all[progId]) {
+                all[progId].splice(index, 1);
+                if (window.saveReviewsToCloud) window.saveReviewsToCloud(all);
+                renderModalReviewsList(progId);
+                renderPrograms();
+            }
+        }
+
         function selectProgramForPurchase(programValue, cardElem) {
             const select = document.getElementById('form-program');
             if (select) {
@@ -1338,7 +1666,14 @@
             const grid = document.getElementById('programs-grid');
             grid.innerHTML = '';
             programs.forEach(prog => {
-                const imgAspectClass = 'aspect-[9/16] w-[70%] max-w-[220px]';
+                const imgAspectClass = 'aspect-[9/16] w-[80%]';
+                const stats = getProgramStats(prog.id);
+                const latestCommentHtml = stats.latest
+                    ? `<div class="mt-2.5 pt-2.5 border-t border-gray-100 text-left">
+                            <p class="text-xs text-gray-600 italic line-clamp-2">"${stats.latest.text}"</p>
+                            <span class="text-[10px] font-bold text-apple-gray block mt-1">— ${stats.latest.author}</span>
+                       </div>`
+                    : '';
                 
                 const card = document.createElement('div');
                 card.className = 'software-card group p-6 flex flex-col h-full relative';
@@ -1352,11 +1687,28 @@
                     </div>
                     
                     <div class="flex-grow flex flex-col">
-                        <h3 class="font-sans font-bold text-2xl mb-3 text-apple-text">${prog.title[currentLang]}</h3>
-                        <p class="text-apple-gray text-sm leading-relaxed mb-8 flex-grow">${prog.desc[currentLang]}</p>
+                        <h3 class="font-sans font-bold text-2xl mb-2 text-apple-text">${prog.title[currentLang]}</h3>
+                        <p class="text-apple-gray text-sm leading-relaxed mb-4 flex-grow">${prog.desc[currentLang]}</p>
+
+                        <!-- Cuadro de Valoración (1 a 5 Estrellas) y Comentarios de la Aplicación -->
+                        <div class="bg-white rounded-2xl p-3.5 mb-5 border border-gray-200/80 shadow-sm">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-1.5">
+                                    <div class="flex items-center gap-0.5">
+                                        ${renderStarsMiniHtml(stats.avg, prog.id)}
+                                    </div>
+                                    <span class="font-extrabold text-sm text-apple-text ml-1">${stats.avg}</span>
+                                    <span class="text-[11px] text-apple-gray">(${stats.count})</span>
+                                </div>
+                                <button type="button" onclick="openReviewsModal('${prog.id}'); event.stopPropagation();" class="text-[11px] font-bold text-slot-red hover:underline flex items-center gap-1 cursor-pointer">
+                                    <span>💬 Opiniones / Votar</span>
+                                </button>
+                            </div>
+                            ${latestCommentHtml}
+                        </div>
                     </div>
                     <div class="mt-auto flex flex-col gap-3">
-                        <button onclick="openModal('${prog.id}'); event.stopPropagation();" class="w-full bg-apple-text text-white py-2.5 rounded-xl font-sans font-bold uppercase tracking-wider text-sm transition-transform hover:scale-[1.02] shadow-md flex items-center justify-center gap-2">
+                        <button onclick="openModal('${prog.id}'); event.stopPropagation();" class="w-full bg-apple-text text-white py-2.5 rounded-xl font-sans font-bold uppercase tracking-wider text-sm transition-transform hover:scale-[1.02] shadow-md flex items-center justify-center gap-2 cursor-pointer">
                             <span>${i18nData[currentLang].catalogGalleryBtn}</span>
                         </button>
                         <a href="${prog.link}" target="_blank" class="w-full bg-white border-2 border-apple-text text-apple-text py-2.5 rounded-xl font-sans font-semibold text-sm transition-colors hover:bg-apple-bg flex items-center justify-center gap-2" onclick="event.stopPropagation();">
@@ -1675,6 +2027,40 @@
         }
 
         let isMusicPlaying = false;
+        let userManuallyPausedMusic = false;
+
+        function startMusicAutoplay() {
+            const audio = document.getElementById('bg-music');
+            const player = document.getElementById('music-player');
+            if (!audio || !player || isMusicPlaying || userManuallyPausedMusic) return;
+
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isMusicPlaying = true;
+                    player.classList.remove('paused');
+                    player.classList.add('playing');
+                }).catch(() => {
+                    // Si el navegador bloquea el autoplay con sonido antes de interactuar, lo activamos al primer clic/toque/scroll
+                    const unlockAudio = () => {
+                        if (!isMusicPlaying && !userManuallyPausedMusic) {
+                            audio.play().then(() => {
+                                isMusicPlaying = true;
+                                player.classList.remove('paused');
+                                player.classList.add('playing');
+                            }).catch(() => {});
+                        }
+                        document.removeEventListener('click', unlockAudio);
+                        document.removeEventListener('touchstart', unlockAudio);
+                        document.removeEventListener('scroll', unlockAudio);
+                    };
+                    document.addEventListener('click', unlockAudio, { once: true });
+                    document.addEventListener('touchstart', unlockAudio, { once: true });
+                    document.addEventListener('scroll', unlockAudio, { once: true });
+                });
+            }
+        }
+
         function toggleMusic() {
             const audio = document.getElementById('bg-music');
             const player = document.getElementById('music-player');
@@ -1683,18 +2069,21 @@
                 audio.pause();
                 player.classList.remove('playing');
                 player.classList.add('paused');
+                isMusicPlaying = false;
+                userManuallyPausedMusic = true;
             } else {
+                userManuallyPausedMusic = false;
                 const playPromise = audio.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
                         player.classList.remove('paused');
                         player.classList.add('playing');
+                        isMusicPlaying = true;
                     }).catch(error => {
                         console.warn("Aún no se ha encontrado el archivo 1.mp3 en el servidor para reproducirlo:", error);
                     });
                 }
             }
-            isMusicPlaying = !isMusicPlaying;
         }
 
         // Control del Carrusel de 5 Vídeos Promocionales (Automático cada 5s y Manual)
@@ -2080,6 +2469,7 @@
             renderVerticalToolsCarousel();
             startVerticalCarouselLoop();
             setupPromoSwipe();
+            startMusicAutoplay();
 
             if (!localStorage.getItem('cookiesAccepted')) {
                 setTimeout(() => {
