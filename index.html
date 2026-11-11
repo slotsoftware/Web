@@ -444,6 +444,8 @@
                         <ul id="modal-features" class="space-y-3 text-sm text-apple-text"></ul>
                     </div>
                 </div>
+                <!-- Contenedor destacado para vídeos (Doble de grandes y en Autoplay) -->
+                <div id="modal-videos-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 empty:hidden"></div>
                 <div id="modal-gallery" class="masonry pb-10"></div>
             </div>
         </div>
@@ -1745,7 +1747,9 @@
                 featuresList.appendChild(li);
             });
 
+            const videosGrid = document.getElementById('modal-videos-grid');
             const galleryGrid = document.getElementById('modal-gallery');
+            if (videosGrid) videosGrid.innerHTML = '';
             galleryGrid.innerHTML = '';
 
             let totalImages = 30;
@@ -1781,8 +1785,6 @@
                 if (isVertical) itemAspect = 'aspect-[9/16]';
                 else if (isHybrid && i % 2 !== 0) itemAspect = 'aspect-[9/16]';
 
-                item.className = `masonry-item group cursor-pointer w-full relative ${itemAspect} min-h-[150px]`;
-                
                 let currentMediaId = '';
                 if (isVideoPosition) {
                     currentMediaId = videoSrc;
@@ -1795,18 +1797,29 @@
                 item.onclick = () => openLightbox(isVideoPosition ? videoSrc : currentMediaId, isVideoPosition ? 'video' : 'img', currentMediaId);
 
                 if (isVideoPosition) {
+                    // El vídeo ocupa el doble de ancho (2 de las 4 columnas de la galería)
+                    const videoSizeClass = isVertical
+                        ? 'md:col-span-2 w-full max-w-md mx-auto aspect-[9/16]'
+                        : (prog.id === 'sector-time-v1' ? 'w-full aspect-video' : 'md:col-span-2 w-full aspect-video');
+
+                    item.className = `group cursor-pointer relative ${videoSizeClass} rounded-2xl overflow-hidden shadow-apple-lg border-2 border-slot-red/30 bg-[#F5F5F7]`;
                     item.innerHTML = `
                         <div class="absolute inset-0 bg-gray-200 flex flex-col items-center justify-center text-gray-400 p-4 text-center z-0">
                             <span class="font-bold text-sm uppercase tracking-widest">${i18nData[currentLang].errorMissing} ${videoSrc}</span>
                         </div>
-                        <video src="${videoSrc}" class="absolute inset-0 w-full h-full object-cover z-10" preload="metadata"></video>
-                        <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors z-20 flex items-center justify-center pointer-events-none">
-                            <div class="w-16 h-16 bg-slot-red/90 rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
+                        <video src="${videoSrc}" autoplay loop muted playsinline class="gallery-autoplay-video absolute inset-0 w-full h-full object-cover z-10" preload="auto"></video>
+                        <div class="absolute top-3 right-3 bg-slot-red text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full z-30 shadow-md flex items-center gap-1.5 pointer-events-none">
+                            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                            <span>EN REPRODUCCIÓN • CLIC PARA AMPLIAR</span>
+                        </div>
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors z-20 flex items-center justify-center pointer-events-none">
+                            <div class="w-16 h-16 bg-slot-red/90 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-110 transition-all">
                                 <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             </div>
                         </div>
                     `;
                 } else {
+                    item.className = `masonry-item group cursor-pointer w-full relative ${itemAspect} min-h-[150px]`;
                     item.innerHTML = `
                         <div class="absolute inset-0 bg-gray-200 flex flex-col items-center justify-center text-gray-400 p-4 text-center z-0">
                             <span class="font-bold text-sm uppercase tracking-widest">${i18nData[currentLang].errorMissing} ${currentMediaId}</span>
@@ -1817,10 +1830,13 @@
                 }
 
                 const caption = document.createElement('div');
-                caption.className = 'absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white text-xs font-medium z-30 pointer-events-none';
+                caption.className = 'absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent text-white text-xs font-bold z-30 pointer-events-none';
                 
                 if (isVideoPosition) {
-                    caption.innerText = i18nData[currentLang].imgVideo || 'VÍDEO PRESENTACIÓN';
+                    caption.innerText = `🎬 ${i18nData[currentLang].imgVideo || 'VÍDEO PRESENTACIÓN'} (${videoSrc})`;
+                    item.appendChild(caption);
+                    if (videosGrid) videosGrid.appendChild(item);
+                    else galleryGrid.appendChild(item);
                 } else {
                     let imgNumber = i + 1;
                     if (prog.id === 'sector-time-v1') {
@@ -1829,11 +1845,9 @@
                         imgNumber = i;
                     }
                     caption.innerText = `${i18nData[currentLang].imgCaption} ${imgNumber}`;
+                    item.appendChild(caption);
+                    galleryGrid.appendChild(item);
                 }
-                
-                item.appendChild(caption);
-
-                galleryGrid.appendChild(item);
 
                 if (prog.id === 'tracks-telemetry-v2' && currentMediaId === '77.jpg') {
                     const itemExtra = document.createElement('div');
@@ -1861,13 +1875,25 @@
 
             const modal = document.getElementById('program-modal');
             modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                // Iniciar automáticamente todos los vídeos de la galería abierta
+                document.querySelectorAll('#modal-videos-grid .gallery-autoplay-video').forEach(vid => {
+                    vid.muted = true;
+                    const p = vid.play();
+                    if (p !== undefined) p.catch(() => {});
+                });
+            }, 10);
             document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
             const modal = document.getElementById('program-modal');
             modal.classList.add('opacity-0');
+            // Pausar los vídeos de la galería al cerrarla para liberar memoria
+            document.querySelectorAll('#modal-videos-grid .gallery-autoplay-video').forEach(vid => {
+                vid.pause();
+            });
             setTimeout(() => {
                 modal.classList.add('hidden');
                 document.body.style.overflow = 'auto';
