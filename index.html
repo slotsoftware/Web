@@ -325,38 +325,40 @@
                 </button>
             </div>
             
-            <!-- CONTENEDOR DE 5 IMÁGENES HERO CON COREOGRAFÍA MORPHING DRÁSTICA CADA 3 SEGUNDOS -->
-            <div class="relative w-full max-w-5xl mx-auto h-[420px] sm:h-[560px] md:h-[680px] mt-16 md:mt-24 select-none" id="hero-morph-stage">
-                <!-- Indicador sutil de la figura actual -->
-                <div class="absolute -top-9 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-gray-100/90 backdrop-blur-sm px-4 py-1 rounded-full border border-gray-200 shadow-sm">
+            <!-- CARRUSEL DE IMÁGENES HORIZONTALES DE LAS HERRAMIENTAS (Mismo tamaño que el vídeo, paso automático cada 2 segundos) -->
+            <div id="vertical-tools-carousel" class="mt-10 w-full max-w-4xl mx-auto aspect-video bg-gray-100 rounded-3xl md:rounded-[2.5rem] shadow-apple-lg overflow-hidden border-4 md:border-8 border-white relative flex items-center justify-center z-30 group select-none">
+                
+                <!-- Etiqueta superior informativa -->
+                <div class="absolute top-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-black/55 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/15 pointer-events-none">
                     <span class="w-2 h-2 rounded-full bg-slot-red animate-ping"></span>
-                    <span id="morph-formation-label" class="text-[10px] font-bold uppercase tracking-[0.2em] text-apple-gray">Formación: Mosaico Paddock Bento</span>
+                    <span id="vcarousel-tool-label" class="text-[11px] font-bold uppercase tracking-[0.18em] text-white">Galería Horizontal de Herramientas</span>
                 </div>
 
-                <!-- Imagen 1 -->
-                <div id="hero-piece-0" style="top:2%; left:2%; width:46%; height:62%; border-radius:64px 16px 64px 16px;" class="hero-morph-piece bg-gradient-to-br from-gray-100 to-gray-200 shadow-apple-lg z-30 border-4 md:border-8 border-white flex items-center justify-center overflow-hidden">
-                    <span class="text-gray-500 font-bold text-xs md:text-sm z-0 uppercase tracking-widest px-2">Poner 1.jpg</span>
-                    <img src="1.jpg" alt="Hero 1" class="absolute inset-0 w-full h-full object-cover hover:scale-110 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+                <!-- Pista deslizante horizontal (Cada imagen horizontal ocupa el 100% del visor, igual que el vídeo) -->
+                <div id="vertical-tools-track" class="flex w-full h-full transition-transform duration-700 ease-out">
+                    <!-- Se rellena dinámicamente con todas las imágenes horizontales de las herramientas -->
                 </div>
-                <!-- Imagen 2 -->
-                <div id="hero-piece-1" style="top:2%; left:50%; width:48%; height:30%; border-radius:16px 64px 16px 16px;" class="hero-morph-piece bg-gradient-to-br from-gray-100 to-gray-200 shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center overflow-hidden">
-                    <span class="text-gray-500 font-bold text-xs md:text-sm z-0 uppercase tracking-widest px-2">Poner 2.jpg</span>
-                    <img src="2.jpg" alt="Hero 2" class="absolute inset-0 w-full h-full object-cover hover:scale-110 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
-                </div>
-                <!-- Imagen 3 -->
-                <div id="hero-piece-2" style="top:34%; left:50%; width:23%; height:30%; border-radius:50%;" class="hero-morph-piece bg-gradient-to-br from-gray-100 to-gray-200 shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center overflow-hidden">
-                    <span class="text-gray-500 font-bold text-xs md:text-sm z-0 uppercase tracking-widest px-2">Poner 3.jpg</span>
-                    <img src="3.jpg" alt="Hero 3" class="absolute inset-0 w-full h-full object-cover hover:scale-110 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
-                </div>
-                <!-- Imagen 4 -->
-                <div id="hero-piece-3" style="top:34%; left:75%; width:23%; height:64%; border-radius:16px 16px 64px 16px;" class="hero-morph-piece bg-gradient-to-br from-gray-100 to-gray-200 shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center overflow-hidden">
-                    <span class="text-gray-500 font-bold text-xs md:text-sm z-0 uppercase tracking-widest px-2">Poner 4.jpg</span>
-                    <img src="4.jpg" alt="Hero 4" class="absolute inset-0 w-full h-full object-cover hover:scale-110 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
-                </div>
-                <!-- Imagen 5 -->
-                <div id="hero-piece-4" style="top:66%; left:2%; width:71%; height:32%; border-radius:16px 64px 16px 64px;" class="hero-morph-piece bg-gradient-to-br from-gray-100 to-gray-200 shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center overflow-hidden">
-                    <span class="text-gray-500 font-bold text-xs md:text-sm z-0 uppercase tracking-widest px-2">Poner 5.jpg</span>
-                    <img src="5.jpg" alt="Hero 5" class="absolute inset-0 w-full h-full object-cover hover:scale-110 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+
+                <!-- Flecha Izquierda -->
+                <button onclick="prevVerticalSlide(event)" aria-label="Imagen anterior" class="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-slot-red text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 shadow-lg border border-white/25 cursor-pointer hover:scale-105">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+
+                <!-- Flecha Derecha -->
+                <button onclick="nextVerticalSlide(event)" aria-label="Imagen siguiente" class="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-40 bg-black/50 hover:bg-slot-red text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 shadow-lg border border-white/25 cursor-pointer hover:scale-105">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
+
+                <!-- Barra inferior: Contador y botón de Pausar/Reanudar cada 2s -->
+                <div class="absolute bottom-4 left-4 right-4 md:bottom-5 md:left-6 md:right-6 z-40 flex items-center justify-between pointer-events-none">
+                    <button id="vcarousel-pause-btn" onclick="toggleVerticalAutoScroll(event)" class="pointer-events-auto bg-black/60 hover:bg-black/80 backdrop-blur-md text-white px-4 py-2 rounded-full flex items-center gap-2 transition-all shadow-lg border border-white/20 cursor-pointer text-xs font-semibold">
+                        <span id="vcarousel-status-dot" class="w-2 h-2 rounded-full bg-green-400"></span>
+                        <span id="vcarousel-pause-text">Pausar Scroll (2s)</span>
+                    </button>
+
+                    <div class="bg-black/55 backdrop-blur-md text-white/90 text-xs font-bold px-3.5 py-1.5 rounded-full border border-white/15">
+                        <span id="vcarousel-counter">1 / 93</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -417,18 +419,18 @@
                 </div>
                 <button type="button" onclick="closeModal()" class="bg-apple-bg text-apple-text hover:bg-gray-200 transition-colors p-2 rounded-full cursor-pointer">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-            
+            <!-- 
             <div class="flex-grow overflow-y-auto p-4 md:p-6 relative bg-white overscroll-contain">
-                <!-- Banner grande de Próximas Versiones Pro / Lite -->
-                <div id="modal-upcoming-banner" class="bg-gradient-to-r from-slot-dark via-[#252528] to-slot-dark text-white p-6 md:p-8 rounded-3xl mb-6 text-center shadow-apple-lg border-2 border-slot-red/80 relative overflow-hidden">
-                    <div class="inline-flex items-center gap-2 bg-slot-red text-white text-xs font-extrabold uppercase tracking-widest px-4 py-1 rounded-full mb-3 shadow">
+            -->
+            <div class="flex-grow overflow-y-auto p-4 md:p-6 relative bg-white overscroll-contain">
+                <!-- Banner grande de Nuevas Versiones Pro / Lite Ya a la Venta -->
+                <div id="modal-upcoming-banner" class="bg-gradient-to-r from-slot-dark via-[#252528] to-slot-dark text-white p-6 md:p-8 rounded-3xl mb-6 text-center shadow-apple-lg border-2 border-slot-red relative overflow-hidden">
+                    <div class="inline-flex items-center gap-2 bg-green-600 text-white text-xs font-extrabold uppercase tracking-widest px-4 py-1 rounded-full mb-3 shadow">
                         <span class="w-2 h-2 rounded-full bg-yellow-300 animate-ping"></span>
-                        <span>Novedad en Desarrollo</span>
+                        <span>¡DISPONIBLES AHORA MISMO!</span>
                     </div>
                     <h4 id="modal-upcoming-title" class="font-sans font-extrabold text-2xl sm:text-4xl md:text-5xl tracking-tight uppercase text-white drop-shadow-md leading-tight">
-                        PRÓXIMAS VERSIONES PRO
+                        NUEVAS VERSIONES PRO — ¡YA A LA VENTA!
                     </h4>
                     <p id="modal-upcoming-sub" class="font-sans font-bold text-lg sm:text-2xl md:text-3xl text-yellow-400 uppercase tracking-widest mt-2 drop-shadow">
                         TODO CON MÁS PRECISIÓN 100 X 100
@@ -1378,7 +1380,7 @@
             const upcomingTitle = document.getElementById('modal-upcoming-title');
             const upcomingSub = document.getElementById('modal-upcoming-sub');
             if (upcomingTitle && upcomingSub) {
-                upcomingTitle.innerText = isLiteTool ? 'PRÓXIMAS VERSIONES LITE' : 'PRÓXIMAS VERSIONES PRO';
+                upcomingTitle.innerText = isLiteTool ? 'NUEVAS VERSIONES LITE — ¡YA A LA VENTA!' : 'NUEVAS VERSIONES PRO — ¡YA A LA VENTA!';
                 upcomingSub.innerText = 'TODO CON MÁS PRECISIÓN 100 X 100';
             }
             
@@ -1890,131 +1892,194 @@
             }
         }
 
-        // Coreografía de Morphing Estilo "Mosaico Bento Arquitectónico" (Encaje perfecto de bloques con curvas opuestas cada 3 segundos)
-        const heroMorphFormations = [
-            {
-                name: "Mosaico Paddock Bento",
-                pieces: [
-                    // La opción 5 original: Gran bloque izq, 2 arriba/centro dcha, 1 píldora circular y base panorámica
-                    { top: '2%',  left: '2%',  width: '46%', height: '62%', radius: '64px 16px 64px 16px', rotate: '0deg', z: 25 },
-                    { top: '2%',  left: '50%', width: '48%', height: '30%', radius: '16px 64px 16px 16px', rotate: '0deg', z: 25 },
-                    { top: '34%', left: '50%', width: '23%', height: '30%', radius: '50%', rotate: '0deg', z: 35 },
-                    { top: '34%', left: '75%', width: '23%', height: '64%', radius: '16px 16px 64px 16px', rotate: '0deg', z: 25 },
-                    { top: '66%', left: '2%',  width: '71%', height: '32%', radius: '16px 64px 16px 64px', rotate: '0deg', z: 30 }
-                ]
-            },
-            {
-                name: "Bento Simétrico de Control",
-                pieces: [
-                    // Pantalla central circular/cápsula gigante flanqueada por 4 módulos angulares en las esquinas que la abrazan
-                    { top: '18%', left: '29%', width: '42%', height: '64%', radius: '90px 24px 90px 24px', rotate: '0deg', z: 40 },
-                    { top: '2%',  left: '2%',  width: '25%', height: '47%', radius: '64px 16px 16px 16px', rotate: '0deg', z: 25 },
-                    { top: '2%',  left: '73%', width: '25%', height: '47%', radius: '16px 64px 16px 16px', rotate: '0deg', z: 25 },
-                    { top: '51%', left: '2%',  width: '25%', height: '47%', radius: '16px 16px 16px 64px', rotate: '0deg', z: 25 },
-                    { top: '51%', left: '73%', width: '25%', height: '47%', radius: '16px 16px 64px 16px', rotate: '0deg', z: 25 }
-                ]
-            },
-            {
-                name: "Bento Telemetría Invertido",
-                pieces: [
-                    // Espejo asimétrico: Gran columna derecha curva, cabecera panorámica izquierda y 3 módulos encajados abajo
-                    { top: '2%',  left: '54%', width: '44%', height: '64%', radius: '16px 72px 16px 72px', rotate: '0deg', z: 30 },
-                    { top: '2%',  left: '2%',  width: '50%', height: '31%', radius: '72px 16px 16px 16px', rotate: '0deg', z: 25 },
-                    { top: '35%', left: '2%',  width: '24%', height: '63%', radius: '16px 16px 16px 72px', rotate: '0deg', z: 25 },
-                    { top: '35%', left: '28%', width: '24%', height: '31%', radius: '50%', rotate: '0deg', z: 35 },
-                    { top: '68%', left: '28%', width: '70%', height: '30%', radius: '64px 16px 72px 16px', rotate: '0deg', z: 30 }
-                ]
-            },
-            {
-                name: "Bento Galería de Boxes",
-                pieces: [
-                    // Gran monitor panorámico superior y 4 columnas inferiores con arcos alternos estilo cockpit
-                    { top: '2%',  left: '2%',  width: '96%', height: '44%', radius: '64px 64px 16px 16px', rotate: '0deg', z: 30 },
-                    { top: '48%', left: '2%',  width: '22.5%', height: '50%', radius: '16px 48px 16px 64px', rotate: '0deg', z: 25 },
-                    { top: '48%', left: '26.5%', width: '22.5%', height: '50%', radius: '48px 16px 48px 16px', rotate: '0deg', z: 35 },
-                    { top: '48%', left: '51%', width: '22.5%', height: '50%', radius: '16px 48px 16px 48px', rotate: '0deg', z: 35 },
-                    { top: '48%', left: '75.5%', width: '22.5%', height: '50%', radius: '48px 16px 64px 16px', rotate: '0deg', z: 25 }
-                ]
-            },
-            {
-                name: "Bento Turbina Modular",
-                pieces: [
-                    // 4 bloques alargados dispuestos en espiral cuadrada dejando una cápsula circular perfecta en el centro
-                    { top: '33%', left: '35%', width: '30%', height: '34%', radius: '50%', rotate: '0deg', z: 40 },
-                    { top: '2%',  left: '2%',  width: '63%', height: '29%', radius: '64px 16px 48px 16px', rotate: '0deg', z: 25 },
-                    { top: '2%',  left: '67%', width: '31%', height: '65%', radius: '16px 64px 16px 48px', rotate: '0deg', z: 25 },
-                    { top: '69%', left: '35%', width: '63%', height: '29%', radius: '48px 16px 64px 16px', rotate: '0deg', z: 25 },
-                    { top: '33%', left: '2%',  width: '31%', height: '65%', radius: '16px 48px 16px 64px', rotate: '0deg', z: 25 }
-                ]
-            },
-            {
-                name: "Bento Tríptico & Cápsulas",
-                pieces: [
-                    // Columna maestra central alta con dos módulos gemelos a cada lado de curvas contrapuestas
-                    { top: '2%',  left: '33%', width: '34%', height: '96%', radius: '999px', rotate: '0deg', z: 35 },
-                    { top: '2%',  left: '2%',  width: '29%', height: '56%', radius: '64px 20px 64px 20px', rotate: '0deg', z: 25 },
-                    { top: '60%', left: '2%',  width: '29%', height: '38%', radius: '20px 64px 20px 64px', rotate: '0deg', z: 25 },
-                    { top: '2%',  left: '69%', width: '29%', height: '38%', radius: '20px 64px 20px 64px', rotate: '0deg', z: 25 },
-                    { top: '42%', left: '69%', width: '29%', height: '56%', radius: '64px 20px 64px 20px', rotate: '0deg', z: 25 }
-                ]
-            }
-        ];
+        // =========================================================================
+        // CARRUSEL AUTOMÁTICO CADA 2 SEGUNDOS CON TODAS LAS IMÁGENES HORIZONTALES
+        // =========================================================================
+        let verticalToolImages = [];
+        let currentVerticalIndex = 0;
+        let verticalCarouselInterval = null;
+        let isVerticalAutoScroll = true;
 
-        let currentMorphIndex = 0;
+        function buildVerticalToolImagesList() {
+            const list = [];
 
-        function applyHeroMorphFormation(index) {
-            const formation = heroMorphFormations[index];
-            if (!formation) return;
-
-            const label = document.getElementById('morph-formation-label');
-            if (label) {
-                label.innerText = `Formación: ${formation.name}`;
+            // 1. KRONO PERSONAL PRO TV (híbrida: las posiciones pares > 0 son horizontales 16:9 -> 14 imágenes)
+            for (let i = 2; i < 30; i += 2) {
+                list.push({
+                    src: `${121 + i}.jpg`,
+                    toolTitle: "KRONO PERSONAL PRO TV",
+                    progId: "krono-personal-tv"
+                });
             }
 
-            formation.pieces.forEach((cfg, i) => {
-                const el = document.getElementById(`hero-piece-${i}`);
-                if (!el) return;
-                el.style.top = cfg.top;
-                el.style.left = cfg.left;
-                el.style.width = cfg.width;
-                el.style.height = cfg.height;
-                el.style.borderRadius = cfg.radius;
-                el.style.transform = `rotate(${cfg.rotate || '0deg'})`;
-                el.style.zIndex = cfg.z || 20;
-            });
+            // 2. KRONO DUAL PRO TV (híbrida: las posiciones pares > 0 son horizontales 16:9 -> 14 imágenes)
+            for (let i = 2; i < 30; i += 2) {
+                list.push({
+                    src: `${151 + i}.jpg`,
+                    toolTitle: "KRONO DUAL PRO TV",
+                    progId: "krono-dual-tv"
+                });
+            }
+
+            // 3. SECTOR TIME PRO (100% horizontal: 15 imágenes desde 181.jpg hasta 195.jpg)
+            for (let i = 4; i < 19; i++) {
+                list.push({
+                    src: `${181 + i - 4}.jpg`,
+                    toolTitle: "SECTOR TIME PRO",
+                    progId: "sector-time-v1"
+                });
+            }
+
+            // 4. TRACKS TELEMETRY PRO (100% horizontal: 49 imágenes + 77-1.jpg -> 50 imágenes)
+            for (let i = 0; i < 49; i++) {
+                const mediaId = `${72 + i}.jpg`;
+                list.push({
+                    src: mediaId,
+                    toolTitle: "TRACKS TELEMETRY PRO",
+                    progId: "tracks-telemetry-v2"
+                });
+                if (mediaId === '77.jpg') {
+                    list.push({
+                        src: '77-1.jpg',
+                        toolTitle: "TRACKS TELEMETRY PRO",
+                        progId: "tracks-telemetry-v2"
+                    });
+                }
+            }
+
+            verticalToolImages = list;
         }
 
-        function startHeroMorphLoop() {
-            applyHeroMorphFormation(0);
-            setInterval(() => {
-                currentMorphIndex = (currentMorphIndex + 1) % heroMorphFormations.length;
-                applyHeroMorphFormation(currentMorphIndex);
-            }, 3000);
+        function renderVerticalToolsCarousel() {
+            buildVerticalToolImagesList();
+            const track = document.getElementById('vertical-tools-track');
+            if (!track) return;
+
+            track.innerHTML = verticalToolImages.map((item) => `
+                <div onclick="openLightbox('${item.src}', 'img', '${item.src}')" class="vtool-slide w-full h-full flex-shrink-0 relative flex items-center justify-center bg-gray-100 cursor-pointer">
+                    <span class="text-gray-400 font-bold text-sm uppercase tracking-widest px-4 text-center z-0">Poner ${item.src} (${item.toolTitle})</span>
+                    <img src="${item.src}" alt="${item.toolTitle}" class="absolute inset-0 w-full h-full object-cover z-10" loading="lazy" onerror="this.style.display='none';">
+                    <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent z-20 pointer-events-none"></div>
+                </div>
+            `).join('');
+
+            updateVerticalCarouselPosition();
         }
 
-        // Soporte táctil (Swipe) para el carrusel de vídeos
+        function getVisibleVerticalSlidesCount() {
+            return 1;
+        }
+
+        function updateVerticalCarouselPosition() {
+            const track = document.getElementById('vertical-tools-track');
+            if (!track || verticalToolImages.length === 0) return;
+
+            const maxIndex = Math.max(0, verticalToolImages.length - 1);
+            if (currentVerticalIndex > maxIndex) currentVerticalIndex = 0;
+            if (currentVerticalIndex < 0) currentVerticalIndex = maxIndex;
+
+            track.style.transform = `translateX(-${currentVerticalIndex * 100}%)`;
+
+            const currentItem = verticalToolImages[currentVerticalIndex];
+            const label = document.getElementById('vcarousel-tool-label');
+            if (label && currentItem) {
+                label.innerText = `${currentItem.toolTitle} — (${currentItem.src})`;
+            }
+
+            const counter = document.getElementById('vcarousel-counter');
+            if (counter) {
+                counter.innerText = `${currentVerticalIndex + 1} / ${verticalToolImages.length}`;
+            }
+        }
+
+        function startVerticalCarouselLoop() {
+            clearInterval(verticalCarouselInterval);
+            if (!isVerticalAutoScroll) return;
+            verticalCarouselInterval = setInterval(() => {
+                const maxIndex = Math.max(0, verticalToolImages.length - 1);
+                currentVerticalIndex = currentVerticalIndex >= maxIndex ? 0 : currentVerticalIndex + 1;
+                updateVerticalCarouselPosition();
+            }, 2000);
+        }
+
+        function nextVerticalSlide(e) {
+            if (e) e.stopPropagation();
+            const visibleCount = getVisibleVerticalSlidesCount();
+            const maxIndex = Math.max(0, verticalToolImages.length - visibleCount);
+            currentVerticalIndex = currentVerticalIndex >= maxIndex ? 0 : currentVerticalIndex + 1;
+            updateVerticalCarouselPosition();
+            startVerticalCarouselLoop();
+        }
+
+        function prevVerticalSlide(e) {
+            if (e) e.stopPropagation();
+            const visibleCount = getVisibleVerticalSlidesCount();
+            const maxIndex = Math.max(0, verticalToolImages.length - visibleCount);
+            currentVerticalIndex = currentVerticalIndex <= 0 ? maxIndex : currentVerticalIndex - 1;
+            updateVerticalCarouselPosition();
+            startVerticalCarouselLoop();
+        }
+
+        function toggleVerticalAutoScroll(e) {
+            if (e) e.stopPropagation();
+            isVerticalAutoScroll = !isVerticalAutoScroll;
+            const dot = document.getElementById('vcarousel-status-dot');
+            const text = document.getElementById('vcarousel-pause-text');
+            if (isVerticalAutoScroll) {
+                if (dot) { dot.classList.remove('bg-yellow-400'); dot.classList.add('bg-green-400'); }
+                if (text) text.innerText = "Pausar Scroll (2s)";
+                startVerticalCarouselLoop();
+            } else {
+                clearInterval(verticalCarouselInterval);
+                if (dot) { dot.classList.remove('bg-green-400'); dot.classList.add('bg-yellow-400'); }
+                if (text) text.innerText = "Reanudar Scroll (2s)";
+            }
+        }
+
+        // Soporte táctil (Swipe) para el carrusel de vídeos y el carrusel vertical
         function setupPromoSwipe() {
             const carousel = document.getElementById('promo-carousel');
-            if (!carousel) return;
-            let startX = 0;
-            carousel.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX;
-            }, { passive: true });
-            carousel.addEventListener('touchend', (e) => {
-                const diff = startX - e.changedTouches[0].clientX;
-                if (Math.abs(diff) > 40) {
-                    if (diff > 0) nextPromoSlide();
-                    else prevPromoSlide();
-                }
-            }, { passive: true });
+            if (carousel) {
+                let startX = 0;
+                carousel.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                }, { passive: true });
+                carousel.addEventListener('touchend', (e) => {
+                    const diff = startX - e.changedTouches[0].clientX;
+                    if (Math.abs(diff) > 40) {
+                        if (diff > 0) nextPromoSlide();
+                        else prevPromoSlide();
+                    }
+                }, { passive: true });
+            }
+
+            const vCarousel = document.getElementById('vertical-tools-carousel');
+            if (vCarousel) {
+                let vStartX = 0;
+                vCarousel.addEventListener('touchstart', (e) => {
+                    vStartX = e.touches[0].clientX;
+                }, { passive: true });
+                vCarousel.addEventListener('touchend', (e) => {
+                    const diff = vStartX - e.changedTouches[0].clientX;
+                    if (Math.abs(diff) > 40) {
+                        if (diff > 0) nextVerticalSlide();
+                        else prevVerticalSlide();
+                    }
+                }, { passive: true });
+            }
         }
+
+        window.addEventListener('resize', () => {
+            updateVerticalCarouselPosition();
+        });
 
         // Inicialización principal al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
             changeLanguage(currentLang);
             startPromoAutoSlide();
+            renderVerticalToolsCarousel();
+            startVerticalCarouselLoop();
             setupPromoSwipe();
-            startHeroMorphLoop();
 
             if (!localStorage.getItem('cookiesAccepted')) {
                 setTimeout(() => {
