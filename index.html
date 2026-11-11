@@ -100,6 +100,17 @@
             animation: shimmer-sweep 3.5s infinite;
             pointer-events: none;
         }
+
+        /* Sistema de Morphing Coreografiado Drástico (Cada 3 segundos las 5 piezas crean una figura conjunta) */
+        .hero-morph-piece {
+            position: absolute;
+            transition: all 1.35s cubic-bezier(0.68, -0.25, 0.265, 1.25);
+            will-change: top, left, width, height, border-radius, transform, clip-path;
+        }
+        .hero-morph-piece:hover {
+            z-index: 50 !important;
+            filter: brightness(1.05);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -234,10 +245,63 @@
                 </button>
             </div>
 
-            <!-- VÍDEO DE PUBLICIDAD EN BUCLE -->
-            <div class="mt-12 w-full max-w-4xl mx-auto aspect-video bg-gray-100 rounded-3xl md:rounded-[2.5rem] shadow-apple-lg overflow-hidden border-4 md:border-8 border-white relative flex items-center justify-center z-30 group">
-                <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest absolute">Poner publicidad.mp4</span>
-                <video id="promo-video" src="publicidad.mp4" autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-10 bg-black/5"></video>
+            <!-- CARRUSEL DE 5 VÍDEOS DE PUBLICIDAD (Automático cada 5s y Manual) -->
+            <div id="promo-carousel" class="mt-12 w-full max-w-4xl mx-auto aspect-video bg-gray-100 rounded-3xl md:rounded-[2.5rem] shadow-apple-lg overflow-hidden border-4 md:border-8 border-white relative flex items-center justify-center z-30 group select-none">
+                
+                <!-- Pista deslizante horizontal -->
+                <div id="promo-track" class="flex w-full h-full transition-transform duration-700 ease-out">
+                    <!-- Vídeo 1 -->
+                    <div class="w-full h-full flex-shrink-0 relative flex items-center justify-center bg-gray-100">
+                        <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest absolute">Poner publicidad.mp4</span>
+                        <video src="publicidad.mp4" autoplay loop muted playsinline class="promo-video-item absolute inset-0 w-full h-full object-cover z-10 bg-black/5"></video>
+                    </div>
+                    <!-- Vídeo 2 -->
+                    <div class="w-full h-full flex-shrink-0 relative flex items-center justify-center bg-gray-100">
+                        <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest absolute">Poner publicidad2.mp4</span>
+                        <video src="publicidad2.mp4" autoplay loop muted playsinline class="promo-video-item absolute inset-0 w-full h-full object-cover z-10 bg-black/5"></video>
+                    </div>
+                    <!-- Vídeo 3 -->
+                    <div class="w-full h-full flex-shrink-0 relative flex items-center justify-center bg-gray-100">
+                        <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest absolute">Poner publicidad3.mp4</span>
+                        <video src="publicidad3.mp4" autoplay loop muted playsinline class="promo-video-item absolute inset-0 w-full h-full object-cover z-10 bg-black/5"></video>
+                    </div>
+                    <!-- Vídeo 4 -->
+                    <div class="w-full h-full flex-shrink-0 relative flex items-center justify-center bg-gray-100">
+                        <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest absolute">Poner publicidad4.mp4</span>
+                        <video src="publicidad4.mp4" autoplay loop muted playsinline class="promo-video-item absolute inset-0 w-full h-full object-cover z-10 bg-black/5"></video>
+                    </div>
+                    <!-- Vídeo 5 -->
+                    <div class="w-full h-full flex-shrink-0 relative flex items-center justify-center bg-gray-100">
+                        <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest absolute">Poner publicidad5.mp4</span>
+                        <video src="publicidad5.mp4" autoplay loop muted playsinline class="promo-video-item absolute inset-0 w-full h-full object-cover z-10 bg-black/5"></video>
+                    </div>
+                </div>
+
+                <!-- Flecha Izquierda (Manual) -->
+                <button onclick="prevPromoSlide(event)" aria-label="Vídeo anterior" class="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-40 bg-black/45 hover:bg-slot-red text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 shadow-lg border border-white/25 cursor-pointer hover:scale-105">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+
+                <!-- Flecha Derecha (Manual) -->
+                <button onclick="nextPromoSlide(event)" aria-label="Siguiente vídeo" class="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-40 bg-black/45 hover:bg-slot-red text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 shadow-lg border border-white/25 cursor-pointer hover:scale-105">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
+
+                <!-- Indicadores inferiores (Puntos clicables) -->
+                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/15">
+                    <button onclick="goToPromoSlide(0, event)" class="promo-dot w-6 h-2 rounded-full bg-slot-red transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 1"></button>
+                    <button onclick="goToPromoSlide(1, event)" class="promo-dot w-2 h-2 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 2"></button>
+                    <button onclick="goToPromoSlide(2, event)" class="promo-dot w-2 h-2 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 3"></button>
+                    <button onclick="goToPromoSlide(3, event)" class="promo-dot w-2 h-2 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 4"></button>
+                    <button onclick="goToPromoSlide(4, event)" class="promo-dot w-2 h-2 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer" aria-label="Ir al vídeo 5"></button>
+                </div>
+
+                <!-- Botón flotante para fijar/desactivar el paso automático y ver el vídeo tranquilo -->
+                <button id="promo-autoscroll-btn" onclick="togglePromoAutoScroll(event)" class="absolute bottom-4 left-4 md:bottom-6 md:left-6 z-40 bg-black/60 hover:bg-black/80 backdrop-blur-md text-white p-2.5 md:px-4 md:py-2.5 rounded-full flex items-center gap-2 transition-all shadow-lg border border-white/20 cursor-pointer">
+                    <svg id="promo-icon-autoscroll-pause" class="w-4 h-4 md:w-5 md:h-5 block text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <svg id="promo-icon-autoscroll-play" class="w-4 h-4 md:w-5 md:h-5 hidden text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span id="promo-autoscroll-text" class="text-xs md:text-sm font-semibold tracking-wide hidden sm:block" data-i18n="promoAutoScrollOff">Fijar Vídeo</span>
+                </button>
                 
                 <!-- Botón flotante para activar/desactivar sonido -->
                 <button onclick="togglePromoSound(event)" class="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-40 bg-black/60 hover:bg-black/80 backdrop-blur-md text-white p-2.5 md:px-5 md:py-2.5 rounded-full flex items-center gap-2 transition-all shadow-lg border border-white/20 cursor-pointer">
@@ -247,32 +311,38 @@
                 </button>
             </div>
             
-            <!-- CONTENEDOR DE IMÁGENES HERO -->
-            <div class="relative w-full max-w-6xl mx-auto h-[450px] sm:h-[600px] md:h-[750px] mt-16 md:mt-24">
-                <!-- Imagen 1 (Central Principal) -->
-                <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[45%] md:w-[32%] h-[85%] md:h-[90%] bg-gray-100 rounded-[100px] md:rounded-[200px] shadow-apple-lg z-30 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 1.jpg</span>
-                    <img src="1.jpg" alt="Hero 1" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+            <!-- CONTENEDOR DE 5 IMÁGENES HERO CON COREOGRAFÍA MORPHING DRÁSTICA CADA 3 SEGUNDOS -->
+            <div class="relative w-full max-w-5xl mx-auto h-[420px] sm:h-[560px] md:h-[680px] mt-16 md:mt-24 select-none" id="hero-morph-stage">
+                <!-- Indicador sutil de la figura actual -->
+                <div class="absolute -top-9 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-gray-100/90 backdrop-blur-sm px-4 py-1 rounded-full border border-gray-200 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-slot-red animate-ping"></span>
+                    <span id="morph-formation-label" class="text-[10px] font-bold uppercase tracking-[0.2em] text-apple-gray">Formación: Mosaico Paddock Bento</span>
                 </div>
-                <!-- Imagen 2 (Arriba Izquierda) -->
-                <div class="absolute left-[5%] md:left-[12%] top-[10%] md:top-[15%] w-[40%] md:w-[26%] aspect-square bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 2.jpg</span>
-                    <img src="2.jpg" alt="Hero 2" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+
+                <!-- Imagen 1 -->
+                <div id="hero-piece-0" style="top:2%; left:2%; width:46%; height:62%; border-radius:64px 16px 64px 16px;" class="hero-morph-piece bg-gradient-to-br from-gray-100 to-gray-200 shadow-apple-lg z-30 border-4 md:border-8 border-white flex items-center justify-center overflow-hidden">
+                    <span class="text-gray-500 font-bold text-xs md:text-sm z-0 uppercase tracking-widest px-2">Poner 1.jpg</span>
+                    <img src="1.jpg" alt="Hero 1" class="absolute inset-0 w-full h-full object-cover hover:scale-110 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
-                <!-- Imagen 3 (Arriba Derecha) -->
-                <div class="absolute right-[5%] md:right-[10%] top-[5%] md:top-[8%] w-[42%] md:w-[30%] aspect-[4/3] bg-gray-100 rounded-[2rem] md:rounded-[3rem] shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 3.jpg</span>
-                    <img src="3.jpg" alt="Hero 3" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+                <!-- Imagen 2 -->
+                <div id="hero-piece-1" style="top:2%; left:50%; width:48%; height:30%; border-radius:16px 64px 16px 16px;" class="hero-morph-piece bg-gradient-to-br from-gray-100 to-gray-200 shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center overflow-hidden">
+                    <span class="text-gray-500 font-bold text-xs md:text-sm z-0 uppercase tracking-widest px-2">Poner 2.jpg</span>
+                    <img src="2.jpg" alt="Hero 2" class="absolute inset-0 w-full h-full object-cover hover:scale-110 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
-                <!-- Imagen 4 (Abajo Izquierda) -->
-                <div class="absolute left-[10%] bottom-[15%] md:bottom-[5%] w-[40%] md:w-[30%] h-[35%] md:h-[40%] bg-gray-100 rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-xl rounded-bl-xl shadow-apple-lg z-20 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 4.jpg</span>
-                    <img src="4.jpg" alt="Hero 4" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+                <!-- Imagen 3 -->
+                <div id="hero-piece-2" style="top:34%; left:50%; width:23%; height:30%; border-radius:50%;" class="hero-morph-piece bg-gradient-to-br from-gray-100 to-gray-200 shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center overflow-hidden">
+                    <span class="text-gray-500 font-bold text-xs md:text-sm z-0 uppercase tracking-widest px-2">Poner 3.jpg</span>
+                    <img src="3.jpg" alt="Hero 3" class="absolute inset-0 w-full h-full object-cover hover:scale-110 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
-                <!-- Imagen 5 (Abajo Derecha) -->
-                <div class="absolute right-[8%] bottom-[5%] md:bottom-[15%] w-[45%] md:w-[35%] h-[25%] md:h-[30%] bg-gray-100 rounded-full shadow-apple-lg z-40 border-4 md:border-8 border-white hidden sm:flex items-center justify-center border-dashed border-gray-300 overflow-hidden">
-                    <span class="text-gray-400 font-bold text-sm z-0 uppercase tracking-widest">Poner 5.jpg</span>
-                    <img src="5.jpg" alt="Hero 5" class="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+                <!-- Imagen 4 -->
+                <div id="hero-piece-3" style="top:34%; left:75%; width:23%; height:64%; border-radius:16px 16px 64px 16px;" class="hero-morph-piece bg-gradient-to-br from-gray-100 to-gray-200 shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center overflow-hidden">
+                    <span class="text-gray-500 font-bold text-xs md:text-sm z-0 uppercase tracking-widest px-2">Poner 4.jpg</span>
+                    <img src="4.jpg" alt="Hero 4" class="absolute inset-0 w-full h-full object-cover hover:scale-110 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
+                </div>
+                <!-- Imagen 5 -->
+                <div id="hero-piece-4" style="top:66%; left:2%; width:71%; height:32%; border-radius:16px 64px 16px 64px;" class="hero-morph-piece bg-gradient-to-br from-gray-100 to-gray-200 shadow-apple-lg z-20 border-4 md:border-8 border-white flex items-center justify-center overflow-hidden">
+                    <span class="text-gray-500 font-bold text-xs md:text-sm z-0 uppercase tracking-widest px-2">Poner 5.jpg</span>
+                    <img src="5.jpg" alt="Hero 5" class="absolute inset-0 w-full h-full object-cover hover:scale-110 transition-transform duration-700 bg-white z-10" onerror="this.style.display='none';">
                 </div>
             </div>
         </div>
@@ -461,49 +531,7 @@
                         Haz clic en cualquier programa para seleccionarlo:
                     </p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                        <!-- Krono Personal V3.0 -->
-                        <div onclick="selectProgramForPurchase('Krono Personal V3.0 (5€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
-                            <div>
-                                <div class="flex justify-between items-start gap-2">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 group-hover:bg-red-50 group-hover:text-slot-red transition-colors">1 Carril • Webcam</span>
-                                    <div class="text-right">
-                                        <span class="font-sans font-extrabold text-2xl text-apple-text group-hover:text-slot-red transition-colors">5€</span>
-                                    </div>
-                                </div>
-                                <h4 class="font-bold text-base text-apple-text mt-2">Krono Personal V3.0</h4>
-                                <p class="text-xs text-apple-gray mt-1">Visión artificial fotométrica y voz en tiempo real.</p>
-                            </div>
-                        </div>
-
-                        <!-- Krono Dual V3.0 -->
-                        <div onclick="selectProgramForPurchase('Krono Dual V3.0 (10€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
-                            <div>
-                                <div class="flex justify-between items-start gap-2">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-red-50 text-slot-red">Popular • 1 vs 1</span>
-                                    <div class="text-right">
-                                        <span class="font-sans font-extrabold text-2xl text-apple-text group-hover:text-slot-red transition-colors">10€</span>
-                                    </div>
-                                </div>
-                                <h4 class="font-bold text-base text-apple-text mt-2">Krono Dual V3.0</h4>
-                                <p class="text-xs text-apple-gray mt-1">Piques a 2 carriles, falsas salidas y narrador.</p>
-                            </div>
-                        </div>
-
-                        <!-- Tracks Telemetry V2.0 -->
-                        <div onclick="selectProgramForPurchase('Tracks Telemetry V2.0 (20€)', this)" class="pricing-card cursor-pointer bg-gradient-to-br from-white to-blue-50/40 p-4 rounded-2xl shadow-sm border-2 border-apple-blue/30 hover:border-apple-blue hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
-                            <div>
-                                <div class="flex justify-between items-start gap-2">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-apple-blue text-white">Suite Pro 2D/3D</span>
-                                    <div class="text-right">
-                                        <span class="font-sans font-extrabold text-2xl text-apple-blue">20€</span>
-                                    </div>
-                                </div>
-                                <h4 class="font-bold text-base text-apple-text mt-2">Tracks Telemetry V2.0</h4>
-                                <p class="text-xs text-apple-gray mt-1">Diseñador de circuitos 2D, vista 3D y garaje PDF.</p>
-                            </div>
-                        </div>
-
-                        <!-- Krono Personal TV -->
+                        <!-- 1. Krono Personal TV -->
                         <div onclick="selectProgramForPurchase('Krono Personal TV (10€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                             <div>
                                 <div class="flex justify-between items-start gap-2">
@@ -517,7 +545,7 @@
                             </div>
                         </div>
 
-                        <!-- Krono Dual TV -->
+                        <!-- 2. Krono Dual TV -->
                         <div onclick="selectProgramForPurchase('Krono Dual TV (15€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                             <div>
                                 <div class="flex justify-between items-start gap-2">
@@ -531,7 +559,7 @@
                             </div>
                         </div>
 
-                        <!-- Sector Time V1.0 -->
+                        <!-- 3. Sector Time V1.0 -->
                         <div onclick="selectProgramForPurchase('Sector Time V1.0 (15€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                             <div>
                                 <div class="flex justify-between items-start gap-2">
@@ -542,6 +570,48 @@
                                 </div>
                                 <h4 class="font-bold text-base text-apple-text mt-2">Sector Time V1.0</h4>
                                 <p class="text-xs text-apple-gray mt-1">Cronometraje por sectores y análisis de tramos.</p>
+                            </div>
+                        </div>
+
+                        <!-- 4. Tracks Telemetry V2.0 -->
+                        <div onclick="selectProgramForPurchase('Tracks Telemetry V2.0 (20€)', this)" class="pricing-card cursor-pointer bg-gradient-to-br from-white to-blue-50/40 p-4 rounded-2xl shadow-sm border-2 border-apple-blue/30 hover:border-apple-blue hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
+                            <div>
+                                <div class="flex justify-between items-start gap-2">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-apple-blue text-white">Suite Pro 2D/3D</span>
+                                    <div class="text-right">
+                                        <span class="font-sans font-extrabold text-2xl text-apple-blue">20€</span>
+                                    </div>
+                                </div>
+                                <h4 class="font-bold text-base text-apple-text mt-2">Tracks Telemetry V2.0</h4>
+                                <p class="text-xs text-apple-gray mt-1">Diseñador de circuitos 2D, vista 3D y garaje PDF.</p>
+                            </div>
+                        </div>
+
+                        <!-- 5. Krono Dual V3.0 -->
+                        <div onclick="selectProgramForPurchase('Krono Dual V3.0 (10€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
+                            <div>
+                                <div class="flex justify-between items-start gap-2">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-red-50 text-slot-red">Popular • 1 vs 1</span>
+                                    <div class="text-right">
+                                        <span class="font-sans font-extrabold text-2xl text-apple-text group-hover:text-slot-red transition-colors">10€</span>
+                                    </div>
+                                </div>
+                                <h4 class="font-bold text-base text-apple-text mt-2">Krono Dual V3.0</h4>
+                                <p class="text-xs text-apple-gray mt-1">Piques a 2 carriles, falsas salidas y narrador.</p>
+                            </div>
+                        </div>
+
+                        <!-- 6. Krono Personal V3.0 -->
+                        <div onclick="selectProgramForPurchase('Krono Personal V3.0 (5€)', this)" class="pricing-card cursor-pointer bg-white p-4 rounded-2xl shadow-sm border-2 border-transparent hover:border-slot-red hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
+                            <div>
+                                <div class="flex justify-between items-start gap-2">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 group-hover:bg-red-50 group-hover:text-slot-red transition-colors">1 Carril • Webcam</span>
+                                    <div class="text-right">
+                                        <span class="font-sans font-extrabold text-2xl text-apple-text group-hover:text-slot-red transition-colors">5€</span>
+                                    </div>
+                                </div>
+                                <h4 class="font-bold text-base text-apple-text mt-2">Krono Personal V3.0</h4>
+                                <p class="text-xs text-apple-gray mt-1">Visión artificial fotométrica y voz en tiempo real.</p>
                             </div>
                         </div>
                     </div>
@@ -611,12 +681,12 @@
                                 <label class="block text-xs font-bold text-apple-text mb-1" data-i18n="formProgram">Programa a adquirir</label>
                                 <select id="form-program" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-slot-red focus:border-transparent outline-none text-sm bg-gray-50 cursor-pointer font-medium">
                                     <option value="" disabled selected>Selecciona un programa de la lista...</option>
-                                    <option value="Krono Personal V3.0 (5€)">Krono Personal V3.0 — 5 €</option>
-                                    <option value="Krono Dual V3.0 (10€)">Krono Dual V3.0 — 10 €</option>
-                                    <option value="Tracks Telemetry V2.0 (20€)">Tracks Telemetry V2.0 — 20 €</option>
                                     <option value="Krono Personal TV (10€)">Krono Personal TV — 10 €</option>
                                     <option value="Krono Dual TV (15€)">Krono Dual TV — 15 €</option>
                                     <option value="Sector Time V1.0 (15€)">Sector Time V1.0 — 15 €</option>
+                                    <option value="Tracks Telemetry V2.0 (20€)">Tracks Telemetry V2.0 — 20 €</option>
+                                    <option value="Krono Dual V3.0 (10€)">Krono Dual V3.0 — 10 €</option>
+                                    <option value="Krono Personal V3.0 (5€)">Krono Personal V3.0 — 5 €</option>
                                 </select>
                             </div>
                             <div>
@@ -916,6 +986,7 @@
                 footerLegal: "Legal & Contacto", footerTerms: "Términos de Servicio", footerPrivacy: "Política de Privacidad", footerCookies: "Ajustes de Cookies",
                 footerCopy: "Copyright 2026 SlotSoftware. Todos los derechos reservados. Desarrollado 100% con tecnología web y totalmente compatible con Android, iOS, Windows, macOS, Linux, Unix y Smart TV.",
                 promoSoundOn: "Activar Sonido", promoSoundOff: "Silenciar",
+                promoAutoScrollOff: "Fijar Vídeo", promoAutoScrollOn: "Auto-Scroll",
                 cookieTitle: "Privacidad y Cookies", cookieDesc: "Usamos cookies técnicas y analíticas para mejorar tu experiencia en la plataforma.", cookieSettings: "Ajustes", cookieAccept: "Aceptar",
                 cookieModalTitle: "Ajustes de Privacidad", cookieReq: "Técnicas (Obligatorias)", cookieReqDesc: "Necesarias para que la plataforma funcione correctamente.", cookieOpt: "Analíticas (Opcionales)", cookieOptDesc: "Nos ayudan a mejorar el rendimiento y estabilidad de las apps.", cookieSave: "Guardar Preferencias",
                 pricingTitle: "Tarifas y Licencias", pricingSub: "Adquiere tu herramienta definitiva.", pricingLifetime: "Pago único para toda la vida", pricingStep1: "1. Solicita tu Licencia", pricingStep1Desc: "Rellena el formulario para recibir las instrucciones de pago seguras.", formEmail: "Tu Correo Electrónico", formProgram: "Programa a adquirir", formMethod: "Método de pago preferido", formSubmit: "Solicitar Instrucciones", pricingStep2: "¡Solicitud Registrada!", pricingStep2Desc: "Realiza el pago mediante el método seleccionado para finalizar.", paypalClick: "Haz clic aquí para pagar a @slotcarvideo", bizumConcept: "Por favor, indica tu correo en el concepto del Bizum.", paymentCheck: "Una vez verifiquemos el ingreso, te enviaremos la licencia.",
@@ -944,6 +1015,7 @@
                 footerLegal: "Legal & Contact", footerTerms: "Terms of Service", footerPrivacy: "Privacy Policy", footerCookies: "Cookie Settings",
                 footerCopy: "Copyright 2026 SlotSoftware. All rights reserved. 100% web technology compatible with Android, iOS, Windows, macOS, Linux, and Smart TVs.",
                 promoSoundOn: "Unmute", promoSoundOff: "Mute",
+                promoAutoScrollOff: "Pin Video", promoAutoScrollOn: "Auto-Scroll",
                 cookieTitle: "Privacy & Cookies", cookieDesc: "We use technical and analytical cookies to improve your experience on the platform.", cookieSettings: "Settings", cookieAccept: "Accept",
                 cookieModalTitle: "Privacy Settings", cookieReq: "Technical (Required)", cookieReqDesc: "Necessary for the platform to function correctly.", cookieOpt: "Analytical (Optional)", cookieOptDesc: "Help us improve the performance of the apps.", cookieSave: "Save Preferences",
                 pricingTitle: "Rates & Licenses", pricingSub: "Get your ultimate tool.", pricingLifetime: "Lifetime single payment", pricingStep1: "1. Request your License", pricingStep1Desc: "Fill out the form to receive secure payment instructions.", formEmail: "Your Email Address", formProgram: "Program to acquire", formMethod: "Preferred payment method", formSubmit: "Request Instructions", pricingStep2: "Request Registered!", pricingStep2Desc: "Make the payment using the selected method to finish.", paypalClick: "Click here to pay @slotcarvideo", bizumConcept: "Please include your email in the Bizum concept.", paymentCheck: "Once we verify the payment, we will send the license.",
@@ -972,6 +1044,7 @@
                 footerLegal: "Légal & Contact", footerTerms: "Conditions d'Utilisation", footerPrivacy: "Politique de Confidentialité", footerCookies: "Paramètres des Cookies",
                 footerCopy: "Copyright 2026 SlotSoftware. Tous droits réservés.",
                 promoSoundOn: "Activer le son", promoSoundOff: "Couper le son",
+                promoAutoScrollOff: "Figer Vidéo", promoAutoScrollOn: "Auto-Scroll",
                 cookieTitle: "Confidentialité et Cookies", cookieDesc: "Nous utilisons des cookies techniques et analytiques.", cookieSettings: "Paramètres", cookieAccept: "Accepter",
                 cookieModalTitle: "Paramètres de Confidentialité", cookieReq: "Techniques (Obligatoires)", cookieReqDesc: "Nécessaires au bon fonctionnement.", cookieOpt: "Analytiques (Optionnels)", cookieOptDesc: "Nous aident à améliorer les performances.", cookieSave: "Enregistrer",
                 pricingTitle: "Tarifs et Licences", pricingSub: "Obtenez votre outil ultime.", pricingLifetime: "Paiement unique à vie", pricingStep1: "1. Demandez votre licence", pricingStep1Desc: "Remplissez le formulaire pour recevoir les instructions.", formEmail: "Votre Email", formProgram: "Programme à acquérir", formMethod: "Méthode de paiement", formSubmit: "Demander les instructions", pricingStep2: "Demande Enregistrée !", pricingStep2Desc: "Effectuez le paiement pour finaliser.", paypalClick: "Cliquez ici pour payer @slotcarvideo", bizumConcept: "Veuillez inclure votre email dans le concept Bizum.", paymentCheck: "Une fois le paiement vérifié, nous enverrons la licence.",
@@ -1000,6 +1073,7 @@
                 footerLegal: "Legale & Contatti", footerTerms: "Termini di Servizio", footerPrivacy: "Politica sulla Riservatezza", footerCookies: "Impostazioni Cookie",
                 footerCopy: "Copyright 2026 SlotSoftware. Tutti i diritti riservati.",
                 promoSoundOn: "Attiva audio", promoSoundOff: "Disattiva audio",
+                promoAutoScrollOff: "Fissa Video", promoAutoScrollOn: "Auto-Scroll",
                 cookieTitle: "Privacy e Cookie", cookieDesc: "Utilizziamo cookie tecnici e analitici.", cookieSettings: "Impostazioni", cookieAccept: "Accetta",
                 cookieModalTitle: "Impostazioni Privacy", cookieReq: "Tecnici (Obbligatori)", cookieReqDesc: "Necessari per il funzionamento.", cookieOpt: "Analitici (Opzionali)", cookieOptDesc: "Ci aiutano a migliorare le prestazioni.", cookieSave: "Salva Preferenze",
                 pricingTitle: "Tariffe e Licenze", pricingSub: "Ottieni il tuo strumento definitivo.", pricingLifetime: "Pagamento unico a vita", pricingStep1: "1. Richiedi la tua licenza", pricingStep1Desc: "Compila il modulo per ricevere le istruzioni.", formEmail: "La tua email", formProgram: "Programma da acquisire", formMethod: "Metodo di pagamento", formSubmit: "Richiedi Istruzioni", pricingStep2: "Richiesta Registrata!", pricingStep2Desc: "Effettua il pagamento tramite il metodo selezionato.", paypalClick: "Clicca qui per pagare @slotcarvideo", bizumConcept: "Si prega di includere l'e-mail nel concetto Bizum.", paymentCheck: "Una volta verificato il pagamento, invieremo la licenza.",
@@ -1014,30 +1088,6 @@
         };
 
         const programs = [
-            {
-                id: 'krono-personal-v3', img: '6.jpg', imgStartId: 12, link: 'https://slotsoftware.github.io/TiemposPersonal/',
-                title: { es: "Krono Personal V3.0", en: "Krono Personal V3.0", fr: "Krono Personal V3.0", it: "Krono Personal V3.0" },
-                desc: { es: "Cronometraje profesional para un solo carril mediante visión artificial.", en: "Professional single-lane timing via artificial vision.", fr: "Chronométrage professionnel par vision artificielle.", it: "Cronometraggio professionale tramite visione artificiale." },
-                descLong: { es: "La solución definitiva para el piloto solitario que busca la perfección. Krono Personal V3.0 transforma tu webcam en un juez de línea implacable.", en: "The ultimate solution for the solo racer.", fr: "La solution ultime pour le pilote solitaire.", it: "La soluzione definitiva per il pilota solitario." },
-                features: { es: ["Detección por Visión Artificial", "Precisión de Milésimas", "Historial de Vueltas Detallado", "Síntesis de Voz en Español"], en: ["Artificial Vision Detection", "Thousandths Precision", "Detailed Lap History", "Speech Synthesis"], fr: ["Détection par Vision Artificielle", "Précision Milliseconde", "Historique", "Synthèse Vocale"], it: ["Rilevamento Visione Artificiale", "Precisione Millesimi", "Cronologia", "Sintesi Vocale"] },
-                galleryTexts: { es: { "krono-personal.mp4": "Vídeo Presentación Krono Personal V3.0", "12.jpg": "Pantalla principal de entrenamiento con los mejores tiempos del piloto." } }
-            },
-            {
-                id: 'krono-dual-v3', img: '7.jpg', imgStartId: 42, link: 'https://slotsoftware.github.io/TiemposDual/',
-                title: { es: "Krono Dual V3.0", en: "Krono Dual V3.0", fr: "Krono Dual V3.0", it: "Krono Dual V3.0" },
-                desc: { es: "El sistema definitivo para piques 1vs1. Controla dos carriles simultáneamente.", en: "The ultimate system for 1vs1 duels.", fr: "Le système ultime pour les duels 1vs1.", it: "Il sistema definitivo per i duelli 1vs1." },
-                descLong: { es: "Lleva la emoción de la competición a tu hogar. Krono Dual V3.0 está diseñado específicamente para duelos intensos.", en: "Bring excitement to your home.", fr: "Apportez l'excitation chez vous.", it: "Porta l'emozione a casa tua." },
-                features: { es: ["Cronometraje de 2 Carriles", "Control de Falsas Salidas", "Semáforo Visual y Sonoro", "Narración de Carrera"], en: ["2-Lane Timing", "False Start Control", "Visual/Audio Lights", "Race Narration"], fr: ["Chronométrage 2 Voies", "Contrôle Faux Départs", "Feux", "Narration"], it: ["Cronometraggio 2 Corsie", "Controllo False Partenze", "Semaforo", "Narrazione"] },
-                galleryTexts: { es: { "krono-dual.mp4": "Vídeo Presentación Krono Dual V3.0" } }
-            },
-            {
-                id: 'tracks-telemetry-v2', img: '8.jpg', imgStartId: 72, link: 'https://slotsoftware.github.io/Telemetria/',
-                title: { es: "Tracks Telemetry V2.0", en: "Tracks Telemetry V2.0", fr: "Tracks Telemetry V2.0", it: "Tracks Telemetry V2.0" },
-                desc: { es: "Suite completa de ingeniería. Diseña circuitos en 2D y visualízalos en 3D.", en: "Complete engineering suite.", fr: "Suite d'ingénierie complète.", it: "Suite di ingegneria completa." },
-                descLong: { es: "Tracks Telemetry V2.0 es el sueño de cualquier diseñador de pistas.", en: "The dream of any track designer.", fr: "Le rêve de tout concepteur de piste.", it: "Il sogno di ogni progettista di piste." },
-                features: { es: ["Diseñador 2D Multi-Marca", "Visualizador 3D Hiperrealista", "Garaje Interactivo", "Generación de Fichas en PDF"], en: ["Multi-Brand 2D Designer", "3D Viewer", "Interactive Garage", "PDF Generation"], fr: ["Concepteur 2D Multi-Marques", "Visualiseur 3D", "Garage Interactif", "PDF"], it: ["Progettista 2D Multi-Marca", "Visualizzatore 3D", "Garage Interattivo", "PDF"] },
-                galleryTexts: { es: {} }
-            },
             {
                 id: 'krono-personal-tv', img: '9.jpg', imgStartId: 121, link: 'https://slotsoftware.github.io/KronoPerTV/',
                 title: { es: "Krono Personal TV", en: "Krono Personal TV", fr: "Krono Personal TV", it: "Krono Personal TV" },
@@ -1058,9 +1108,33 @@
                 id: 'sector-time-v1', img: '11.jpg', imgStartId: 181, link: 'https://slotsoftware.github.io/SectorTime/',
                 title: { es: "Sector Time V1.0", en: "Sector Time V1.0", fr: "Sector Time V1.0", it: "Sector Time V1.0" },
                 desc: { es: "Herramienta de análisis sectorial.", en: "Sector analysis tool.", fr: "Outil d'analyse sectorielle.", it: "Strumento di analisi settoriale." },
-                descLong: { es: "Para los ingenieros de pista más exigentes. Divide y analiza.", en: "For demanding track engineers.", fr: "Pour les ingénieurs exigeants.", it: "Per ingegneri esigenti." },
+                descLong: { es: "Para los ingenieros de pista más exigentes. Divide y analiza.", en: "For demanding track engineers.", fr: "Pour les ingegneri esigenti.", it: "Per ingegneri esigenti." },
                 features: { es: ["Cronometraje por Sectores", "Análisis de Velocidad", "Gráficos Ganancia/Pérdida", "Integración Krono V3"], en: ["Sector Timing", "Speed Analysis", "Charts", "Krono Integration"], fr: ["Chronométrage Secteurs", "Analyse Vitesse", "Graphiques", "Intégration"], it: ["Cronometraggio Settori", "Analisi Velocità", "Grafici", "Integrazione"] },
                 galleryTexts: { es: {} }
+            },
+            {
+                id: 'tracks-telemetry-v2', img: '8.jpg', imgStartId: 72, link: 'https://slotsoftware.github.io/Telemetria/',
+                title: { es: "Tracks Telemetry V2.0", en: "Tracks Telemetry V2.0", fr: "Tracks Telemetry V2.0", it: "Tracks Telemetry V2.0" },
+                desc: { es: "Suite completa de ingeniería. Diseña circuitos en 2D y visualízalos en 3D.", en: "Complete engineering suite.", fr: "Suite d'ingénierie complète.", it: "Suite di ingegneria completa." },
+                descLong: { es: "Tracks Telemetry V2.0 es el sueño de cualquier diseñador de pistas.", en: "The dream of any track designer.", fr: "Le rêve de tout concepteur de piste.", it: "Il sogno di ogni progettista di piste." },
+                features: { es: ["Diseñador 2D Multi-Marca", "Visualizador 3D Hiperrealista", "Garaje Interactivo", "Generación de Fichas en PDF"], en: ["Multi-Brand 2D Designer", "3D Viewer", "Interactive Garage", "PDF Generation"], fr: ["Concepteur 2D Multi-Marques", "Visualiseur 3D", "Garage Interactif", "PDF"], it: ["Progettista 2D Multi-Marca", "Visualizzatore 3D", "Garage Interattivo", "PDF"] },
+                galleryTexts: { es: {} }
+            },
+            {
+                id: 'krono-dual-v3', img: '7.jpg', imgStartId: 42, link: 'https://slotsoftware.github.io/TiemposDual/',
+                title: { es: "Krono Dual V3.0", en: "Krono Dual V3.0", fr: "Krono Dual V3.0", it: "Krono Dual V3.0" },
+                desc: { es: "El sistema definitivo para piques 1vs1. Controla dos carriles simultáneamente.", en: "The ultimate system for 1vs1 duels.", fr: "Le système ultime pour les duels 1vs1.", it: "Il sistema definitivo per i duelli 1vs1." },
+                descLong: { es: "Lleva la emoción de la competición a tu hogar. Krono Dual V3.0 está diseñado específicamente para duelos intensos.", en: "Bring excitement to your home.", fr: "Apportez l'excitation chez vous.", it: "Porta l'emozione a casa tua." },
+                features: { es: ["Cronometraje de 2 Carriles", "Control de Falsas Salidas", "Semáforo Visual y Sonoro", "Narración de Carrera"], en: ["2-Lane Timing", "False Start Control", "Visual/Audio Lights", "Race Narration"], fr: ["Chronométrage 2 Voies", "Contrôle Faux Départs", "Feux", "Narration"], it: ["Cronometraggio 2 Corsie", "Controllo False Partenze", "Semaforo", "Narrazione"] },
+                galleryTexts: { es: { "krono-dual.mp4": "Vídeo Presentación Krono Dual V3.0" } }
+            },
+            {
+                id: 'krono-personal-v3', img: '6.jpg', imgStartId: 12, link: 'https://slotsoftware.github.io/TiemposPersonal/',
+                title: { es: "Krono Personal V3.0", en: "Krono Personal V3.0", fr: "Krono Personal V3.0", it: "Krono Personal V3.0" },
+                desc: { es: "Cronometraje profesional para un solo carril mediante visión artificial.", en: "Professional single-lane timing via artificial vision.", fr: "Chronométrage professionnel par vision artificielle.", it: "Cronometraggio professionale tramite visione artificiale." },
+                descLong: { es: "La solución definitiva para el piloto solitario que busca la perfección. Krono Personal V3.0 transforma tu webcam en un juez de línea implacable.", en: "The ultimate solution for the solo racer.", fr: "La solution ultime pour le pilote solitaire.", it: "La soluzione definitiva per il pilota solitario." },
+                features: { es: ["Detección por Visión Artificial", "Precisión de Milésimas", "Historial de Vueltas Detallado", "Síntesis de Voz en Español"], en: ["Artificial Vision Detection", "Thousandths Precision", "Detailed Lap History", "Speech Synthesis"], fr: ["Détection par Vision Artificielle", "Précision Milliseconde", "Historique", "Synthèse Vocale"], it: ["Rilevamento Visione Artificiale", "Precisione Millesimi", "Cronologia", "Sintesi Vocale"] },
+                galleryTexts: { es: { "krono-personal.mp4": "Vídeo Presentación Krono Personal V3.0", "12.jpg": "Pantalla principal de entrenamiento con los mejores tiempos del piloto." } }
             }
         ];
 
@@ -1585,22 +1659,111 @@
             isMusicPlaying = !isMusicPlaying;
         }
 
+        // Lógica del Carrusel de 5 Vídeos de Publicidad
+        let currentPromoSlide = 0;
+        const totalPromoSlides = 5;
+        let promoInterval = null;
+        let isPromoMuted = true;
+        let isPromoAutoScroll = true;
+
+        function updatePromoCarousel() {
+            const track = document.getElementById('promo-track');
+            if (!track) return;
+            track.style.transform = `translateX(-${currentPromoSlide * 100}%)`;
+
+            const dots = document.querySelectorAll('.promo-dot');
+            dots.forEach((dot, idx) => {
+                if (idx === currentPromoSlide) {
+                    dot.classList.remove('w-2', 'bg-white/60');
+                    dot.classList.add('w-6', 'bg-slot-red');
+                } else {
+                    dot.classList.remove('w-6', 'bg-slot-red');
+                    dot.classList.add('w-2', 'bg-white/60');
+                }
+            });
+
+            // Sincronizar audio solo con el vídeo visible en este momento
+            const videos = document.querySelectorAll('.promo-video-item');
+            videos.forEach((vid, idx) => {
+                vid.muted = isPromoMuted || (idx !== currentPromoSlide);
+            });
+        }
+
+        function startPromoAutoSlide() {
+            clearInterval(promoInterval);
+            if (!isPromoAutoScroll) return;
+            promoInterval = setInterval(() => {
+                currentPromoSlide = (currentPromoSlide + 1) % totalPromoSlides;
+                updatePromoCarousel();
+            }, 5000);
+        }
+
+        function togglePromoAutoScroll(e) {
+            if (e) e.stopPropagation();
+            isPromoAutoScroll = !isPromoAutoScroll;
+            const iconPause = document.getElementById('promo-icon-autoscroll-pause');
+            const iconPlay = document.getElementById('promo-icon-autoscroll-play');
+            const textBtn = document.getElementById('promo-autoscroll-text');
+            const btn = document.getElementById('promo-autoscroll-btn');
+
+            if (isPromoAutoScroll) {
+                iconPause.classList.remove('hidden');
+                iconPause.classList.add('block');
+                iconPlay.classList.add('hidden');
+                iconPlay.classList.remove('block');
+                textBtn.innerText = i18nData[currentLang].promoAutoScrollOff || "Fijar Vídeo";
+                btn.classList.remove('bg-slot-red/90', 'border-red-300');
+                btn.classList.add('bg-black/60', 'border-white/20');
+                startPromoAutoSlide();
+            } else {
+                clearInterval(promoInterval);
+                iconPause.classList.add('hidden');
+                iconPause.classList.remove('block');
+                iconPlay.classList.remove('hidden');
+                iconPlay.classList.add('block');
+                textBtn.innerText = i18nData[currentLang].promoAutoScrollOn || "Auto-Scroll";
+                btn.classList.remove('bg-black/60', 'border-white/20');
+                btn.classList.add('bg-slot-red/90', 'border-red-300');
+            }
+        }
+
+        function nextPromoSlide(e) {
+            if (e) e.stopPropagation();
+            currentPromoSlide = (currentPromoSlide + 1) % totalPromoSlides;
+            updatePromoCarousel();
+            startPromoAutoSlide();
+        }
+
+        function prevPromoSlide(e) {
+            if (e) e.stopPropagation();
+            currentPromoSlide = (currentPromoSlide - 1 + totalPromoSlides) % totalPromoSlides;
+            updatePromoCarousel();
+            startPromoAutoSlide();
+        }
+
+        function goToPromoSlide(index, e) {
+            if (e) e.stopPropagation();
+            currentPromoSlide = index;
+            updatePromoCarousel();
+            startPromoAutoSlide();
+        }
+
         function togglePromoSound(e) {
             if(e) e.preventDefault();
-            const video = document.getElementById('promo-video');
             const iconMuted = document.getElementById('promo-icon-muted');
             const iconUnmuted = document.getElementById('promo-icon-unmuted');
             const textBtn = document.getElementById('promo-sound-text');
             
-            if (video.muted) {
-                video.muted = false;
+            isPromoMuted = !isPromoMuted;
+            updatePromoCarousel();
+
+            if (!isPromoMuted) {
                 iconMuted.classList.add('hidden');
                 iconMuted.classList.remove('block');
                 iconUnmuted.classList.remove('hidden');
                 iconUnmuted.classList.add('block');
                 textBtn.innerText = i18nData[currentLang].promoSoundOff || "Silenciar";
             } else {
-                video.muted = true;
                 iconUnmuted.classList.add('hidden');
                 iconUnmuted.classList.remove('block');
                 iconMuted.classList.remove('hidden');
@@ -1609,30 +1772,148 @@
             }
         }
 
+        // Coreografía de Morphing Estilo "Mosaico Bento Arquitectónico" (Encaje perfecto de bloques con curvas opuestas cada 3 segundos)
+        const heroMorphFormations = [
+            {
+                name: "Mosaico Paddock Bento",
+                pieces: [
+                    // La opción 5 original: Gran bloque izq, 2 arriba/centro dcha, 1 píldora circular y base panorámica
+                    { top: '2%',  left: '2%',  width: '46%', height: '62%', radius: '64px 16px 64px 16px', rotate: '0deg', z: 25 },
+                    { top: '2%',  left: '50%', width: '48%', height: '30%', radius: '16px 64px 16px 16px', rotate: '0deg', z: 25 },
+                    { top: '34%', left: '50%', width: '23%', height: '30%', radius: '50%', rotate: '0deg', z: 35 },
+                    { top: '34%', left: '75%', width: '23%', height: '64%', radius: '16px 16px 64px 16px', rotate: '0deg', z: 25 },
+                    { top: '66%', left: '2%',  width: '71%', height: '32%', radius: '16px 64px 16px 64px', rotate: '0deg', z: 30 }
+                ]
+            },
+            {
+                name: "Bento Simétrico de Control",
+                pieces: [
+                    // Pantalla central circular/cápsula gigante flanqueada por 4 módulos angulares en las esquinas que la abrazan
+                    { top: '18%', left: '29%', width: '42%', height: '64%', radius: '90px 24px 90px 24px', rotate: '0deg', z: 40 },
+                    { top: '2%',  left: '2%',  width: '25%', height: '47%', radius: '64px 16px 16px 16px', rotate: '0deg', z: 25 },
+                    { top: '2%',  left: '73%', width: '25%', height: '47%', radius: '16px 64px 16px 16px', rotate: '0deg', z: 25 },
+                    { top: '51%', left: '2%',  width: '25%', height: '47%', radius: '16px 16px 16px 64px', rotate: '0deg', z: 25 },
+                    { top: '51%', left: '73%', width: '25%', height: '47%', radius: '16px 16px 64px 16px', rotate: '0deg', z: 25 }
+                ]
+            },
+            {
+                name: "Bento Telemetría Invertido",
+                pieces: [
+                    // Espejo asimétrico: Gran columna derecha curva, cabecera panorámica izquierda y 3 módulos encajados abajo
+                    { top: '2%',  left: '54%', width: '44%', height: '64%', radius: '16px 72px 16px 72px', rotate: '0deg', z: 30 },
+                    { top: '2%',  left: '2%',  width: '50%', height: '31%', radius: '72px 16px 16px 16px', rotate: '0deg', z: 25 },
+                    { top: '35%', left: '2%',  width: '24%', height: '63%', radius: '16px 16px 16px 72px', rotate: '0deg', z: 25 },
+                    { top: '35%', left: '28%', width: '24%', height: '31%', radius: '50%', rotate: '0deg', z: 35 },
+                    { top: '68%', left: '28%', width: '70%', height: '30%', radius: '64px 16px 72px 16px', rotate: '0deg', z: 30 }
+                ]
+            },
+            {
+                name: "Bento Galería de Boxes",
+                pieces: [
+                    // Gran monitor panorámico superior y 4 columnas inferiores con arcos alternos estilo cockpit
+                    { top: '2%',  left: '2%',  width: '96%', height: '44%', radius: '64px 64px 16px 16px', rotate: '0deg', z: 30 },
+                    { top: '48%', left: '2%',  width: '22.5%', height: '50%', radius: '16px 48px 16px 64px', rotate: '0deg', z: 25 },
+                    { top: '48%', left: '26.5%', width: '22.5%', height: '50%', radius: '48px 16px 48px 16px', rotate: '0deg', z: 35 },
+                    { top: '48%', left: '51%', width: '22.5%', height: '50%', radius: '16px 48px 16px 48px', rotate: '0deg', z: 35 },
+                    { top: '48%', left: '75.5%', width: '22.5%', height: '50%', radius: '48px 16px 64px 16px', rotate: '0deg', z: 25 }
+                ]
+            },
+            {
+                name: "Bento Turbina Modular",
+                pieces: [
+                    // 4 bloques alargados dispuestos en espiral cuadrada dejando una cápsula circular perfecta en el centro
+                    { top: '33%', left: '35%', width: '30%', height: '34%', radius: '50%', rotate: '0deg', z: 40 },
+                    { top: '2%',  left: '2%',  width: '63%', height: '29%', radius: '64px 16px 48px 16px', rotate: '0deg', z: 25 },
+                    { top: '2%',  left: '67%', width: '31%', height: '65%', radius: '16px 64px 16px 48px', rotate: '0deg', z: 25 },
+                    { top: '69%', left: '35%', width: '63%', height: '29%', radius: '48px 16px 64px 16px', rotate: '0deg', z: 25 },
+                    { top: '33%', left: '2%',  width: '31%', height: '65%', radius: '16px 48px 16px 64px', rotate: '0deg', z: 25 }
+                ]
+            },
+            {
+                name: "Bento Tríptico & Cápsulas",
+                pieces: [
+                    // Columna maestra central alta con dos módulos gemelos a cada lado de curvas contrapuestas
+                    { top: '2%',  left: '33%', width: '34%', height: '96%', radius: '999px', rotate: '0deg', z: 35 },
+                    { top: '2%',  left: '2%',  width: '29%', height: '56%', radius: '64px 20px 64px 20px', rotate: '0deg', z: 25 },
+                    { top: '60%', left: '2%',  width: '29%', height: '38%', radius: '20px 64px 20px 64px', rotate: '0deg', z: 25 },
+                    { top: '2%',  left: '69%', width: '29%', height: '38%', radius: '20px 64px 20px 64px', rotate: '0deg', z: 25 },
+                    { top: '42%', left: '69%', width: '29%', height: '56%', radius: '64px 20px 64px 20px', rotate: '0deg', z: 25 }
+                ]
+            }
+        ];
+
+        let currentMorphIndex = 0;
+
+        function applyHeroMorphFormation(index) {
+            const formation = heroMorphFormations[index];
+            if (!formation) return;
+
+            const label = document.getElementById('morph-formation-label');
+            if (label) {
+                label.innerText = `Formación: ${formation.name}`;
+            }
+
+            formation.pieces.forEach((cfg, i) => {
+                const el = document.getElementById(`hero-piece-${i}`);
+                if (!el) return;
+                el.style.top = cfg.top;
+                el.style.left = cfg.left;
+                el.style.width = cfg.width;
+                el.style.height = cfg.height;
+                el.style.borderRadius = cfg.radius;
+                el.style.transform = `rotate(${cfg.rotate || '0deg'})`;
+                el.style.zIndex = cfg.z || 20;
+            });
+        }
+
+        function startHeroMorphLoop() {
+            applyHeroMorphFormation(0);
+            setInterval(() => {
+                currentMorphIndex = (currentMorphIndex + 1) % heroMorphFormations.length;
+                applyHeroMorphFormation(currentMorphIndex);
+            }, 3000);
+        }
+
+        // Soporte táctil (Swipe) para el carrusel de vídeos
+        function setupPromoSwipe() {
+            const carousel = document.getElementById('promo-carousel');
+            if (!carousel) return;
+            let startX = 0;
+            carousel.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            }, { passive: true });
+            carousel.addEventListener('touchend', (e) => {
+                const diff = startX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 40) {
+                    if (diff > 0) nextPromoSlide();
+                    else prevPromoSlide();
+                }
+            }, { passive: true });
+        }
+
+        // Inicialización principal al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
             changeLanguage(currentLang);
+            startPromoAutoSlide();
+            setupPromoSwipe();
+            startHeroMorphLoop();
 
             if (!localStorage.getItem('cookiesAccepted')) {
                 setTimeout(() => {
-                    document.getElementById('cookie-banner').classList.remove('translate-y-[200%]');
+                    const banner = document.getElementById('cookie-banner');
+                    if (banner) banner.classList.remove('translate-y-[200%]');
                 }, 2000);
             }
 
             document.addEventListener('click', (e) => {
                 const mobileMenu = document.getElementById('mobile-menu');
                 const menuButton = document.querySelector('button[onclick="toggleMobileMenu()"]');
-                if (!mobileMenu.classList.contains('hidden') && !mobileMenu.contains(e.target) && !menuButton.contains(e.target)) {
+                if (mobileMenu && !mobileMenu.classList.contains('hidden') && !mobileMenu.contains(e.target) && menuButton && !menuButton.contains(e.target)) {
                     toggleMobileMenu();
                 }
             });
         });
 
-        // ==========================================
-        // SISTEMA DE SEGUIMIENTO Y NOTIFICACIONES (EmailJS)
-        // ==========================================
-        // SISTEMA DE SEGUIMIENTO Y NOTIFICACIONES (Web3Forms)
-        // ==========================================
-        // SISTEMA DE SEGUIMIENTO Y NOTIFICACIONES (Web3Forms Infalible)
         // ==========================================
         // SISTEMA DE SEGUIMIENTO DOBLE: NUBE FIREBASE EN TIEMPO REAL + CORREO WEB3FORMS
         // ==========================================
@@ -1726,7 +2007,6 @@
             reportSent: false,
             
             init() {
-                // 1. Rastrear qué secciones mira el usuario haciendo scroll
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting && entry.target.id) {
@@ -1738,7 +2018,6 @@
                 
                 document.querySelectorAll('section, header, footer').forEach(el => observer.observe(el));
 
-                // 2. Interceptar clicks en las galerías
                 const originalOpenModal = window.openModal;
                 window.openModal = (progId) => {
                     this.programsClicked.add(progId);
@@ -1746,14 +2025,12 @@
                     if(originalOpenModal) originalOpenModal(progId);
                 };
 
-                // 3. Interceptar si abren la ventana de precios
                 const originalOpenPricing = window.openPricingModal;
                 window.openPricingModal = () => {
                     this.logAction('Consultó Tarifas y Licencias');
                     if(originalOpenPricing) originalOpenPricing();
                 };
 
-                // 4. Interceptar clics en enlaces externos (WhatsApp, PayPal, Demos)
                 document.addEventListener('click', (e) => {
                     const link = e.target.closest('a[target="_blank"]');
                     if (link) {
@@ -1768,17 +2045,14 @@
                     }
                 });
 
-                // 5. Actualizar en la nube de Firebase cada 10 segundos mientras el usuario sigue en la web
                 setInterval(() => {
                     if (document.visibilityState === 'visible') {
                         this.syncToCloud();
                     }
                 }, 10000);
 
-                // Registrar la entrada inicial a los 3 segundos
                 setTimeout(() => this.syncToCloud(), 3000);
 
-                // 6. Detectar salida para el envío por correo
                 document.addEventListener('visibilitychange', () => {
                     if (document.visibilityState === 'hidden') {
                         this.syncToCloud();
@@ -1798,7 +2072,7 @@
             },
 
             syncToCloud() {
-                if (window.isAdmin) return; // No ensuciar las estadísticas cuando tú entras como Admin
+                if (window.isAdmin) return;
                 const timeSpent = Math.floor((Date.now() - this.startTime) / 1000);
                 const minutes = Math.floor(timeSpent / 60);
                 const seconds = timeSpent % 60;
